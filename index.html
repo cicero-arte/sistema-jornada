@@ -299,7 +299,12 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
     <div class="splash-titulo">Jornada do Desenho em Espiral</div>
     <div class="splash-subtitulo">Sistema de gestão pedagógica</div>
     <div class="splash-frase">O curso não tem começo nem fim definidos. Cada aluno entra e sai em qualquer ponto. Os conteúdos se repetem em níveis crescentes de profundidade, como uma espiral que sempre revisita os mesmos núcleos com mais complexidade.</div>
-    <button class="splash-btn" onclick="document.getElementById('splash').style.display='none'">Entrar na Jornada</button>
+    <button class="splash-btn" onclick="verificarSenha()">Entrar na Jornada</button>
+    <div id="splash-senha-wrap" style="display:none;width:100%;max-width:320px;margin:0 auto;">
+      <input type="password" id="splash-senha-input" placeholder="Senha de acesso" style="width:100%;padding:12px 16px;border:1.5px solid #1a1a1a;border-radius:8px;font-family:'Lato',sans-serif;font-size:15px;margin-bottom:10px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')confirmarSenha()">
+      <button class="splash-btn" onclick="confirmarSenha()" style="margin-top:0;">Confirmar</button>
+      <div id="splash-senha-erro" style="color:#c0392b;font-size:12px;margin-top:8px;display:none;">Senha incorreta. Tente novamente.</div>
+    </div>
     <div class="splash-contato">Cícero Lopes · CL Graphic Design &amp; Ilustração · <a href="https://www.cicero.art.br" target="_blank">cicero.art.br</a></div>
   </div>
 </div>
@@ -1815,11 +1820,12 @@ function preencherConfig(){['empresa','cnpj','rep','qual','cpf','end','local','l
 
 async function iniciar(){
   const splash = document.getElementById('splash');
-  if(splash) splash.style.display='flex';
+  const jaAutenticado = verificarAcesso();
+  if(splash && !jaAutenticado) splash.style.display='flex';
   await carregar();
   popularMeses();
   renderAlunos();
-  if(splash) splash.style.display='none';
+  if(splash && jaAutenticado) splash.style.display='none';
 }
 iniciar();
 
@@ -2033,7 +2039,50 @@ function avalToggleRubrica() {
   else { el.classList.add('open'); lnk.textContent = '▲ ocultar tabela'; }
 }
 
-// ── EXPOSIÇÃO GLOBAL (necessária com type="module") ──────
+// ── SENHA DE ACESSO ──────────────────────────────────────
+const SENHA_HASH = '5064583e18550f2dabf630be60b2b4dd20b5b66c1bc7d534e3c5166d00087d39';
+
+async function hashSenha(senha) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(senha);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function verificarAcesso() {
+  const expiry = localStorage.getItem('jornada_auth_expiry');
+  if (expiry && Date.now() < parseInt(expiry)) {
+    return true;
+  }
+  localStorage.removeItem('jornada_auth_expiry');
+  return false;
+}
+
+function verificarSenha() {
+  document.getElementById('splash-senha-wrap').style.display = 'block';
+  document.querySelector('.splash-btn').style.display = 'none';
+  setTimeout(() => document.getElementById('splash-senha-input').focus(), 100);
+}
+
+async function confirmarSenha() {
+  const input = document.getElementById('splash-senha-input').value;
+  const hash = await hashSenha(input);
+  const erroEl = document.getElementById('splash-senha-erro');
+  if (hash === SENHA_HASH) {
+    const expiry = Date.now() + (10 * 24 * 60 * 60 * 1000); // 10 dias
+    localStorage.setItem('jornada_auth_expiry', String(expiry));
+    document.getElementById('splash').style.display = 'none';
+    erroEl.style.display = 'none';
+  } else {
+    erroEl.style.display = 'block';
+    document.getElementById('splash-senha-input').value = '';
+    document.getElementById('splash-senha-input').focus();
+  }
+}
+
+
+window.verificarSenha=verificarSenha; window.confirmarSenha=confirmarSenha;
 window.abrirModal=abrirModal; window.abrirNFSe=abrirNFSe; window.avalImprimir=avalImprimir;
 window.avalReset=avalReset; window.avalSelNota=avalSelNota; window.avalSelecionarAluno=avalSelecionarAluno;
 window.avalToggleEscala=avalToggleEscala; window.avalToggleRubrica=avalToggleRubrica;
