@@ -29,6 +29,10 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
 .nav-btn{flex:1;padding:13px 4px;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;color:#ffffff55;background:none;border:none;cursor:pointer;transition:all 0.2s;}
 .nav-btn.ativo{color:#fff;background:#ffffff18;border-bottom:2px solid var(--warm);}
 .nav-btn:hover:not(.ativo){color:#fff;}
+.nav-salvar{padding:8px 14px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:#fff;background:#ffffff22;border:1.5px solid #ffffff44;border-radius:7px;cursor:pointer;transition:all 0.2s;white-space:nowrap;margin:auto 10px auto auto;}
+.nav-salvar:hover{background:#ffffff33;}
+.nav-salvar.salvando{opacity:0.6;cursor:wait;}
+.nav-salvar.erro{background:#c0392b88;border-color:#e74c3c;}
 .nav-hamburger{display:none;}
 .nav-menu{display:none;}
 .app{background:var(--card);border-radius:0 0 12px 12px;border:1px solid var(--border);border-top:none;}
@@ -325,6 +329,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
   <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this)">📋 <span>Avaliação</span></button>
   <button class="nav-btn" data-tela="email" onclick="ir('email',this)">✉️ <span>E-mail</span></button>
   <button class="nav-btn" data-tela="config" onclick="ir('config',this)">⚙️ <span>Config</span></button>
+  <button class="nav-salvar" id="btn-salvar-forcado" onclick="salvarForcado()">💾 Salvar</button>
   <div class="nav-menu" id="nav-menu">
     <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this);fecharNavMenu()">👥 Alunos</button>
     <button class="nav-btn" data-tela="frequencia" onclick="ir('frequencia',this);fecharNavMenu()">📅 Frequência</button>
@@ -797,21 +802,48 @@ const DOC_REF = doc(db, "sistema", "dados");
 
 let _salvandoDebounce = null;
 
+function _payload(){
+  return {
+    alunos: JSON.stringify(alunos),
+    pid: pid,
+    statusItens: JSON.stringify(statusItens),
+    notasItens: JSON.stringify(notasItens),
+    cfg: JSON.stringify(cfg),
+    vrSet: JSON.stringify([...vrSet])
+  };
+}
+
 function salvar(){
   clearTimeout(_salvandoDebounce);
   _salvandoDebounce = setTimeout(async ()=>{
     try{
-      await setDoc(DOC_REF,{
-        alunos: JSON.stringify(alunos),
-        pid: pid,
-        statusItens: JSON.stringify(statusItens),
-        notasItens: JSON.stringify(notasItens),
-        cfg: JSON.stringify(cfg),
-        vrSet: JSON.stringify([...vrSet])
-      });
+      await setDoc(DOC_REF, _payload());
       showToast();
     }catch(e){ console.error('Erro ao salvar:', e); }
   }, 600);
+}
+
+async function salvarForcado(){
+  const btn = document.getElementById('btn-salvar-forcado');
+  if(!btn) return;
+  btn.textContent = '⏳ Salvando…';
+  btn.classList.add('salvando');
+  btn.classList.remove('erro');
+  btn.disabled = true;
+  try{
+    await setDoc(DOC_REF, _payload());
+    btn.textContent = '✓ Salvo!';
+    btn.classList.remove('salvando','erro');
+    setTimeout(()=>{ btn.textContent='💾 Salvar'; btn.disabled=false; }, 2000);
+    showToast();
+  }catch(e){
+    console.error('Erro ao salvar forçado:', e);
+    btn.textContent = '✗ Erro: ' + (e.code || e.message || 'falha');
+    btn.classList.remove('salvando');
+    btn.classList.add('erro');
+    btn.disabled = false;
+    setTimeout(()=>{ btn.textContent='💾 Salvar'; btn.classList.remove('erro'); }, 5000);
+  }
 }
 
 async function carregar(){
@@ -2105,7 +2137,7 @@ window.pixPreview=pixPreview; window.pixQrRemover=pixQrRemover; window.pixQrSalv
 window.pixQrCarregar=pixQrCarregar; window.resetarCert=resetarCert;
 window.richAplicarData=richAplicarData; window.richAplicarTag=richAplicarTag;
 window.richAplicarTexto=richAplicarTexto; window.richAplicarTitulo=richAplicarTitulo;
-window.richCmd=richCmd; window.salvarConfig=salvarConfig; window.salvarRPS=salvarRPS;
+window.richCmd=richCmd; window.salvarConfig=salvarConfig; window.salvarRPS=salvarRPS; window.salvarForcado=salvarForcado;
 window.selecionarNivel=selecionarNivel; window.setPag=setPag; window.toggleCard=toggleCard;
 window.toggleFreqCard=toggleFreqCard; window.toggleFreq=toggleFreq;
 window.toggleNavMenu=toggleNavMenu; window.trocarCert=trocarCert; window.verContrato=verContrato;
