@@ -813,6 +813,18 @@ function _payload(){
   };
 }
 
+let _salvandoImediatoDebounce = null;
+
+function salvarImediato(){
+  clearTimeout(_salvandoImediatoDebounce);
+  _salvandoImediatoDebounce = setTimeout(async ()=>{
+    try{
+      await setDoc(DOC_REF, _payload());
+      showToast();
+    }catch(e){ console.error('Erro ao salvar obs:', e); }
+  }, 300);
+}
+
 function salvar(){
   clearTimeout(_salvandoDebounce);
   _salvandoDebounce = setTimeout(async ()=>{
@@ -1583,7 +1595,7 @@ function renderFreq(){
           <label for="${idF}">Falta</label>
         </div>
         <textarea class="freq-obs" placeholder="Observação..."
-          onblur="salvarObs(${a.id},'${kO}',this.value)">${obsV}</textarea>
+          oninput="salvarObs(${a.id},'${kO}',this.value)">${obsV}</textarea>
       </div>`;
     }).join('');
     return `<div class="freq-card">
@@ -1618,7 +1630,7 @@ function toggleFreq(aid,keyOn,keyOff,idOff,checked){
   }
   salvar();
 }
-function salvarObs(aid,key,val){const a=alunos.find(x=>x.id===aid);if(!a)return;if(!a.freq)a.freq={};a.freq[key]=val;salvar();}
+function salvarObs(aid,key,val){const a=alunos.find(x=>x.id===aid);if(!a)return;if(!a.freq)a.freq={};a.freq[key]=val;salvarImediato();}
 
 // ── FINANCEIRO ───────────────────────────────────────
 function renderFin(){
