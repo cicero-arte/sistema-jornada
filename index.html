@@ -443,19 +443,19 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
           <div style="font-weight:700;font-size:17px;color:var(--ink);">Assistente da Jornada</div>
           <div style="font-size:12px;color:var(--ink-muted);">Planejamento de aulas · Análise de alunos · Sugestões pedagógicas</div>
         </div>
-        <button id="ia-btn-limpar" onclick="iaLimpar()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--ink-muted);cursor:pointer;">🗑 Limpar</button>
+        <button onclick="iaLimpar()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--ink-muted);cursor:pointer;">🗑 Limpar</button>
       </div>
 
       <!-- Atalhos rápidos -->
-      <div id="ia-atalhos" style="margin-bottom:14px;">
+      <div style="margin-bottom:14px;">
         <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Atalhos rápidos</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
           <button class="ia-atalho-btn" onclick="iaAtalho('Analise o progresso de cada aluno com base nas observações e frequência registradas. Identifique padrões, pontos fortes e alertas para cada um.')">📊 Análise dos alunos</button>
           <button class="ia-atalho-btn" onclick="iaAtalho('Sugira um planejamento para a próxima aula considerando o grupo atual, o que já foi trabalhado nas observações recentes e os pilares técnicos do currículo em espiral.')">📅 Planejar próxima aula</button>
           <button class="ia-atalho-btn" onclick="iaAtalho('Quais pilares técnicos estão sendo menos trabalhados com base nas observações das últimas semanas? Sugira formas de reintroduzi-los de forma orgânica dentro do tema atual do grupo.')">🌀 Pilares em falta</button>
           <button class="ia-atalho-btn" onclick="iaAtalho('Há algum aluno com frequência irregular ou sinais de desmotivação nas observações? Sugira abordagens pedagógicas específicas para cada caso.')">⚠️ Alertas de engajamento</button>
-          <button class="ia-atalho-btn" onclick="iaAtalho('Considerando os perfis dos alunos (faixa etária, altas habilidades, observações), sugira atividades diferenciadas para trabalhar no mesmo encontro sem separar o grupo.')">🎯 Diferenciação no grupo</button>
-          <button class="ia-atalho-btn" onclick="iaAtalho('Resuma o que foi trabalhado nas últimas semanas com cada aluno e sugira uma sequência para as próximas 4 aulas.')">📋 Resumo e sequência</button>
+          <button class="ia-atalho-btn" onclick="iaAtalho('Considerando os perfis dos alunos, sugira atividades diferenciadas para trabalhar no mesmo encontro sem separar o grupo.')">🎯 Diferenciação no grupo</button>
+          <button class="ia-atalho-btn" onclick="iaAtalho('Resuma o que foi trabalhado nas últimas semanas com cada aluno e sugira uma sequência para os próximos 4 encontros.')">📋 Resumo e sequência</button>
         </div>
       </div>
 
@@ -468,8 +468,21 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
         </div>
       </div>
 
+      <!-- Preview de imagem anexada -->
+      <div id="ia-img-preview" style="display:none;margin-bottom:8px;position:relative;display:none;">
+        <img id="ia-img-thumb" style="max-height:80px;border-radius:8px;border:1px solid var(--border);">
+        <button onclick="iaRemoverImagem()" style="position:absolute;top:-6px;left:-6px;background:#c0392b;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1;">✕</button>
+      </div>
+
       <!-- Input -->
-      <div style="display:flex;gap:8px;align-items:flex-end;">
+      <div style="display:flex;gap:6px;align-items:flex-end;">
+        <!-- Anexar imagem -->
+        <button onclick="document.getElementById('ia-file-input').click()" title="Anexar imagem" style="background:#f0ede8;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:16px;cursor:pointer;height:44px;flex-shrink:0;">📎</button>
+        <input type="file" id="ia-file-input" accept="image/*" style="display:none" onchange="iaAnexarImagem(this)">
+
+        <!-- Microfone -->
+        <button id="ia-btn-mic" onclick="iaMicrofone()" title="Falar" style="background:#f0ede8;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:16px;cursor:pointer;height:44px;flex-shrink:0;">🎙</button>
+
         <textarea id="ia-input" placeholder="Pergunte sobre os alunos, planejamento, metodologia..." rows="2" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Lato',sans-serif;font-size:14px;resize:none;line-height:1.4;transition:border-color .2s;" onfocus="this.style.borderColor='var(--warm)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();iaEnviar();}"></textarea>
         <button id="ia-btn-enviar" onclick="iaEnviar()" style="background:var(--warm);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;cursor:pointer;height:44px;white-space:nowrap;">Enviar</button>
       </div>
@@ -2205,115 +2218,116 @@ async function confirmarSenha() {
 // ── ASSISTENTE IA ────────────────────────────────────────
 
 let iaHistorico = [];
+let iaCustoSessao = 0;
+let iaImagemAnexada = null;
+let iaMicAtivo = false;
+let iaRecognition = null;
 
-// System prompt fixo — metodologia e comportamento, nunca muda
-const IA_SYSTEM = `Você é o Assistente Pedagógico da Jornada do Desenho em Espiral, apoio exclusivo do professor Cícero Lopes da Costa (designer gráfico e ilustrador, sem formação em saúde). Responda sempre em português brasileiro, direto, sem jargão clínico desnecessário.
+const IA_SYSTEM = `Você é o Assistente Pedagógico da Jornada do Desenho em Espiral, apoio exclusivo do professor Cícero Lopes da Costa (designer gráfico e ilustrador, sem formação em saúde).
 
-## METODOLOGIA
+REGRAS DE FORMATAÇÃO — OBRIGATÓRIAS:
+- Responda em texto corrido, sem markdown
+- Proibido usar #, ##, *, **, |, ---, _
+- Para listas use somente traço simples seguido de espaço
+- Separe seções com uma linha em branco
+- Linguagem direta, sem jargão clínico
+
+METODOLOGIA:
 - Currículo em espiral aberta: sem início/fim fixos, alunos entram em qualquer ponto
 - Conteúdos revisitados em profundidade crescente a cada ciclo
 - Tema disparador: escolha orientada do grupo; professor tece os pilares organicamente
+- Encontros de 60 minutos como padrão; podem ser estendidos conforme contrato
 - Turmas mistas de idade e perfil; terminologia: "jornada" (nunca "curso"/"aula"), "escolha orientada"
 - Hierarquia ausente; sketchbook com datas é o instrumento de progresso individual
 - Comparação entre alunos é incompatível com o método
 
-## PILARES TÉCNICOS
-1. Linha e gesto — contorno, linha viva, esboço, gestual
-2. Forma e proporção — geometria, proporção corporal, escala
-3. Luz e sombra — fonte de luz, sombras, gradação, volume 3D
-4. Perspectiva e espaço — pontos de fuga, profundidade, composição, figura-fundo
-5. Materiais e superfícies — grafite, carvão, tinta, aquarela, textura
+PILARES TÉCNICOS (sempre mencionar qual pilar está envolvido):
+1. Linha e gesto
+2. Forma e proporção
+3. Luz e sombra
+4. Perspectiva e espaço
+5. Materiais e superfícies
 
-## PERFIS E ADAPTAÇÕES
-**Crianças (6-10):** gesto, brincadeira, materiais; sem cobrança de precisão.
-**Pré-adolescentes (11-14):** personagens, estilo próprio; técnica sem tolher identidade.
-**Adultos iniciantes:** superar bloqueio; progressão visível; desmitificar talento.
-**Adultos experientes:** aprofundamento técnico; autonomia no projeto pessoal.
-**Grupos mistos:** tarefas abertas com múltiplos níveis; tutoria entre pares.
-**AH/SD:** aprofundamento DENTRO do tema do grupo — nunca tarefa separada nem aceleração. Papel de curador, pesquisador ou colaborador.
-**TDAH:** tarefas com início/meio/fim curtos; variação de material no encontro; aquecimento motor obrigatório; evitar tempo ocioso.
-**TEA:** previsibilidade da rotina como suporte; transições anunciadas; respeitar hiperfoco; evitar surpresas de material; não interpretar silêncio como desengajamento.
-**Declínio cognitivo / Alzheimer / Demência:** objetivo é presença, prazer e memória afetiva — não técnica. Tarefas simples com resultado visível em minutos. Materiais fáceis (carvão grosso, pincel largo). Não corrigir bruscamente. Rotina idêntica a cada encontro. Celebrar processo, não produto.
+PERFIS E ADAPTAÇÕES:
+Crianças (6-10): gesto, brincadeira, materiais; sem cobrança de precisão.
+Pré-adolescentes (11-14): personagens, estilo próprio; técnica sem tolher identidade.
+Adultos iniciantes: superar bloqueio; progressão visível; desmitificar talento.
+Adultos experientes: aprofundamento técnico; autonomia no projeto pessoal.
+Grupos mistos: tarefas abertas com múltiplos níveis; tutoria entre pares.
+AH/SD: aprofundamento DENTRO do tema do grupo, nunca tarefa separada nem aceleração.
+TDAH: tarefas com início/meio/fim curtos; variação de material; aquecimento motor obrigatório.
+TEA: previsibilidade da rotina; transições anunciadas; respeitar hiperfoco; não interpretar silêncio como desengajamento.
+Declínio cognitivo/Alzheimer/Demência: objetivo é presença, prazer e memória afetiva. Tarefas simples, rotina idêntica, não corrigir bruscamente.
 
-**Regra para condições de saúde:** Cícero não é terapeuta. Não diagnostique, não prescreva. Ante sinal de alerta (agitação intensa, confusão, choro persistente, comportamento auto ou heteroagressivo), oriente comunicar o responsável e suspender a atividade com acolhimento calmo. Sugira adaptações práticas dentro do desenho.
+Regra para condições de saúde: Cícero não é terapeuta. Não diagnostique, não prescreva. Ante sinal de alerta, oriente comunicar o responsável e suspender com acolhimento calmo.
 
-## INSTRUÇÕES
-- Respostas objetivas; tópicos só quando listar 3+ itens
-- Sempre indique o pilar técnico envolvido
-- Se precisar de dados de um aluno, peça ao professor
-- Não invente dados que não estejam na mensagem`;
+INSTRUÇÕES:
+- Se precisar de mais dados de um aluno, peça ao professor
+- Não invente dados que não estejam na mensagem
+- Ao analisar imagem de desenho: observe traço, proporção, luz/sombra, perspectiva, material, pontos fortes e sugestões para o próximo encontro`;
 
-// Gera resumo compacto de UM aluno — chamado sob demanda
-function iaResumoAluno(a, numRelats = 3) {
+function iaResumoAluno(a, numRelats) {
+  numRelats = numRelats || 3;
   const freqKeys = Object.keys(a.freq || {}).sort().slice(-4);
-  const freq = freqKeys.map(k => {
+  const freq = freqKeys.map(function(k) {
     const f = a.freq[k];
-    const p = Array.isArray(f) ? f.filter(d => d === 'P').length : 0;
-    return `${k.slice(5)}:${p}P`;
+    const p = Array.isArray(f) ? f.filter(function(d){return d==='P';}).length : 0;
+    return k.slice(5)+':'+p+'P';
   }).join(' ');
-
   const nomeKey = a.nome.split(' ')[0].toLowerCase();
   const relats = Object.entries(notasItens || {})
-    .filter(([k]) => k.toLowerCase().includes(nomeKey))
-    .sort(([a],[b]) => b.localeCompare(a))
+    .filter(function(e){return e[0].toLowerCase().includes(nomeKey);})
+    .sort(function(a,b){return b[0].localeCompare(a[0]);})
     .slice(0, numRelats)
-    .map(([k, v]) => `${k.slice(5)}: ${String(v).slice(0, 200)}`)
+    .map(function(e){return e[0].slice(5)+': '+String(e[1]).slice(0,200);})
     .join(' | ');
-
-  const idade = a.nasc ? (() => {
-    const d = new Date(a.nasc);
-    return (new Date().getFullYear() - d.getFullYear()) + 'a';
-  })() : '';
-
-  return `${a.nome}${idade ? ' ('+idade+')' : ''} | ${a.perfil||'perfil?'} | obs: ${(a.obs||'—').slice(0,100)} | freq: ${freq||'—'} | relatos: ${relats||'—'}`;
+  const idade = a.nasc ? (new Date().getFullYear() - new Date(a.nasc).getFullYear())+'a' : '';
+  return a.nome+(idade?' ('+idade+')':'')+' | '+(a.perfil||'perfil?')+' | obs: '+(a.obs||'—').slice(0,100)+' | freq: '+(freq||'—')+' | relatos: '+(relats||'—');
 }
 
-// Gera lista mínima de todos os alunos (só nome, perfil, obs curta)
 function iaListaAlunos() {
-  return alunos.map(a =>
-    `- ${a.nome} | ${a.perfil||'perfil?'} | ${(a.obs||'—').slice(0,60)}`
-  ).join('\n');
+  return alunos.map(function(a){
+    return '- '+a.nome+' | '+(a.perfil||'perfil?')+' | '+(a.obs||'—').slice(0,60);
+  }).join('\n');
 }
 
-// Detecta se a pergunta menciona um aluno específico e retorna os dados dele
 function iaInjetarDados(pergunta) {
   const pLower = pergunta.toLowerCase();
-
-  // Verifica se a pergunta menciona algum aluno pelo primeiro nome
-  const alunosMencionados = alunos.filter(a => {
-    const nome = a.nome.split(' ')[0].toLowerCase();
-    return pLower.includes(nome);
+  const mencionados = alunos.filter(function(a){
+    return pLower.includes(a.nome.split(' ')[0].toLowerCase());
   });
-
-  if (alunosMencionados.length === 1) {
-    // Pergunta sobre um aluno específico — manda dados completos dele
-    return `[DADOS DO ALUNO MENCIONADO]\n${iaResumoAluno(alunosMencionados[0], 5)}\n\n[PERGUNTA DO PROFESSOR]\n${pergunta}`;
+  if (mencionados.length === 1) {
+    return '[DADOS DO ALUNO MENCIONADO]\n'+iaResumoAluno(mencionados[0],5)+'\n\n[PERGUNTA]\n'+pergunta;
   }
-
-  if (alunosMencionados.length > 1) {
-    // Pergunta menciona alguns alunos
-    const resumos = alunosMencionados.map(a => iaResumoAluno(a, 3)).join('\n');
-    return `[DADOS DOS ALUNOS MENCIONADOS]\n${resumos}\n\n[PERGUNTA DO PROFESSOR]\n${pergunta}`;
+  if (mencionados.length > 1) {
+    return '[DADOS DOS ALUNOS MENCIONADOS]\n'+mencionados.map(function(a){return iaResumoAluno(a,3);}).join('\n')+'\n\n[PERGUNTA]\n'+pergunta;
   }
+  const trabalhados = Object.entries(statusItens||{}).filter(function(e){return e[1];}).map(function(e){return e[0];}).join(', ');
+  return '[DADOS GERAIS — '+alunos.length+' alunos]\n'+iaListaAlunos()+'\nConteúdos trabalhados: '+(trabalhados||'—')+'\n\n[PERGUNTA]\n'+pergunta;
+}
 
-  // Pergunta geral — manda só a lista mínima
-  const trabalhados = Object.entries(statusItens || {})
-    .filter(([,v]) => v).map(([k]) => k).join(', ').slice(0, 200);
-
-  return `[DADOS GERAIS — ${alunos.length} alunos]\n${iaListaAlunos()}\nConteúdos trabalhados: ${trabalhados||'—'}\n\n[PERGUNTA DO PROFESSOR]\n${pergunta}`;
+function iaLimparMarkdown(texto) {
+  return texto
+    .replace(/#{1,6}\s*/g,'')
+    .replace(/\*\*(.+?)\*\*/g,'$1')
+    .replace(/\*(.+?)\*/g,'$1')
+    .replace(/_{1,2}(.+?)_{1,2}/g,'$1')
+    .replace(/\|/g,' ')
+    .replace(/^[-—]{3,}$/gm,'')
+    .replace(/\n{3,}/g,'\n\n')
+    .trim();
 }
 
 function iaAdicionarMensagem(tipo, texto) {
   const chat = document.getElementById('ia-chat');
   const bv = document.getElementById('ia-boas-vindas');
   if (bv) bv.remove();
-
+  const textoLimpo = tipo === 'ia' ? iaLimparMarkdown(texto) : texto;
   const div = document.createElement('div');
-  div.className = `ia-msg ${tipo}`;
-  div.innerHTML = `
-    <div class="ia-label">${tipo === 'user' ? 'Você' : '🤖 Assistente'}</div>
-    <div class="ia-bubble">${texto.replace(/\n/g, '<br>')}</div>
-  `;
+  div.className = 'ia-msg '+tipo;
+  div.dataset.texto = textoLimpo;
+  const acoes = tipo === 'ia' ? '<button onclick="navigator.clipboard.writeText(this.closest(\'.ia-msg\').dataset.texto)" style="background:none;border:none;font-size:11px;color:var(--ink-muted);cursor:pointer;padding:2px 6px;border-radius:4px;" title="Copiar">📋 copiar</button>' : '';
+  div.innerHTML = '<div class="ia-label" style="display:flex;justify-content:space-between;align-items:center;"><span>'+(tipo==='user'?'Você':'🤖 Assistente')+'</span>'+acoes+'</div><div class="ia-bubble">'+textoLimpo.replace(/\n/g,'<br>')+'</div>';
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
   return div;
@@ -2323,113 +2337,131 @@ function iaAdicionarPensando() {
   const chat = document.getElementById('ia-chat');
   const bv = document.getElementById('ia-boas-vindas');
   if (bv) bv.remove();
-
   const div = document.createElement('div');
   div.className = 'ia-msg ia';
-  div.innerHTML = `
-    <div class="ia-label">🤖 Assistente</div>
-    <div class="ia-pensando"><span></span><span></span><span></span> pensando…</div>
-  `;
+  div.innerHTML = '<div class="ia-label">🤖 Assistente</div><div class="ia-pensando"><span></span><span></span><span></span> pensando…</div>';
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
   return div;
 }
 
+function iaAnexarImagem(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    iaImagemAnexada = { base64: e.target.result.split(',')[1], mediaType: file.type };
+    document.getElementById('ia-img-thumb').src = e.target.result;
+    document.getElementById('ia-img-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function iaRemoverImagem() {
+  iaImagemAnexada = null;
+  document.getElementById('ia-img-preview').style.display = 'none';
+  document.getElementById('ia-img-thumb').src = '';
+}
+
+function iaMicrofone() {
+  const btn = document.getElementById('ia-btn-mic');
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Seu navegador não suporta reconhecimento de voz. Use o Chrome.');
+    return;
+  }
+  if (iaMicAtivo) { iaRecognition && iaRecognition.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  iaRecognition = new SR();
+  iaRecognition.lang = 'pt-BR';
+  iaRecognition.interimResults = false;
+  iaRecognition.maxAlternatives = 1;
+  iaMicAtivo = true;
+  btn.textContent = '🔴';
+  btn.style.background = '#fde8e8';
+  iaRecognition.onresult = function(e) {
+    document.getElementById('ia-input').value = e.results[0][0].transcript;
+    iaMicAtivo = false; btn.textContent = '🎙'; btn.style.background = '#f0ede8';
+    iaEnviar();
+  };
+  iaRecognition.onerror = iaRecognition.onend = function() {
+    iaMicAtivo = false; btn.textContent = '🎙'; btn.style.background = '#f0ede8';
+  };
+  iaRecognition.start();
+}
+
 async function iaEnviar() {
   const input = document.getElementById('ia-input');
   const pergunta = input.value.trim();
-  if (!pergunta) return;
-
+  if (!pergunta && !iaImagemAnexada) return;
   if (!cfg.apiKey) {
-    iaAdicionarMensagem('ia', '⚠️ Chave API não configurada. Vá em ⚙️ Config → Assistente IA, insira sua chave e salve.');
+    iaAdicionarMensagem('ia', 'Chave API não configurada. Vá em Config, seção Assistente IA, insira sua chave e salve.');
     return;
   }
-
   input.value = '';
   document.getElementById('ia-btn-enviar').disabled = true;
-
-  iaAdicionarMensagem('user', pergunta);
+  iaAdicionarMensagem('user', pergunta || '(imagem anexada)');
   const pensandoEl = iaAdicionarPensando();
-
-  // Injeta dados relevantes na mensagem do usuário, não no system prompt
-  const mensagemComDados = iaInjetarDados(pergunta);
-  iaHistorico.push({ role: 'user', content: mensagemComDados });
-
+  const textoComDados = iaInjetarDados(pergunta || 'Analise esta imagem de desenho e dê feedback pedagógico.');
+  let conteudoMensagem;
+  if (iaImagemAnexada) {
+    conteudoMensagem = [
+      { type: 'image', source: { type: 'base64', media_type: iaImagemAnexada.mediaType, data: iaImagemAnexada.base64 } },
+      { type: 'text', text: textoComDados }
+    ];
+    iaRemoverImagem();
+  } else {
+    conteudoMensagem = textoComDados;
+  }
+  iaHistorico.push({ role: 'user', content: conteudoMensagem });
   try {
     const response = await fetch('https://jornada-ia.cicero-arte.workers.dev/', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        apiKey: cfg.apiKey,
-        model: 'claude-sonnet-4-5',
-        max_tokens: 1024,
-        system: IA_SYSTEM,
-        messages: iaHistorico
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey: cfg.apiKey, model: 'claude-sonnet-4-5', max_tokens: 1024, system: IA_SYSTEM, messages: iaHistorico })
     });
-
     const data = await response.json();
-
     if (data.error) throw new Error(data.error.message || 'Erro da API');
-
     const resposta = data.content && data.content[0] ? data.content[0].text : 'Não foi possível obter resposta.';
-
     pensandoEl.remove();
     iaAdicionarMensagem('ia', resposta);
     iaHistorico.push({ role: 'assistant', content: resposta });
-
-    // Mostra contagem de tokens desta troca
     if (data.usage) {
-      const { input_tokens, output_tokens } = data.usage;
-      const total = input_tokens + output_tokens;
-      const custo = (input_tokens * 3 / 1_000_000) + (output_tokens * 15 / 1_000_000);
+      const inp = data.usage.input_tokens, out = data.usage.output_tokens;
+      const custo = (inp * 3 / 1000000) + (out * 15 / 1000000);
       iaCustoSessao += custo;
-      const fmt = v => v < 0.001 ? '< $0,001' : '$' + v.toFixed(3);
+      const fmt = function(v){ return v < 0.001 ? '< $0,001' : '$'+v.toFixed(3); };
       const el = document.getElementById('ia-tokens');
-      if (el) {
-        el.textContent = `última troca: ${total} tokens · ${fmt(custo)} · sessão: ${fmt(iaCustoSessao)}`;
-        el.style.display = 'block';
-      }
+      if (el) { el.textContent = 'última troca: '+(inp+out)+' tokens · '+fmt(custo)+' · sessão: '+fmt(iaCustoSessao); el.style.display = 'block'; }
     }
-
-    // Mantém só as últimas 10 trocas (20 mensagens) para não acumular tokens no histórico
     if (iaHistorico.length > 20) iaHistorico = iaHistorico.slice(-20);
-
-  } catch (e) {
+  } catch(e) {
     pensandoEl.remove();
-    iaAdicionarMensagem('ia', '⚠️ Erro ao conectar com a IA.\n\nDetalhe: ' + (e.message || e));
+    iaAdicionarMensagem('ia', 'Erro ao conectar com a IA. Detalhe: '+(e.message||e));
     iaHistorico.pop();
   }
-
   document.getElementById('ia-btn-enviar').disabled = false;
 }
 
 function iaAtalho(texto) {
-  const input = document.getElementById('ia-input');
-  input.value = texto;
+  document.getElementById('ia-input').value = texto;
   iaEnviar();
 }
 
-let iaCustoSessao = 0;
-
 function iaLimpar() {
-  iaHistorico = [];
-  iaCustoSessao = 0;
+  iaHistorico = []; iaCustoSessao = 0; iaImagemAnexada = null;
+  document.getElementById('ia-img-preview').style.display = 'none';
   const el = document.getElementById('ia-tokens');
   if (el) el.style.display = 'none';
-  const chat = document.getElementById('ia-chat');
-  chat.innerHTML = `<div id="ia-boas-vindas" style="text-align:center;padding:24px 16px;color:var(--ink-muted);">
-    <div style="font-size:32px;margin-bottom:8px;">🌀</div>
-    <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Olá, Cícero!</div>
-    <div style="font-size:13px;line-height:1.5;">Use os atalhos acima ou escreva uma pergunta.<br>Tenho acesso a todos os dados do sistema.</div>
-  </div>`;
+  document.getElementById('ia-chat').innerHTML = '<div id="ia-boas-vindas" style="text-align:center;padding:24px 16px;color:var(--ink-muted);"><div style="font-size:32px;margin-bottom:8px;">🌀</div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">Olá, Cícero!</div><div style="font-size:13px;line-height:1.5;">Use os atalhos acima ou escreva uma pergunta.<br>Tenho acesso a todos os dados do sistema.</div></div>';
 }
 
 window.iaEnviar = iaEnviar;
 window.iaAtalho = iaAtalho;
 window.iaLimpar = iaLimpar;
+window.iaAnexarImagem = iaAnexarImagem;
+window.iaRemoverImagem = iaRemoverImagem;
+window.iaMicrofone = iaMicrofone;
 
 // ── FIM ASSISTENTE IA ─────────────────────────────────────
 
