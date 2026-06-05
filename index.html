@@ -2356,15 +2356,13 @@ async function iaEnviar() {
   iaHistorico.push({ role: 'user', content: mensagemComDados });
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://jornada-ia.cicero-arte.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': cfg.apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true'
       },
       body: JSON.stringify({
+        apiKey: cfg.apiKey,
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         system: IA_SYSTEM,
