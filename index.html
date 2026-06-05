@@ -2384,9 +2384,12 @@ async function iaEnviar() {
     if (data.usage) {
       const { input_tokens, output_tokens } = data.usage;
       const total = input_tokens + output_tokens;
+      const custo = (input_tokens * 3 / 1_000_000) + (output_tokens * 15 / 1_000_000);
+      iaCustoSessao += custo;
+      const fmt = v => v < 0.001 ? '< $0,001' : '$' + v.toFixed(3);
       const el = document.getElementById('ia-tokens');
       if (el) {
-        el.textContent = `última troca: ${total} tokens (${input_tokens} entrada · ${output_tokens} saída)`;
+        el.textContent = `última troca: ${total} tokens · ${fmt(custo)} · sessão: ${fmt(iaCustoSessao)}`;
         el.style.display = 'block';
       }
     }
@@ -2409,8 +2412,13 @@ function iaAtalho(texto) {
   iaEnviar();
 }
 
+let iaCustoSessao = 0;
+
 function iaLimpar() {
   iaHistorico = [];
+  iaCustoSessao = 0;
+  const el = document.getElementById('ia-tokens');
+  if (el) el.style.display = 'none';
   const chat = document.getElementById('ia-chat');
   chat.innerHTML = `<div id="ia-boas-vindas" style="text-align:center;padding:24px 16px;color:var(--ink-muted);">
     <div style="font-size:32px;margin-bottom:8px;">🌀</div>
