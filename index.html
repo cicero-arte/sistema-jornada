@@ -150,6 +150,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
   .tela { padding: 14px; }
   .grid2 { grid-template-columns: 1fr; }
   .freq-semanas { grid-template-columns: 1fr; }
+  .freq-obs { font-size: 16px; min-height: 72px; width: 100%; }
   .fin-table thead { display: none; }
   .fin-table tr { display: block; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; padding: 10px; }
   .fin-table td { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border: none; font-size: 13px; }
@@ -1679,7 +1680,7 @@ function renderFreq(){
           <label for="${idF}">Falta</label>
         </div>
         <textarea class="freq-obs" placeholder="Observação..."
-          oninput="salvarObs(${a.id},'${kO}',this.value)">${obsV}</textarea>
+          oninput="salvarObs(${a.id},'${kO}',this.value);autoGrow(this)">${obsV}</textarea>
       </div>`;
     }).join('');
     return `<div class="freq-card">
@@ -1701,6 +1702,14 @@ function toggleFreqCard(id){
   const arrow=document.getElementById('fqa-'+id.replace('fq-',''));
   body.classList.toggle('aberto');
   arrow.classList.toggle('aberto');
+  if(body.classList.contains('aberto')){
+    body.querySelectorAll('.freq-obs').forEach(function(t){if(t.value)autoGrow(t);});
+  }
+}
+
+function autoGrow(el){
+  el.style.height='auto';
+  el.style.height=Math.max(52,el.scrollHeight+2)+'px';
 }
 
 function toggleFreq(aid,keyOn,keyOff,idOff,checked){
@@ -1872,15 +1881,15 @@ function verContrato(id){
   const a=alunos.find(x=>x.id===id);if(!a)return;
   const logoHtml=cfg.logo?`<div style="text-align:center;margin-bottom:20px;"><img src="${cfg.logo}" style="max-height:80px;max-width:240px;"></div>`:'';
   const vp=a.valorPromo||240,vc=a.valorCheio||440;
-  const html=`${logoHtml}<h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE ENSINO DE DESENHO ARTÍSTICO</h2><h3>QUALIFICAÇÃO DAS PARTES</h3><p><strong>CONTRATADA:</strong><br>${cfg.empresa} (Nome Fantasia), inscrita no CNPJ/CPF sob o nº ${cfg.cnpj}, com sede/endereço na ${cfg.end}, neste ato representada por ${cfg.rep}, ${cfg.qual}, CPF ${cfg.cpf}.</p><p><strong>CONTRATANTE:</strong><br>Nome: ${a.resp||'_______'}<br>CPF/CNPJ: ${a.cpfResp||'_______'}<br>Endereço: ${a.endResp||'_______'}<br>E-mail: ${a.email||'_______'}<br>Telefone: ${a.tel||'_______'}</p><p><strong>ALUNO BENEFICIÁRIO:</strong><br>Nome Completo: ${a.nome}<br>Data de Nascimento: ${fmtData(a.nasc)}</p><h3>CLÁUSULA PRIMEIRA - DO OBJETO E NATUREZA DO SERVIÇO</h3><p>1.1. O objeto é a prestação de serviços de ensino de desenho artístico (encontros presenciais) denominados Jornada de Desenho em Espiral, com currículo aberto e não sequencial, cujos conteúdos técnicos e temáticos se aprofundam progressivamente a cada ciclo, conforme o interesse e o momento do aluno.</p><p>1.2. MODELO DE CURRÍCULO ABERTO: A Jornada não possui início, fim ou sequência curricular fixos. O aluno pode ingressar em qualquer ponto da Jornada, sem pré-requisitos, e os conteúdos técnicos fundamentais (linha, forma, proporção, luz, sombra, perspectiva, materiais e cor) são trabalhados de forma contextualizada e progressiva ao longo do tempo, ancorados nos interesses do grupo em cada ciclo.</p><p>1.3. OBJETIVOS: A Jornada visa o desenvolvimento do olhar observacional, da expressão criativa pessoal, da confiança na prática do desenho, do domínio progressivo de ferramentas e técnicas fundamentais e da ampliação do repertório visual e cultural do aluno.</p><p>1.4. NATUREZA NÃO TERAPÊUTICA: A Jornada é de natureza estritamente artística. Não caracteriza e não substitui qualquer tipo de acompanhamento ou tratamento terapêutico, psicológico ou neuropsicológico, mesmo sendo realizada em ambiente de consultório.</p><h3>CLÁUSULA PRIMEIRA A – VIGÊNCIA E RENOVAÇÃO</h3><p>1A.1. O presente Contrato terá vigência de 12 (doze) meses, iniciando-se na data da assinatura eletrônica.</p><p>1A.2. Ao término da vigência, o Contrato será encerrado automaticamente, sendo necessária a celebração de um novo instrumento para a continuidade dos serviços.</p><h3>CLÁUSULA SEGUNDA - FORMATO, LOCAL E VAGAS</h3><p>2.1. Os encontros da Jornada são semanais, com duração de 60 (sessenta) minutos cada, conduzidos em grupos de perfis mistos de idade e experiência.</p><p>2.2. Não há pré-requisito de conhecimento ou nível técnico para ingresso. O aluno ingressa no grupo em andamento e participa a partir do ciclo em curso, recebendo orientação individualizada dentro do contexto coletivo.</p><p>2.3. Cada horário será limitado a 4 (quatro) vagas, uma por contrato.</p><p>2.4. LOCAL E EXCLUSÃO DE RESPONSABILIDADE: O local de realização da Jornada é o ${cfg.local}, sendo o espaço meramente cedido. Fica expressamente afastada toda e qualquer responsabilidade civil, profissional ou fiscal do local, sendo a ${cfg.empresa} a única responsável pela prestação e gestão dos serviços.</p><h3>CLÁUSULA TERCEIRA - PAGAMENTO</h3><p>3.1. A retribuição mensal pelo serviço é de R$ ${vp.toFixed(2)} (${valorExt(vp)} reais), correspondente a 4 (quatro) encontros semanais de 60 (sessenta) minutos cada, na modalidade presencial em Sobradinho-DF.</p><p>3.2. O valor contratado será mantido durante toda a vigência de 12 (doze) meses do presente Contrato, sendo vedado qualquer reajuste nesse período.</p><p>3.3. Após o término da vigência, o valor para celebração de novo contrato será o praticado pela Contratada à época da renovação.</p><p>3.4. O pagamento deverá ser efetuado até o quinto dia útil de cada mês, por meio da chave PIX${cfg.pix?' ('+cfg.pix+')':' que será fornecida nos dias finais do mês anterior'}.</p><p>3.5. O não pagamento até a data de vencimento implicará multa de 2% (dois por cento) sobre o valor da mensalidade, acrescida de juros de mora de 1% (um por cento) ao mês, calculados pro rata die até a data do efetivo pagamento.</p><h3>CLÁUSULA QUARTA - FALTAS E REPOSIÇÃO</h3><p>4.1. O Contratante ou seu responsável legal deve avisar a falta com, no mínimo, 24 (vinte e quatro) horas de antecedência.</p><p>4.2. A reposição de encontro, em qualquer situação, está condicionada à disponibilidade de horário e vaga na agenda da Contratada, não sendo garantida de forma automática.</p><p>4.3. O aviso realizado com menos de 24 (vinte e quatro) horas de antecedência, incluindo avisos feitos horas ou minutos antes do início do encontro, não gera direito a reposição presencial. Nesses casos, a Contratada cumprirá sua obrigação contratual mediante a entrega do material preparado para o encontro na forma impressa, o que será considerado suficiente para fins de cumprimento da carga horária daquele encontro.</p><h3>CLÁUSULA QUINTA - ALUNO MENOR DE IDADE</h3><p>5.1. Sendo o aluno menor de idade, este Contrato deverá ser celebrado e assinado por seu(sua) genitor(a) ou responsável legal, que assume integralmente todas as obrigações e responsabilidades.</p><h3>CLÁUSULA SEXTA - USO DE IMAGEM, OBRAS E PROPRIEDADE INTELECTUAL</h3><p>6.1. O Contratante ou Responsável legal autoriza de forma IRREVOGÁVEL, GRATUITA, ILIMITADA e SEM ÔNUS à Contratada a utilizar a imagem pessoal do aluno e as imagens de suas obras criadas no âmbito da Jornada para fins de divulgação e promoção comercial dos serviços da Contratada.</p><p>6.2. Esta autorização possui validade ILIMITADA e abrange o uso em qualquer tipo de veículo (mídia, redes sociais, etc.), sendo válida para qualquer território (nacional ou internacional).</p><p>6.3. O aluno/autor mantém a Propriedade Intelectual sobre suas obras. A autorização do item 6.1 é uma licença de uso para promoção e não implica cessão ou transferência dos Direitos Autorais para a ${cfg.empresa}.</p><h3>CLÁUSULA SÉTIMA - CERTIFICADOS E CERTIFICAÇÃO ARTÍSTICA</h3><p>7.1. A Contratada poderá emitir gratuitamente o Certificado de Participação na Jornada de Desenho em Espiral ao aluno que completar, no mínimo, 6 (seis) meses de presença comprovada nos encontros. A emissão é opcional e deverá ser solicitada pelo Contratante ou Responsável.</p><p>7.2. A Contratada oferece, de forma independente e mediante pagamento, o serviço de Certificação Artística por Competência. O aluno poderá, a qualquer momento após 3 (três) meses de prática, solicitar a Certificação Artística por Competência, na qual será avaliado quanto ao progresso e nível de desenvolvimento por meio do portfólio (sketchbook). Esse processo valoriza não apenas o resultado final, mas também a disciplina e a evolução registrada ao longo do tempo. O valor do serviço de Certificação Artística por Competência será informado pela Contratada no momento da solicitação.</p><h3>CLÁUSULA OITAVA - QUINTA SEMANA OPCIONAL</h3>
+  const html=`${logoHtml}<h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE ENSINO DE DESENHO ARTÍSTICO</h2><h3>QUALIFICAÇÃO DAS PARTES</h3><p><strong>CONTRATADA:</strong><br>${cfg.empresa} (Nome Fantasia), inscrita no CNPJ/CPF sob o nº ${cfg.cnpj}, com sede/endereço na ${cfg.end}, neste ato representada por ${cfg.rep}, ${cfg.qual}, CPF ${cfg.cpf}.</p><p><strong>CONTRATANTE:</strong><br>Nome: ${a.resp||'_______'}<br>CPF/CNPJ: ${a.cpfResp||'_______'}<br>Endereço: ${a.endResp||'_______'}<br>E-mail: ${a.email||'_______'}<br>Telefone: ${a.tel||'_______'}</p><p><strong>ALUNO BENEFICIÁRIO:</strong><br>Nome Completo: ${a.nome}<br>Data de Nascimento: ${fmtData(a.nasc)}</p><h3>CLÁUSULA PRIMEIRA - DO OBJETO E NATUREZA DO SERVIÇO</h3><p>1.1. O objeto é a prestação de serviços de ensino de desenho artístico (encontros presenciais) denominados Jornada de Desenho em Espiral, com currículo aberto e não sequencial, cujos conteúdos técnicos e temáticos se aprofundam progressivamente a cada ciclo, conforme o interesse e o momento do aluno.</p><p>1.2. MODELO DE CURRÍCULO ABERTO: A Jornada não possui início, fim ou sequência curricular fixos. O aluno pode ingressar em qualquer ponto da Jornada, sem pré-requisitos, e os conteúdos técnicos fundamentais (linha, forma, proporção, luz, sombra, perspectiva, materiais e cor) são trabalhados de forma contextualizada e progressiva ao longo do tempo, ancorados nos interesses do grupo em cada ciclo.</p><p>1.3. OBJETIVOS: A Jornada visa o desenvolvimento do olhar observacional, da expressão criativa pessoal, da confiança na prática do desenho, do domínio progressivo de ferramentas e técnicas fundamentais e da ampliação do repertório visual e cultural do aluno.</p><p>1.4. NATUREZA NÃO TERAPÊUTICA: A Jornada é de natureza estritamente artística. Não caracteriza e não substitui qualquer tipo de acompanhamento ou tratamento terapêutico, psicológico ou neuropsicológico, mesmo sendo realizada em ambiente de consultório.</p><h3>CLÁUSULA PRIMEIRA A – VIGÊNCIA E RENOVAÇÃO</h3><p>1A.1. O presente Contrato terá vigência de 12 (doze) meses, iniciando-se na data da assinatura eletrônica.</p><p>1A.2. Ao término da vigência, o Contrato será encerrado automaticamente, sendo necessária a celebração de um novo instrumento para a continuidade dos serviços.</p><h3>CLÁUSULA SEGUNDA - FORMATO, LOCAL E VAGAS</h3><p>2.1. Os encontros da Jornada são semanais (um encontro por semana), com duração de 60 (sessenta) minutos cada, conduzidos em grupos de perfis mistos de idade e experiência.</p><p>2.2. Não há pré-requisito de conhecimento ou nível técnico para ingresso. O aluno ingressa no grupo em andamento e participa a partir do ciclo em curso, recebendo orientação individualizada dentro do contexto coletivo.</p><p>2.3. Cada horário será limitado a 4 (quatro) vagas, uma por contrato.</p><p>2.4. LOCAL E EXCLUSÃO DE RESPONSABILIDADE: O local de realização da Jornada é o ${cfg.local}, sendo o espaço meramente cedido. Fica expressamente afastada toda e qualquer responsabilidade civil, profissional ou fiscal do local, sendo a ${cfg.empresa} a única responsável pela prestação e gestão dos serviços.</p><h3>CLÁUSULA TERCEIRA - PAGAMENTO</h3><p>3.1. A retribuição mensal pelo serviço é de R$ ${vp.toFixed(2)} (${valorExt(vp)} reais), correspondente a 4 (quatro) encontros mensais, realizados semanalmente (um encontro por semana), de 60 (sessenta) minutos cada, na modalidade presencial em Sobradinho-DF.</p><p>3.2. O valor contratado será mantido durante toda a vigência de 12 (doze) meses do presente Contrato, sendo vedado qualquer reajuste nesse período.</p><p>3.3. Após o término da vigência, o valor para celebração de novo contrato será o praticado pela Contratada à época da renovação.</p><p>3.4. O pagamento deverá ser efetuado até o quinto dia útil de cada mês, por meio da chave PIX${cfg.pix?' ('+cfg.pix+')':' que será fornecida nos dias finais do mês anterior'}.</p><p>3.5. O não pagamento até a data de vencimento implicará multa de 2% (dois por cento) sobre o valor da mensalidade, acrescida de juros de mora de 1% (um por cento) ao mês, calculados pro rata die até a data do efetivo pagamento.</p><p>3.6. O atraso no pagamento superior a 15 (quinze) dias autoriza a Contratada a suspender a participação do aluno nos encontros até a regularização dos valores devidos, mediante comunicação prévia ao Contratante, sem prejuízo da cobrança da multa e dos juros previstos no item 3.5.</p><h3>CLÁUSULA QUARTA - FALTAS E REPOSIÇÃO</h3><p>4.1. O Contratante ou seu responsável legal deve avisar a falta com, no mínimo, 24 (vinte e quatro) horas de antecedência.</p><p>4.2. A reposição de encontro, em qualquer situação, está condicionada à disponibilidade de horário e vaga na agenda da Contratada, não sendo garantida de forma automática.</p><p>4.3. O aviso realizado com menos de 24 (vinte e quatro) horas de antecedência, incluindo avisos feitos horas ou minutos antes do início do encontro, não gera direito a reposição. Nesses casos, a Contratada poderá, como cortesia e mera liberalidade, disponibilizar o material preparado para o encontro em formato impresso ou digital, sem que isso constitua obrigação contratual.</p><p>4.4. FERIADOS E CANCELAMENTOS PELA CONTRATADA: Não haverá encontro regular em feriados que coincidam com o dia da turma. Nesses casos, bem como nos cancelamentos por iniciativa da Contratada, o encontro será reposto em data acordada entre as partes ou, na impossibilidade de reposição, o valor proporcional será abatido da mensalidade seguinte.</p><h3>CLÁUSULA QUINTA - ALUNO MENOR DE IDADE</h3><p>5.1. Sendo o aluno menor de idade, este Contrato deverá ser celebrado e assinado por seu(sua) genitor(a) ou responsável legal, que assume integralmente todas as obrigações e responsabilidades.</p><h3>CLÁUSULA SEXTA - USO DE IMAGEM, OBRAS E PROPRIEDADE INTELECTUAL</h3><p>6.1. O Contratante ou Responsável legal autoriza de forma GRATUITA e SEM ÔNUS à Contratada a utilizar a imagem pessoal do aluno e as imagens de suas obras criadas no âmbito da Jornada para fins de divulgação e promoção comercial dos serviços da Contratada.</p><p>6.2. Esta autorização vigora por prazo indeterminado e abrange o uso em qualquer tipo de veículo (mídia, redes sociais, etc.), em território nacional ou internacional, podendo ser revogada a qualquer tempo pelo Contratante ou Responsável mediante comunicação escrita à Contratada. A revogação produz efeitos a partir do seu recebimento e não alcança publicações e materiais já veiculados.</p><p>6.3. O aluno/autor mantém a Propriedade Intelectual sobre suas obras. A autorização do item 6.1 é uma licença de uso para promoção e não implica cessão ou transferência dos Direitos Autorais para a ${cfg.empresa}.</p><h3>CLÁUSULA SEXTA A - PROTEÇÃO DE DADOS PESSOAIS (LGPD)</h3><p>6A.1. A Contratada coleta e trata os dados pessoais do Contratante e do aluno beneficiário (identificação, contato, data de nascimento e registros pedagógicos) exclusivamente para a execução deste Contrato, a gestão pedagógica, administrativa e financeira da Jornada e o cumprimento de obrigações legais, nos termos da Lei nº 13.709/2018 (LGPD).</p><p>6A.2. Os dados são armazenados em serviços de tecnologia contratados pela Contratada (como serviços de banco de dados em nuvem) e poderão ser processados por ferramentas de apoio pedagógico e administrativo, inclusive serviços de inteligência artificial, sempre limitados à finalidade descrita no item 6A.1, sendo vedados a comercialização e o compartilhamento com terceiros para fins diversos.</p><p>6A.3. O Contratante poderá, a qualquer tempo, solicitar acesso, correção ou eliminação dos dados pessoais, ressalvados os registros cuja manutenção seja exigida por lei. Encerrado o Contrato, os dados serão mantidos apenas pelo prazo necessário ao cumprimento de obrigações legais e fiscais.</p><h3>CLÁUSULA SÉTIMA - CERTIFICADOS E CERTIFICAÇÃO ARTÍSTICA</h3><p>7.1. A Contratada poderá emitir gratuitamente o Certificado de Participação na Jornada de Desenho em Espiral ao aluno que completar, no mínimo, 6 (seis) meses de presença comprovada nos encontros. A emissão é opcional e deverá ser solicitada pelo Contratante ou Responsável.</p><p>7.2. A Contratada oferece, de forma independente e mediante pagamento, o serviço de Certificação Artística por Competência. O aluno poderá, a qualquer momento após 3 (três) meses de prática, solicitar a Certificação Artística por Competência, na qual será avaliado quanto ao progresso e nível de desenvolvimento por meio do portfólio (sketchbook). Esse processo valoriza não apenas o resultado final, mas também a disciplina e a evolução registrada ao longo do tempo. O valor do serviço de Certificação Artística por Competência será informado pela Contratada no momento da solicitação.</p><h3>CLÁUSULA OITAVA - QUINTA SEMANA OPCIONAL</h3>
 <p>8.1. O presente Contrato prevê a realização de 4 (quatro) encontros mensais. Nos meses em que o calendário comportar uma quinta semana, não haverá encontro regular programado.</p>
 <p>8.2. Nesses meses, a Contratada poderá oferecer um encontro adicional opcional na quinta semana. O Contratante ou Responsável deverá manifestar interesse formalmente, por mensagem de texto ou aplicativo de comunicação, no prazo de até 3 (três) dias antes da data proposta.</p>
 <p>8.3. A confirmação do interesse pelo Contratante implicará a cobrança desse encontro adicional, no mesmo valor proporcional ao encontro regular vigente no contrato, devendo ser pago juntamente com a mensalidade do mês seguinte ou na data acordada entre as partes.</p>
 <p>8.4. A ausência de manifestação dentro do prazo será interpretada como desinteresse, e o encontro não será realizado nem cobrado.</p>
-<h3>CLÁUSULA NONA - ENCONTROS COM REALIDADE VIRTUAL (OPCIONAL E AVULSO)</h3>
-<p>9.1. A Contratada poderá oferecer, de forma eventual e avulsa, atividades de desenho utilizando equipamento de Realidade Virtual (headset Meta Quest 3 ou equivalente), realizadas durante o encontro regular contratado ou em data e horário distintos, a critério da Contratada.</p>
-<p>9.2. Essas atividades VR são opcionais e serão ofertadas mediante comunicação prévia da Contratada ao Contratante, com antecedência mínima de 3 (três) dias úteis. A Contratada poderá, a seu critério, oferecer atividades VR de forma gratuita, com aviso prévio, sem que isso gere obrigação de repetição ou direito adquirido por parte do Contratante.</p>
-<p>9.3. O Contratante ou Responsável deverá manifestar interesse formalmente, por mensagem de texto ou aplicativo de comunicação, para confirmar a participação do aluno. A confirmação implica a cobrança do valor de R$ ${(a.valorVR||35).toFixed(2)} (${valorExt(a.valorVR||35)} reais) por aluno por atividade VR, com duração de 30 (trinta) minutos, valor que engloba a prestação do serviço de ensino de desenho e o uso do equipamento de Realidade Virtual.</p>
+<h3>CLÁUSULA NONA - ATIVIDADES COM REALIDADE VIRTUAL (EVENTUAIS E GRATUITAS)</h3>
+<p>9.1. A Contratada poderá, a seu exclusivo critério e de forma eventual, oferecer atividades de desenho com uso de equipamento de Realidade Virtual (headset Meta Quest 3 ou equivalente) durante os encontros regulares, sem qualquer custo adicional ao Contratante.</p>
+<p>9.2. As atividades com Realidade Virtual não integram o objeto deste Contrato. Sua oferta constitui mera liberalidade da Contratada, não gerando obrigação de disponibilização, periodicidade, repetição ou direito adquirido por parte do Contratante ou do aluno beneficiário.</p>
+<p>9.3. A participação do aluno é opcional. Sendo o aluno menor de idade, a participação fica condicionada à autorização prévia do responsável legal.</p>
 <p>9.4. RESTRIÇÕES DE SAÚDE: O uso do headset de Realidade Virtual é contraindicado para pessoas com epilepsia fotossensível, histórico de enjoo de movimento severo, problemas vestibulares ou qualquer condição médica que possa ser agravada por estímulos visuais intensos. É responsabilidade do Contratante ou Responsável informar à Contratada sobre quaisquer condições de saúde do aluno que possam ser relevantes antes do uso do equipamento.</p>
 <p>9.5. O aluno beneficiário deverá usar o equipamento sob orientação direta da Contratada, sendo vedado o manuseio autônomo sem supervisão.</p>
 <h3>CLÁUSULA DÉCIMA - RESPONSABILIDADE POR DANOS A EQUIPAMENTOS E BENS</h3>
@@ -2263,6 +2272,7 @@ Regra para condições de saúde: Cícero não é terapeuta. Não diagnostique, 
 
 INSTRUÇÕES:
 - Se precisar de mais dados de um aluno, peça ao professor
+- Os relatórios de frequência e observações dos encontros só entram na mensagem quando o professor os solicita explicitamente (citando "relatórios" ou "observações" e, se quiser, o período). Se você precisar deles e não estiverem na mensagem, oriente o professor a pedi-los dessa forma
 - Não invente dados que não estejam na mensagem
 - Ao analisar imagem de desenho: observe traço, proporção, luz/sombra, perspectiva, material, pontos fortes e sugestões para o próximo encontro`;
 
@@ -2291,11 +2301,69 @@ function iaListaAlunos() {
   }).join('\n');
 }
 
+const IA_MESES_PT = {janeiro:'01',fevereiro:'02','mar\u00e7o':'03',marco:'03',abril:'04',maio:'05',junho:'06',julho:'07',agosto:'08',setembro:'09',outubro:'10',novembro:'11',dezembro:'12'};
+
+function iaDetectarMeses(pLower) {
+  const meses = new Set();
+  let m;
+  const re1 = /(\d{4})-(\d{2})/g;
+  while ((m = re1.exec(pLower))) meses.add(m[1]+'-'+m[2]);
+  const re2 = /(\d{1,2})\/(\d{4})/g;
+  while ((m = re2.exec(pLower))) meses.add(m[2]+'-'+String(m[1]).padStart(2,'0'));
+  Object.keys(IA_MESES_PT).forEach(function(nome){
+    if (pLower.indexOf(nome) !== -1) {
+      const ma = pLower.match(new RegExp(nome+'(?:\\s+de)?\\s+(\\d{4})'));
+      const ano = ma ? ma[1] : String(new Date().getFullYear());
+      meses.add(ano+'-'+IA_MESES_PT[nome]);
+    }
+  });
+  return Array.from(meses).sort();
+}
+
+function iaColetarObservacoes(meses, listaAlunos) {
+  const fonte = (listaAlunos && listaAlunos.length) ? listaAlunos : alunos;
+  const linhas = [];
+  fonte.forEach(function(a){
+    const f = a.freq || {};
+    const porSemana = {};
+    Object.keys(f).forEach(function(k){
+      const mm = k.match(/^(\d{4}-\d{2})-s(\d)-(p|f|obs)$/);
+      if (!mm) return;
+      if (meses && meses.indexOf(mm[1]) === -1) return;
+      const chave = mm[1]+' semana '+mm[2];
+      porSemana[chave] = porSemana[chave] || {};
+      porSemana[chave][mm[3]] = f[k];
+    });
+    const regs = Object.keys(porSemana).sort().map(function(ch){
+      const r = porSemana[ch];
+      if (!r.p && !r.f && !r.obs) return null;
+      const st = r.p ? 'Presente' : (r.f ? 'Falta' : 'sem marca\u00e7\u00e3o');
+      return '  '+ch+': '+st+(r.obs ? (' | Obs: '+r.obs) : '');
+    }).filter(Boolean);
+    if (regs.length) linhas.push(a.nome+':\n'+regs.join('\n'));
+  });
+  return linhas.length ? linhas.join('\n') : '(nenhum registro de frequ\u00eancia ou observa\u00e7\u00e3o encontrado para o per\u00edodo solicitado)';
+}
+
 function iaInjetarDados(pergunta) {
   const pLower = pergunta.toLowerCase();
   const mencionados = alunos.filter(function(a){
     return pLower.includes(a.nome.split(' ')[0].toLowerCase());
   });
+  const pedeRelatorios = /relat[\u00f3o]ri|observa[\u00e7c][\u00f5oa]|anota[\u00e7c][\u00f5oa]/.test(pLower);
+  if (pedeRelatorios) {
+    const mesesPedidos = iaDetectarMeses(pLower);
+    const querTodas = /\btodas?\b|\btodos?\b|\btudo\b|completo|inteiro|hist[\u00f3o]rico/.test(pLower);
+    let meses = null, rotulo = 'todos os meses registrados';
+    if (mesesPedidos.length) { meses = mesesPedidos; rotulo = mesesPedidos.join(', '); }
+    else if (!querTodas) {
+      const atual = new Date().toISOString().slice(0,7);
+      meses = [atual]; rotulo = atual+' (m\u00eas atual; pe\u00e7a "todas" ou cite o m\u00eas desejado para outro per\u00edodo)';
+    }
+    let bloco = '[RELAT\u00d3RIOS DE FREQU\u00caNCIA E OBSERVA\u00c7\u00d5ES \u2014 '+rotulo+(mencionados.length?' \u2014 apenas alunos citados':'')+']\n'+iaColetarObservacoes(meses, mencionados);
+    if (mencionados.length === 1) bloco += '\n\n[DADOS DO ALUNO MENCIONADO]\n'+iaResumoAluno(mencionados[0],5);
+    return bloco+'\n\n[PERGUNTA]\n'+pergunta;
+  }
   if (mencionados.length === 1) {
     return '[DADOS DO ALUNO MENCIONADO]\n'+iaResumoAluno(mencionados[0],5)+'\n\n[PERGUNTA]\n'+pergunta;
   }
@@ -2418,7 +2486,7 @@ async function iaEnviar() {
     const response = await fetch('https://jornada-ia.cicero-arte.workers.dev/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey: cfg.apiKey, model: 'claude-sonnet-4-5', max_tokens: 1024, system: IA_SYSTEM, messages: iaHistorico })
+      body: JSON.stringify({ apiKey: cfg.apiKey, model: 'claude-sonnet-4-5', max_tokens: 8192, system: IA_SYSTEM, messages: iaHistorico })
     });
     const data = await response.json();
     if (data.error) throw new Error(data.error.message || 'Erro da API');
@@ -2487,6 +2555,7 @@ window.richCmd=richCmd; window.salvarConfig=salvarConfig; window.salvarRPS=salva
 window.selecionarNivel=selecionarNivel; window.setPag=setPag; window.toggleCard=toggleCard;
 window.toggleFreqCard=toggleFreqCard; window.toggleFreq=toggleFreq;
 window.toggleNavMenu=toggleNavMenu; window.trocarCert=trocarCert; window.verContrato=verContrato;
+window.fecharNavMenu=fecharNavMenu; window.autoGrow=autoGrow;
 window.calcularIdade=calcularIdade; window.importarDados=importarDados;
 window.preencherCertAluno=preencherCertAluno; window.renderFin=renderFin;
 window.renderFreq=renderFreq; window.toggleVRInline=toggleVRInline; window.toggleVRPanel=toggleVRPanel;
