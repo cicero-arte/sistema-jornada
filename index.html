@@ -1915,18 +1915,44 @@ function copiarContrato(){navigator.clipboard.writeText(document.getElementById(
 function imprimirContrato(){const c=document.getElementById('contrato-html').innerHTML;const j=window.open('','_blank');j.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Contrato</title><style>body{font-family:\'Times New Roman\',serif;font-size:13px;line-height:1.8;color:#111;padding:40px;max-width:800px;margin:0 auto;}h2{text-align:center;font-size:15px;letter-spacing:1px;margin-bottom:20px;}h3{font-size:13px;font-weight:bold;margin:18px 0 6px;}p{margin-bottom:10px;text-align:justify;}.rodape{margin-top:40px;border-top:1px solid #ccc;padding-top:16px;font-size:11px;color:#666;text-align:center;}@media print{@page{margin:2cm;}}</style></head><body>'+c+'</body></html>');j.document.close();setTimeout(()=>j.print(),400);}
 
 
-function exportarDados(){
+async function exportarDados(){
   const backup={alunos,pid,statusItens,notasItens,cfg,exportadoEm:new Date().toLocaleString('pt-BR')};
   const json=JSON.stringify(backup,null,2);
-  const blob=new Blob([json],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
   const now=new Date();
   const data=now.toISOString().slice(0,10);
   const hora=now.toTimeString().slice(0,8).replace(/:/g,'-');
-  a.href=url;a.download='jornada_backup_'+data+'_'+hora+'.json';a.click();
+  const nomeArquivo='jornada_backup_'+data+'_'+hora+'.json';
+
+  if(window.showSaveFilePicker){
+    try{
+      const handle=await window.showSaveFilePicker({
+        suggestedName:nomeArquivo,
+        types:[{description:'Backup JSON',accept:{'application/json':['.json']}}]
+      });
+      const writable=await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      document.getElementById('backup-info').textContent='Backup salvo em '+new Date().toLocaleString('pt-BR');
+    }catch(err){
+      if(err.name==='AbortError'){
+        document.getElementById('backup-info').textContent='Exportação cancelada.';
+      }else{
+        console.error('Erro ao salvar backup:',err);
+        document.getElementById('backup-info').textContent='Erro ao salvar o backup. Veja o console.';
+      }
+    }
+    return;
+  }
+
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=nomeArquivo;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  document.getElementById('backup-info').textContent='Backup exportado em '+new Date().toLocaleString('pt-BR');
+  document.getElementById('backup-info').textContent='Backup exportado em '+new Date().toLocaleString('pt-BR')+' (navegador sem suporte a escolha de pasta, foi para a pasta de Downloads padrão)';
 }
 
 function importarDados(input){
@@ -2275,6 +2301,21 @@ INSTRUÇÕES:
 - Os relatórios de frequência e observações dos encontros só entram na mensagem quando o professor os solicita explicitamente (citando "relatórios" ou "observações" e, se quiser, o período). Se você precisar deles e não estiverem na mensagem, oriente o professor a pedi-los dessa forma
 - Não invente dados que não estejam na mensagem
 - Ao analisar imagem de desenho: observe traço, proporção, luz/sombra, perspectiva, material, pontos fortes e sugestões para o próximo encontro
+
+RELATÓRIOS COM BASE CIENTÍFICA E PEDAGÓGICA:
+Ao emitir relatórios sobre alunos, turmas ou o andamento das aulas, fundamente as observações em literatura pedagógica reconhecida (Bruner, Piaget, Vygotsky, Wallon) e em evidências observáveis descritas pelo professor, evitando afirmações genéricas ou clichês.
+
+Ordem de prioridade nas decisões e recomendações:
+1. Preservar a integridade do aluno
+2. Ajudar no desenvolvimento do desenho do aluno
+3. Tornar as aulas agradáveis e prazerosas
+4. Defender o método e a integridade e o ânimo do professor
+
+Erros de aplicação do método ou de condução das aulas devem ser apontados com honestidade ao professor e corrigidos internamente, nas conversas entre você e ele. Não inclua esses erros em relatórios ou mensagens endereçados aos pais.
+
+Exceção: se o erro afetar a segurança, o bem-estar ou os direitos do aluno, a prioridade 1 (integridade do aluno) exige orientar o professor a comunicar o responsável, mesmo que isso implique reconhecer uma falha. Nesse caso, ajude o professor a comunicar com transparência e cuidado, sem gerar pânico desnecessário.
+
+Nas comunicações voltadas a alunos e pais, mantenha um tom de confiança no método e no trabalho do professor, sem soar defensivo ou inseguro.
 CONTRATO — CLÁUSULAS PRINCIPAIS (versão vigente):
 Objeto: prestação de serviços de ensino de desenho artístico presencial, denominados Jornada de Desenho em Espiral, com currículo aberto e não sequencial.
 Vigência: 12 meses a partir da assinatura eletrônica (Clicksign). Encerramento automático ao final; novo instrumento para continuidade.
