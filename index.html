@@ -525,6 +525,11 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
         <div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">Necessária para usar o Assistente IA. Obtida em <a href="https://console.anthropic.com" target="_blank" style="color:var(--warm);">console.anthropic.com</a>. Salva junto com os dados do sistema.</div>
       </div>
     </div>
+    <div class="config-section" style="margin-top:16px;">
+      <div class="config-section-title">Sessão</div>
+      <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.6;">O acesso fica salvo neste navegador por 10 dias. Se quiser sair antes disso, por exemplo ao terminar de usar um computador compartilhado, use o botão abaixo.</p>
+      <button class="btn" style="border:1.5px solid #c0392b;color:#c0392b;background:transparent;" onclick="sairDaJornada()">Sair da Jornada</button>
+    </div>
     <button class="btn btn-primary" onclick="salvarConfig()">Salvar configurações</button>
     <div class="config-section" style="margin-top:16px;">
       <div class="config-section-title">Backup dos dados</div>
@@ -2227,6 +2232,12 @@ function verificarAcesso() {
   return false;
 }
 
+function sairDaJornada() {
+  if(!confirm('Sair da Jornada? Você vai precisar digitar a senha de novo para entrar.')) return;
+  localStorage.removeItem('jornada_auth_expiry');
+  location.reload();
+}
+
 function verificarSenha() {
   document.getElementById('splash-senha-wrap').style.display = 'block';
   document.querySelector('.splash-btn').style.display = 'none';
@@ -2608,7 +2619,7 @@ window.pixPreview=pixPreview; window.pixQrRemover=pixQrRemover; window.pixQrSalv
 window.pixQrCarregar=pixQrCarregar; window.resetarCert=resetarCert;
 window.richAplicarData=richAplicarData; window.richAplicarTag=richAplicarTag;
 window.richAplicarTexto=richAplicarTexto; window.richAplicarTitulo=richAplicarTitulo;
-window.richCmd=richCmd; window.salvarConfig=salvarConfig; window.salvarRPS=salvarRPS; window.salvarForcado=salvarForcado;
+window.richCmd=richCmd; window.salvarConfig=salvarConfig; window.salvarRPS=salvarRPS; window.salvarForcado=salvarForcado; window.sairDaJornada=sairDaJornada;
 window.selecionarNivel=selecionarNivel; window.setPag=setPag; window.toggleCard=toggleCard;
 window.toggleFreqCard=toggleFreqCard; window.toggleFreq=toggleFreq;
 window.toggleNavMenu=toggleNavMenu; window.trocarCert=trocarCert; window.verContrato=verContrato;
