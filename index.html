@@ -602,7 +602,30 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <button class="btn btn-primary btn-sm" onclick="document.getElementById('mat-titulo').value.trim() ? document.getElementById('mat-arquivo').click() : alert('Preencha o título da folha antes de escolher a imagem.')">⬆️ Enviar folha (PNG/JPG)</button>
       <div id="mat-upload-status" style="font-size:12px;color:var(--ink-muted);margin-top:8px;display:none;"></div>
     </div>
-    <div id="mat-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;"></div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:16px;">
+      <div class="field" style="flex:1;min-width:180px;margin-bottom:0;"><label>Buscar</label><input id="mat-busca" type="text" placeholder="Buscar por título ou observação..." oninput="renderMateriais()"></div>
+      <div class="field" style="min-width:180px;margin-bottom:0;"><label>Filtrar por pilar</label><select id="mat-filtro-pilar" onchange="renderMateriais()">
+        <option value="">Todos os pilares</option>
+        <option value="Linha e gesto">Linha e gesto</option>
+        <option value="Forma e proporção">Forma e proporção</option>
+        <option value="Perspectiva e espaço">Perspectiva e espaço</option>
+        <option value="Luz e sombra">Luz e sombra</option>
+        <option value="Materiais e superfícies">Materiais e superfícies</option>
+        <option value="Cor">Cor</option>
+        <option value="Observação">Observação</option>
+        <option value="Figura humana">Figura humana</option>
+        <option value="Anime/Mangá">Anime/Mangá</option>
+        <option value="Cartoon">Cartoon</option>
+        <option value="Natureza e paisagem">Natureza e paisagem</option>
+        <option value="Narrativa e personagem">Narrativa e personagem</option>
+        <option value="Caricatura">Caricatura</option>
+        <option value="Digital e IA">Digital e IA</option>
+        <option value="__sem__">Sem pilar definido</option>
+      </select></div>
+    </div>
+
+    <div id="mat-lista"></div>
   </div>
   <div class="tela cert-tela" id="tela-certificados">
     <div class="sec-title">Certificados</div>
@@ -909,6 +932,37 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
     <div class="m-actions">
       <button class="btn btn-neutral" onclick="fecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="confirmarAluno()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR FOLHA -->
+<div class="overlay hidden" id="modal-mat">
+  <div class="modal">
+    <h3>Editar folha</h3>
+    <input type="hidden" id="mat-edit-id">
+    <div class="field"><label>Título da folha</label><input id="mat-edit-titulo" type="text"></div>
+    <div class="field"><label>Pilar técnico</label><select id="mat-edit-pilar">
+      <option value="">Não especificado</option>
+      <option value="Linha e gesto">Linha e gesto</option>
+      <option value="Forma e proporção">Forma e proporção</option>
+      <option value="Perspectiva e espaço">Perspectiva e espaço</option>
+      <option value="Luz e sombra">Luz e sombra</option>
+      <option value="Materiais e superfícies">Materiais e superfícies</option>
+      <option value="Cor">Cor</option>
+      <option value="Observação">Observação</option>
+      <option value="Figura humana">Figura humana</option>
+      <option value="Anime/Mangá">Anime/Mangá</option>
+      <option value="Cartoon">Cartoon</option>
+      <option value="Natureza e paisagem">Natureza e paisagem</option>
+      <option value="Narrativa e personagem">Narrativa e personagem</option>
+      <option value="Caricatura">Caricatura</option>
+      <option value="Digital e IA">Digital e IA</option>
+    </select></div>
+    <div class="field"><label>Observação (opcional)</label><input id="mat-edit-obs" type="text"></div>
+    <div class="m-actions">
+      <button class="btn btn-neutral" onclick="fecharModalMat()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoFolha()">Salvar</button>
     </div>
   </div>
 </div>
@@ -2022,23 +2076,86 @@ function renderMateriais(){
   const el = document.getElementById('mat-lista');
   if(!el) return;
   if(!folhas.length){
-    el.innerHTML = '<div style="grid-column:1/-1;padding:24px;text-align:center;color:var(--ink-muted);font-size:13px;">Nenhuma folha enviada ainda. Envie fotos ou exports das folhas que você usa em aula (PNG ou JPG).</div>';
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink-muted);font-size:13px;">Nenhuma folha enviada ainda. Envie fotos ou exports das folhas que você usa em aula (PNG ou JPG).</div>';
     return;
   }
-  const ordenadas = [...folhas].sort((a,b)=> (b.dataUpload||'').localeCompare(a.dataUpload||''));
-  el.innerHTML = ordenadas.map(f=>`
+  const busca = (document.getElementById('mat-busca')?.value || '').trim().toLowerCase();
+  const filtroPilar = document.getElementById('mat-filtro-pilar')?.value || '';
+
+  let filtradas = [...folhas];
+  if(busca){
+    filtradas = filtradas.filter(f => (f.titulo||'').toLowerCase().includes(busca) || (f.obs||'').toLowerCase().includes(busca));
+  }
+  if(filtroPilar === '__sem__'){
+    filtradas = filtradas.filter(f => !f.pilar);
+  } else if(filtroPilar){
+    filtradas = filtradas.filter(f => f.pilar === filtroPilar);
+  }
+
+  if(!filtradas.length){
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink-muted);font-size:13px;">Nenhuma folha encontrada com esses filtros.</div>';
+    return;
+  }
+
+  // Agrupa por pilar (mantém ordenação por data mais recente dentro de cada grupo)
+  const ordenadas = [...filtradas].sort((a,b)=> (b.dataUpload||'').localeCompare(a.dataUpload||''));
+  const grupos = {};
+  ordenadas.forEach(f=>{
+    const chave = f.pilar || 'Sem pilar definido';
+    if(!grupos[chave]) grupos[chave] = [];
+    grupos[chave].push(f);
+  });
+  const chavesOrdenadas = Object.keys(grupos).sort((a,b)=> a==='Sem pilar definido' ? 1 : b==='Sem pilar definido' ? -1 : a.localeCompare(b));
+
+  const cardHtml = f => `
     <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-      <img src="${f.url}" style="width:100%;aspect-ratio:1/1.3;object-fit:cover;display:block;background:#fff;">
+      <img src="${f.url}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#fff;">
       <div style="padding:10px;">
         <div style="font-size:12px;font-weight:700;line-height:1.3;margin-bottom:4px;">${f.titulo}</div>
-        ${f.pilar?`<div style="font-size:10px;color:var(--brand);font-weight:700;margin-bottom:4px;">${f.pilar}</div>`:''}
         ${f.obs?`<div style="font-size:11px;color:var(--ink-muted);margin-bottom:6px;">${f.obs}</div>`:''}
-        <div style="display:flex;gap:6px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <a href="${f.url}" target="_blank" class="btn btn-sm" style="background:#fff;border:1px solid var(--border);color:var(--ink-soft);text-decoration:none;">🔍 Ver</a>
+          <button class="btn btn-sm" style="background:#fff;border:1px solid var(--border);color:var(--ink-soft);" onclick="editarFolha(${f.id})">✏️</button>
           <button class="btn btn-danger btn-sm" onclick="excluirFolha(${f.id})">🗑</button>
         </div>
       </div>
+    </div>`;
+
+  el.innerHTML = chavesOrdenadas.map(chave => `
+    <div style="margin-bottom:20px;">
+      <div class="sec-title" style="margin-bottom:10px;">${chave} <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-muted);">(${grupos[chave].length})</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">
+        ${grupos[chave].map(cardHtml).join('')}
+      </div>
     </div>`).join('');
+}
+
+function editarFolha(id){
+  const f = folhas.find(x=>x.id===id);
+  if(!f) return;
+  document.getElementById('mat-edit-id').value = f.id;
+  document.getElementById('mat-edit-titulo').value = f.titulo || '';
+  document.getElementById('mat-edit-pilar').value = f.pilar || '';
+  document.getElementById('mat-edit-obs').value = f.obs || '';
+  document.getElementById('modal-mat').classList.remove('hidden');
+}
+
+function fecharModalMat(){
+  document.getElementById('modal-mat').classList.add('hidden');
+}
+
+function salvarEdicaoFolha(){
+  const id = parseInt(document.getElementById('mat-edit-id').value);
+  const f = folhas.find(x=>x.id===id);
+  if(!f) return;
+  const titulo = document.getElementById('mat-edit-titulo').value.trim();
+  if(!titulo){ alert('O título não pode ficar em branco.'); return; }
+  f.titulo = titulo;
+  f.pilar = document.getElementById('mat-edit-pilar').value;
+  f.obs = document.getElementById('mat-edit-obs').value.trim();
+  salvar();
+  fecharModalMat();
+  renderMateriais();
 }
 
 function salvarRPS(v){localStorage.setItem('jd_rps',v);}
@@ -2739,10 +2856,24 @@ function iaResumoCrescimento() {
 
 function iaResumoMateriais() {
   if (!folhas.length) return '[MATERIAIS DE AULA]\nNenhuma folha cadastrada ainda no sistema.';
-  const linhas = folhas.map(function(f){
-    return '- '+f.titulo+' | pilar: '+(f.pilar||'n\u00e3o especificado')+(f.obs?' | obs: '+f.obs:'')+' | enviada em '+f.dataUpload;
+  const grupos = {};
+  folhas.forEach(function(f){
+    const chave = f.pilar || 'Sem pilar definido';
+    if (!grupos[chave]) grupos[chave] = [];
+    grupos[chave].push(f);
+  });
+  const chaves = Object.keys(grupos).sort(function(a,b){
+    if (a==='Sem pilar definido') return 1;
+    if (b==='Sem pilar definido') return -1;
+    return a.localeCompare(b);
+  });
+  const blocos = chaves.map(function(chave){
+    const linhas = grupos[chave].map(function(f){
+      return '  - '+f.titulo+(f.obs?' | obs: '+f.obs:'')+' | enviada em '+f.dataUpload;
+    }).join('\n');
+    return chave+' ('+grupos[chave].length+'):\n'+linhas;
   }).join('\n');
-  return '[MATERIAIS DE AULA \u2014 '+folhas.length+' folha(s) cadastradas, apenas t\u00edtulo/pilar/observa\u00e7\u00e3o, sem acesso \u00e0 imagem em si]\n'+linhas;
+  return '[MATERIAIS DE AULA \u2014 '+folhas.length+' folha(s) cadastradas, agrupadas por pilar t\u00e9cnico, apenas t\u00edtulo/observa\u00e7\u00e3o, sem acesso \u00e0 imagem em si]\n'+blocos;
 }
 
 function iaInjetarDados(pergunta) {
@@ -2980,6 +3111,7 @@ window.preencherCertAluno=preencherCertAluno; window.renderFin=renderFin;
 window.renderFreq=renderFreq; window.toggleVRInline=toggleVRInline; window.toggleVRPanel=toggleVRPanel;
 window.salvarObs=salvarObs; window.salvarForcado=salvarForcado; window.salvarImediato=salvarImediato;
 window.materiaisUpload=materiaisUpload; window.excluirFolha=excluirFolha;
+window.editarFolha=editarFolha; window.fecharModalMat=fecharModalMat; window.salvarEdicaoFolha=salvarEdicaoFolha;
 </script>
 
 <!-- POPUP NFSe MODELO -->
