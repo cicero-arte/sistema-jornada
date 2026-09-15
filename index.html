@@ -26,9 +26,12 @@
   --red:#c0392b;--green:#4b6b58;--green-tint:#e4efe8;
 }
 body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;}
-.shell{display:flex;align-items:stretch;max-width:1200px;margin:0 auto;}
+.shell{display:flex;align-items:stretch;max-width:1600px;margin:0 auto;width:100%;}
+body{padding:0 16px;}
+@media (min-width:1700px){ body{padding:0 24px;} }
 .nav{display:flex;flex-direction:column;align-items:stretch;gap:2px;width:230px;flex:none;background:var(--brand);border-radius:12px 0 0 12px;padding:16px 10px;}
 .nav-btn{display:flex;align-items:center;gap:10px;justify-content:flex-start;text-align:left;padding:11px 12px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;color:#ffffff88;background:none;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;width:100%;}
+.nav-icon{width:16px;height:16px;flex-shrink:0;}
 .nav-btn.ativo{color:#fff;background:#ffffff22;}
 .nav-btn:hover:not(.ativo){color:#fff;}
 .nav-salvar{padding:10px 14px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:#fff;background:#ffffff22;border:1.5px solid #ffffff44;border-radius:7px;cursor:pointer;transition:all 0.2s;white-space:nowrap;width:100%;margin-top:10px;}
@@ -331,17 +334,17 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
 <div class="shell">
 <div class="nav">
   <button class="nav-hamburger" onclick="toggleNavMenu()" id="hamburger">☰</button>
-  <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this)">👥 <span>Alunos</span></button>
-  <button class="nav-btn" data-tela="frequencia" onclick="ir('frequencia',this)">📅 <span>Frequência</span></button>
-  <button class="nav-btn" data-tela="financeiro" onclick="ir('financeiro',this)">💰 <span>Financeiro</span></button>
-  <button class="nav-btn" data-tela="crescimento" onclick="ir('crescimento',this)">📈 <span>Crescimento</span></button>
-  <button class="nav-btn" data-tela="conteudo" onclick="ir('conteudo',this)">🌀 <span>Conteúdo</span></button>
-  <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this)">📄 <span>Materiais</span></button>
-  <button class="nav-btn" data-tela="certificados" onclick="ir('certificados',this)">🎓 <span>Certif.</span></button>
-  <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this)">📋 <span>Avaliação</span></button>
-  <button class="nav-btn" data-tela="email" onclick="ir('email',this)">✉️ <span>E-mail</span></button>
-  <button class="nav-btn" data-tela="ia" onclick="ir('ia',this)">🤖 <span>IA</span></button>
-  <button class="nav-btn" data-tela="config" onclick="ir('config',this)">⚙️ <span>Config</span></button>
+  <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> <span>Alunos</span></button>
+  <button class="nav-btn" data-tela="frequencia" onclick="ir('frequencia',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> <span>Frequência</span></button>
+  <button class="nav-btn" data-tela="financeiro" onclick="ir('financeiro',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> <span>Financeiro</span></button>
+  <button class="nav-btn" data-tela="crescimento" onclick="ir('crescimento',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> <span>Crescimento</span></button>
+  <button class="nav-btn" data-tela="conteudo" onclick="ir('conteudo',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1"></circle></svg> <span>Conteúdo</span></button>
+  <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> <span>Materiais</span></button>
+  <button class="nav-btn" data-tela="certificados" onclick="ir('certificados',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg> <span>Certif.</span></button>
+  <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg> <span>Avaliação</span></button>
+  <button class="nav-btn" data-tela="email" onclick="ir('email',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> <span>E-mail</span></button>
+  <button class="nav-btn" data-tela="ia" onclick="ir('ia',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg> <span>IA</span></button>
+  <button class="nav-btn" data-tela="config" onclick="ir('config',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> <span>Config</span></button>
   <button class="nav-salvar" id="btn-salvar-forcado" onclick="salvarForcado()">💾 Salvar</button>
   <div class="nav-menu" id="nav-menu">
     <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this);fecharNavMenu()">👥 Alunos</button>
@@ -587,32 +590,10 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
           <option value="Luz e sombra">Luz e sombra</option>
           <option value="Materiais e superfícies">Materiais e superfícies</option>
           <option value="Cor">Cor</option>
-          <option value="Observação">Observação</option>
-          <option value="Figura humana">Figura humana</option>
-          <option value="Anime/Mangá">Anime/Mangá</option>
-          <option value="Cartoon">Cartoon</option>
-          <option value="Natureza e paisagem">Natureza e paisagem</option>
-          <option value="Narrativa e personagem">Narrativa e personagem</option>
-          <option value="Caricatura">Caricatura</option>
-          <option value="Digital e IA">Digital e IA</option>
         </select></div>
       </div>
-      <div class="field"><label>Observação (opcional)</label><input id="mat-obs" type="text" placeholder="Quando usar, para qual perfil, variações..."></div>
-      <input type="file" id="mat-arquivo" accept="image/png,image/jpeg" style="display:none" onchange="materiaisUpload(this)">
-      <button class="btn btn-primary btn-sm" onclick="document.getElementById('mat-titulo').value.trim() ? document.getElementById('mat-arquivo').click() : alert('Preencha o título da folha antes de escolher a imagem.')">⬆️ Enviar folha (PNG/JPG)</button>
-      <div id="mat-upload-status" style="font-size:12px;color:var(--ink-muted);margin-top:8px;display:none;"></div>
-    </div>
-
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:16px;">
-      <div class="field" style="flex:1;min-width:180px;margin-bottom:0;"><label>Buscar</label><input id="mat-busca" type="text" placeholder="Buscar por título ou observação..." oninput="renderMateriais()"></div>
-      <div class="field" style="min-width:180px;margin-bottom:0;"><label>Filtrar por pilar</label><select id="mat-filtro-pilar" onchange="renderMateriais()">
-        <option value="">Todos os pilares</option>
-        <option value="Linha e gesto">Linha e gesto</option>
-        <option value="Forma e proporção">Forma e proporção</option>
-        <option value="Perspectiva e espaço">Perspectiva e espaço</option>
-        <option value="Luz e sombra">Luz e sombra</option>
-        <option value="Materiais e superfícies">Materiais e superfícies</option>
-        <option value="Cor">Cor</option>
+      <div class="field"><label>Tema / módulo</label><select id="mat-tema">
+        <option value="">Não especificado</option>
         <option value="Observação">Observação</option>
         <option value="Figura humana">Figura humana</option>
         <option value="Anime/Mangá">Anime/Mangá</option>
@@ -621,7 +602,36 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
         <option value="Narrativa e personagem">Narrativa e personagem</option>
         <option value="Caricatura">Caricatura</option>
         <option value="Digital e IA">Digital e IA</option>
+      </select></div>
+      <div class="field"><label>Observação (opcional)</label><input id="mat-obs" type="text" placeholder="Quando usar, para qual perfil, variações..."></div>
+      <input type="file" id="mat-arquivo" accept="image/png,image/jpeg" style="display:none" onchange="materiaisUpload(this)">
+      <button class="btn btn-primary btn-sm" onclick="document.getElementById('mat-titulo').value.trim() ? document.getElementById('mat-arquivo').click() : alert('Preencha o título da folha antes de escolher a imagem.')">⬆️ Enviar folha (PNG/JPG)</button>
+      <div id="mat-upload-status" style="font-size:12px;color:var(--ink-muted);margin-top:8px;display:none;"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:16px;">
+      <div class="field" style="flex:1;min-width:180px;margin-bottom:0;"><label>Buscar</label><input id="mat-busca" type="text" placeholder="Buscar por título ou observação..." oninput="renderMateriais()"></div>
+      <div class="field" style="min-width:170px;margin-bottom:0;"><label>Filtrar por pilar</label><select id="mat-filtro-pilar" onchange="renderMateriais()">
+        <option value="">Todos os pilares</option>
+        <option value="Linha e gesto">Linha e gesto</option>
+        <option value="Forma e proporção">Forma e proporção</option>
+        <option value="Perspectiva e espaço">Perspectiva e espaço</option>
+        <option value="Luz e sombra">Luz e sombra</option>
+        <option value="Materiais e superfícies">Materiais e superfícies</option>
+        <option value="Cor">Cor</option>
         <option value="__sem__">Sem pilar definido</option>
+      </select></div>
+      <div class="field" style="min-width:170px;margin-bottom:0;"><label>Filtrar por tema</label><select id="mat-filtro-tema" onchange="renderMateriais()">
+        <option value="">Todos os temas</option>
+        <option value="Observação">Observação</option>
+        <option value="Figura humana">Figura humana</option>
+        <option value="Anime/Mangá">Anime/Mangá</option>
+        <option value="Cartoon">Cartoon</option>
+        <option value="Natureza e paisagem">Natureza e paisagem</option>
+        <option value="Narrativa e personagem">Narrativa e personagem</option>
+        <option value="Caricatura">Caricatura</option>
+        <option value="Digital e IA">Digital e IA</option>
+        <option value="__sem__">Sem tema definido</option>
       </select></div>
     </div>
 
@@ -950,6 +960,9 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <option value="Luz e sombra">Luz e sombra</option>
       <option value="Materiais e superfícies">Materiais e superfícies</option>
       <option value="Cor">Cor</option>
+    </select></div>
+    <div class="field"><label>Tema / módulo</label><select id="mat-edit-tema">
+      <option value="">Não especificado</option>
       <option value="Observação">Observação</option>
       <option value="Figura humana">Figura humana</option>
       <option value="Anime/Mangá">Anime/Mangá</option>
@@ -2026,6 +2039,7 @@ async function materiaisUpload(input){
   const titulo = document.getElementById('mat-titulo').value.trim();
   if(!titulo){ alert('Preencha o título da folha antes de enviar.'); input.value=''; return; }
   const pilar = document.getElementById('mat-pilar').value;
+  const tema = document.getElementById('mat-tema').value;
   const obs = document.getElementById('mat-obs').value.trim();
   const statusEl = document.getElementById('mat-upload-status');
   statusEl.style.display = 'block';
@@ -2040,7 +2054,7 @@ async function materiaisUpload(input){
     const url = await getDownloadURL(sref);
     folhas.push({
       id: Date.now(),
-      titulo, pilar, obs,
+      titulo, pilar, tema, obs,
       path: caminho,
       url,
       dataUpload: new Date().toISOString().slice(0,10),
@@ -2050,6 +2064,7 @@ async function materiaisUpload(input){
     document.getElementById('mat-titulo').value = '';
     document.getElementById('mat-obs').value = '';
     document.getElementById('mat-pilar').value = '';
+    document.getElementById('mat-tema').value = '';
     statusEl.textContent = 'Enviado com sucesso.';
     setTimeout(()=>{ statusEl.style.display='none'; }, 2000);
     renderMateriais();
@@ -2072,6 +2087,8 @@ async function excluirFolha(id){
   renderMateriais();
 }
 
+let matGruposAbertos = new Set();
+
 function renderMateriais(){
   const el = document.getElementById('mat-lista');
   if(!el) return;
@@ -2081,6 +2098,7 @@ function renderMateriais(){
   }
   const busca = (document.getElementById('mat-busca')?.value || '').trim().toLowerCase();
   const filtroPilar = document.getElementById('mat-filtro-pilar')?.value || '';
+  const filtroTema = document.getElementById('mat-filtro-tema')?.value || '';
 
   let filtradas = [...folhas];
   if(busca){
@@ -2091,11 +2109,18 @@ function renderMateriais(){
   } else if(filtroPilar){
     filtradas = filtradas.filter(f => f.pilar === filtroPilar);
   }
+  if(filtroTema === '__sem__'){
+    filtradas = filtradas.filter(f => !f.tema);
+  } else if(filtroTema){
+    filtradas = filtradas.filter(f => f.tema === filtroTema);
+  }
 
   if(!filtradas.length){
     el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink-muted);font-size:13px;">Nenhuma folha encontrada com esses filtros.</div>';
     return;
   }
+
+  const filtroAtivo = !!(busca || filtroPilar || filtroTema);
 
   // Agrupa por pilar (mantém ordenação por data mais recente dentro de cada grupo)
   const ordenadas = [...filtradas].sort((a,b)=> (b.dataUpload||'').localeCompare(a.dataUpload||''));
@@ -2112,6 +2137,7 @@ function renderMateriais(){
       <img src="${f.url}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#fff;">
       <div style="padding:10px;">
         <div style="font-size:12px;font-weight:700;line-height:1.3;margin-bottom:4px;">${f.titulo}</div>
+        ${f.tema?`<div style="font-size:10px;color:var(--brand);font-weight:700;margin-bottom:4px;">${f.tema}</div>`:''}
         ${f.obs?`<div style="font-size:11px;color:var(--ink-muted);margin-bottom:6px;">${f.obs}</div>`:''}
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <a href="${f.url}" target="_blank" class="btn btn-sm" style="background:#fff;border:1px solid var(--border);color:var(--ink-soft);text-decoration:none;">🔍 Ver</a>
@@ -2121,13 +2147,23 @@ function renderMateriais(){
       </div>
     </div>`;
 
-  el.innerHTML = chavesOrdenadas.map(chave => `
-    <div style="margin-bottom:20px;">
-      <div class="sec-title" style="margin-bottom:10px;">${chave} <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-muted);">(${grupos[chave].length})</span></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">
-        ${grupos[chave].map(cardHtml).join('')}
+  el.innerHTML = chavesOrdenadas.map(chave => {
+    const aberto = filtroAtivo || matGruposAbertos.has(chave);
+    return `
+    <div style="margin-bottom:10px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div onclick="toggleGrupoMateriais(this.dataset.chave)" data-chave="${chave}" style="padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--bg);user-select:none;">
+        <span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--ink-soft);">${chave} <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-muted);">(${grupos[chave].length})</span></span>
+        <span style="font-size:12px;color:var(--ink-muted);">${aberto?'▲':'▼'}</span>
       </div>
-    </div>`).join('');
+      ${aberto ? `<div style="padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">${grupos[chave].map(cardHtml).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleGrupoMateriais(chave){
+  if(matGruposAbertos.has(chave)) matGruposAbertos.delete(chave);
+  else matGruposAbertos.add(chave);
+  renderMateriais();
 }
 
 function editarFolha(id){
@@ -2136,6 +2172,7 @@ function editarFolha(id){
   document.getElementById('mat-edit-id').value = f.id;
   document.getElementById('mat-edit-titulo').value = f.titulo || '';
   document.getElementById('mat-edit-pilar').value = f.pilar || '';
+  document.getElementById('mat-edit-tema').value = f.tema || '';
   document.getElementById('mat-edit-obs').value = f.obs || '';
   document.getElementById('modal-mat').classList.remove('hidden');
 }
@@ -2152,6 +2189,7 @@ function salvarEdicaoFolha(){
   if(!titulo){ alert('O título não pode ficar em branco.'); return; }
   f.titulo = titulo;
   f.pilar = document.getElementById('mat-edit-pilar').value;
+  f.tema = document.getElementById('mat-edit-tema').value;
   f.obs = document.getElementById('mat-edit-obs').value.trim();
   salvar();
   fecharModalMat();
@@ -2869,7 +2907,7 @@ function iaResumoMateriais() {
   });
   const blocos = chaves.map(function(chave){
     const linhas = grupos[chave].map(function(f){
-      return '  - '+f.titulo+(f.obs?' | obs: '+f.obs:'')+' | enviada em '+f.dataUpload;
+      return '  - '+f.titulo+(f.tema?' | tema: '+f.tema:'')+(f.obs?' | obs: '+f.obs:'')+' | enviada em '+f.dataUpload;
     }).join('\n');
     return chave+' ('+grupos[chave].length+'):\n'+linhas;
   }).join('\n');
@@ -3112,6 +3150,7 @@ window.renderFreq=renderFreq; window.toggleVRInline=toggleVRInline; window.toggl
 window.salvarObs=salvarObs; window.salvarForcado=salvarForcado; window.salvarImediato=salvarImediato;
 window.materiaisUpload=materiaisUpload; window.excluirFolha=excluirFolha;
 window.editarFolha=editarFolha; window.fecharModalMat=fecharModalMat; window.salvarEdicaoFolha=salvarEdicaoFolha;
+window.renderMateriais=renderMateriais; window.toggleGrupoMateriais=toggleGrupoMateriais;
 </script>
 
 <!-- POPUP NFSe MODELO -->
