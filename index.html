@@ -1094,6 +1094,7 @@ async function carregar(){
       if(d.cfg) cfg = {...cfg, ...JSON.parse(d.cfg)};
       if(d.vrSet) vrSet = new Set(JSON.parse(d.vrSet));
       if(d.folhas) folhas = JSON.parse(d.folhas);
+      migrarTemasAntigos();
     }
   }catch(e){ console.error('Erro ao carregar:', e); }
 }
@@ -2085,6 +2086,20 @@ async function excluirFolha(id){
   folhas = folhas.filter(x=>x.id!==id);
   salvar();
   renderMateriais();
+}
+
+const TEMAS_VALIDOS = ['Observação','Figura humana','Anime/Mangá','Cartoon','Natureza e paisagem','Narrativa e personagem','Caricatura','Digital e IA'];
+
+function migrarTemasAntigos(){
+  let mudou = false;
+  folhas.forEach(f=>{
+    if(f.pilar && TEMAS_VALIDOS.includes(f.pilar) && !f.tema){
+      f.tema = f.pilar;
+      f.pilar = '';
+      mudou = true;
+    }
+  });
+  if(mudou) salvar();
 }
 
 let matGruposAbertos = new Set();
