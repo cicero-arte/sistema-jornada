@@ -1936,6 +1936,23 @@ async function freqMelhorarIA(textareaId, alunoId, key, btn){
   const textoOriginal = textarea.value.trim();
   if(!textoOriginal){ alert('Escreva ou dite alguma anotação antes de melhorar com IA.'); return; }
   if(!cfg.apiKey){ alert('Chave API não configurada. Vá em Config, seção Assistente IA, insira sua chave e salve.'); return; }
+  const aluno = alunos.find(x=>x.id===alunoId);
+  let contextoAluno = '';
+  if(aluno){
+    let idadeTxt = '';
+    if(aluno.nasc){
+      const nasc = new Date(aluno.nasc);
+      const hoje = new Date();
+      let idade = hoje.getFullYear() - nasc.getFullYear();
+      const aindaNaoFezAniversario = (hoje.getMonth() < nasc.getMonth()) || (hoje.getMonth()===nasc.getMonth() && hoje.getDate() < nasc.getDate());
+      if(aindaNaoFezAniversario) idade--;
+      idadeTxt = idade + ' anos';
+    }
+    const partes = [];
+    if(idadeTxt) partes.push(idadeTxt);
+    if(aluno.perfil) partes.push(aluno.perfil);
+    if(partes.length) contextoAluno = '[Contexto do aluno: ' + partes.join(', ') + ']\n\n';
+  }
   const textoBtn = btn.textContent;
   btn.disabled = true;
   btn.textContent = '...';
@@ -1947,8 +1964,8 @@ async function freqMelhorarIA(textareaId, alunoId, key, btn){
         apiKey: cfg.apiKey,
         model: 'claude-sonnet-4-5',
         max_tokens: 2000,
-        system: 'Você recebe anotações rápidas ou uma transcrição de voz, feitas por um professor de desenho logo após uma aula, sobre um aluno específico. Reescreva em português correto, mantendo exatamente os fatos relatados, sem inventar informações novas e sem cortar nada. O tamanho do texto acompanha o que for necessário para não perder nenhum detalhe, sem limite artificial.\n\nSe a anotação for uma observação pedagógica do dia a dia, devolva algo direto, situando-a no pilar técnico envolvido (linha e gesto, forma e proporção, luz e sombra, perspectiva e espaço, materiais e superfícies) ou no momento do currículo em espiral quando fizer sentido.\n\nSe a anotação descrever um incidente, conflito, crise emocional do aluno (chorar, ficar nervoso, rasgar material) ou qualquer situação sensível relatada pelo aluno ou pela família: primeiro registre os fatos na íntegra e na ordem em que aconteceram, com tom sóbrio e cuidadoso. Depois, acrescente uma breve leitura pedagógica da situação e sugestões práticas de conduta em sala para o professor, como um colega experiente aconselharia. Cícero é designer gráfico e professor de desenho, sem formação em saúde: não diagnostique, não nomeie condições de saúde mental, não prescreva tratamento. Se a situação sugerir risco ao bem-estar do aluno, inclua a orientação de comunicar o responsável, sem gerar alarmismo.\n\nNão cite teóricos nem use termos técnicos de neurociência aqui. Devolva apenas o texto final, sem comentários, sem aspas ao redor do texto.',
-        messages: [{ role: 'user', content: textoOriginal }]
+        system: 'Você recebe anotações rápidas ou uma transcrição de voz, feitas por um professor de desenho logo após uma aula, sobre um aluno específico. A mensagem pode vir precedida de uma linha "[Contexto do aluno: ...]" com idade e perfil, apenas informativa, não faz parte do relato. Use essa informação para calibrar a linguagem e as sugestões ao perfil etário do aluno, sem repeti-la no texto final. Reescreva em português correto, mantendo exatamente os fatos relatados, sem inventar informações novas e sem cortar nada. O tamanho do texto acompanha o que for necessário para não perder nenhum detalhe, sem limite artificial.\n\nSe a anotação for uma observação pedagógica do dia a dia, devolva algo direto, situando-a no pilar técnico envolvido (linha e gesto, forma e proporção, luz e sombra, perspectiva e espaço, materiais e superfícies) ou no momento do currículo em espiral quando fizer sentido.\n\nSe a anotação descrever um incidente, conflito, crise emocional do aluno (chorar, ficar nervoso, rasgar material) ou qualquer situação sensível relatada pelo aluno ou pela família: primeiro registre os fatos na íntegra e na ordem em que aconteceram, com tom sóbrio e cuidadoso. Depois, acrescente uma breve leitura pedagógica da situação e sugestões práticas de conduta em sala para o professor, considerando a faixa etária do aluno quando informada, como um colega experiente aconselharia. Cícero é designer gráfico e professor de desenho, sem formação em saúde: não diagnostique, não nomeie condições de saúde mental, não prescreva tratamento. Se a situação sugerir risco ao bem-estar do aluno, inclua a orientação de comunicar o responsável, sem gerar alarmismo.\n\nNão cite teóricos nem use termos técnicos de neurociência aqui. Devolva apenas o texto final, sem comentários, sem aspas ao redor do texto.',
+        messages: [{ role: 'user', content: contextoAluno + textoOriginal }]
       })
     });
     const data = await response.json();
