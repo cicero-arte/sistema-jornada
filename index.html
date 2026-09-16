@@ -76,6 +76,11 @@ body{padding:0 16px;}
 .freq-check-row.falta input[type=checkbox]:checked{background:var(--red);border-color:var(--red);}
 .freq-check-row.falta input[type=checkbox]:checked::after{content:'✗';}
 .freq-obs{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:6px;font-family:'Lato',sans-serif;font-size:12px;resize:vertical;min-height:52px;background:#fafaf8;color:var(--ink);margin-top:4px;}
+.freq-obs-wrap{position:relative;}
+.freq-obs-tools{display:flex;gap:6px;margin-top:4px;}
+.freq-obs-btn{padding:4px 9px;font-size:11px;font-weight:700;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--ink-soft);font-family:'Lato',sans-serif;}
+.freq-obs-btn:disabled{opacity:0.5;cursor:wait;}
+.freq-obs-btn.gravando{background:#fdf0ef;border-color:#f5c6c2;color:var(--red);}
 .fin-table{width:100%;border-collapse:collapse;}
 .fin-table th{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);}
 .fin-table td{padding:10px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
@@ -1821,8 +1826,14 @@ function renderFreq(){
             onchange="toggleFreq(${a.id},'${kF}','${kP}','${idP}',this.checked)">
           <label for="${idF}">Falta</label>
         </div>
-        <textarea class="freq-obs" placeholder="Observação..."
-          oninput="salvarObs(${a.id},'${kO}',this.value);autoGrow(this)">${obsV}</textarea>
+        <div class="freq-obs-wrap">
+          <textarea class="freq-obs" id="fobs-${a.id}-${kO}" placeholder="Observação..."
+            oninput="salvarObs(${a.id},'${kO}',this.value);autoGrow(this)">${obsV}</textarea>
+          <div class="freq-obs-tools">
+            <button type="button" class="freq-obs-btn" onclick="freqDitado('fobs-${a.id}-${kO}', this)" title="Ditar por voz">🎤 Ditar</button>
+            <button type="button" class="freq-obs-btn" onclick="freqMelhorarIA('fobs-${a.id}-${kO}', ${a.id}, '${kO}', this)" title="Melhorar texto com IA">✨ Melhorar com IA</button>
+          </div>
+        </div>
       </div>`;
     }).join('');
     return `<div class="freq-card">
@@ -1866,6 +1877,95 @@ function toggleFreq(aid,keyOn,keyOff,idOff,checked){
   salvar();
 }
 function salvarObs(aid,key,val){const a=alunos.find(x=>x.id===aid);if(!a)return;if(!a.freq)a.freq={};a.freq[key]=val;salvarImediato();}
+
+let freqReconhecimento = null;
+let freqGravandoId = null;
+
+function freqDitado(textareaId, btn){
+  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognitionAPI){
+    alert('Ditado por voz não é suportado neste navegador. Funciona no Chrome, no computador e no Android.');
+    return;
+  }
+  const textarea = document.getElementById(textareaId);
+  if(!textarea) return;
+
+  if(freqGravandoId === textareaId && freqReconhecimento){
+    freqReconhecimento.stop();
+    return;
+  }
+  if(freqReconhecimento){ freqReconhecimento.stop(); }
+
+  const rec = new SpeechRecognitionAPI();
+  rec.lang = 'pt-BR';
+  rec.continuous = true;
+  rec.interimResults = false;
+
+  freqReconhecimento = rec;
+  freqGravandoId = textareaId;
+  btn.classList.add('gravando');
+  btn.textContent = '⏹ Parar';
+
+  rec.onresult = function(e){
+    let textoFinal = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      if(e.results[i].isFinal) textoFinal += e.results[i][0].transcript;
+    }
+    if(textoFinal.trim()){
+      const precisaEspaco = textarea.value && !/[\s\n]$/.test(textarea.value);
+      textarea.value += (precisaEspaco ? ' ' : '') + textoFinal.trim();
+      textarea.dispatchEvent(new Event('input'));
+      autoGrow(textarea);
+    }
+  };
+  rec.onerror = function(e){
+    if(e.error !== 'no-speech' && e.error !== 'aborted') alert('Erro no reconhecimento de voz: ' + e.error);
+  };
+  rec.onend = function(){
+    btn.classList.remove('gravando');
+    btn.textContent = '🎤 Ditar';
+    freqReconhecimento = null;
+    freqGravandoId = null;
+  };
+  rec.start();
+}
+
+async function freqMelhorarIA(textareaId, alunoId, key, btn){
+  const textarea = document.getElementById(textareaId);
+  if(!textarea) return;
+  const textoOriginal = textarea.value.trim();
+  if(!textoOriginal){ alert('Escreva ou dite alguma anotação antes de melhorar com IA.'); return; }
+  if(!cfg.apiKey){ alert('Chave API não configurada. Vá em Config, seção Assistente IA, insira sua chave e salve.'); return; }
+  const textoBtn = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '...';
+  try{
+    const response = await fetch('https://jornada-ia.cicero-arte.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: cfg.apiKey,
+        model: 'claude-sonnet-4-5',
+        max_tokens: 400,
+        system: 'Você recebe anotações rápidas ou uma transcrição de voz, feitas por um professor de desenho logo após uma aula, sobre um aluno específico. Reescreva como uma observação pedagógica curta, clara e em português correto, mantendo exatamente o sentido original, sem inventar informações novas, sem floreios. Devolva apenas o texto final da observação, sem comentários, sem aspas ao redor do texto.',
+        messages: [{ role: 'user', content: textoOriginal }]
+      })
+    });
+    const data = await response.json();
+    if(data.error) throw new Error(data.error.message || 'Erro da API');
+    const melhorado = data.content && data.content[0] ? data.content[0].text.trim() : '';
+    if(melhorado){
+      textarea.value = melhorado;
+      salvarObs(alunoId, key, melhorado);
+      autoGrow(textarea);
+    }
+  } catch(e){
+    alert('Não foi possível melhorar o texto: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = textoBtn;
+  }
+}
 
 // ── FINANCEIRO ───────────────────────────────────────
 function renderFin(){
@@ -3166,6 +3266,7 @@ window.salvarObs=salvarObs; window.salvarForcado=salvarForcado; window.salvarIme
 window.materiaisUpload=materiaisUpload; window.excluirFolha=excluirFolha;
 window.editarFolha=editarFolha; window.fecharModalMat=fecharModalMat; window.salvarEdicaoFolha=salvarEdicaoFolha;
 window.renderMateriais=renderMateriais; window.toggleGrupoMateriais=toggleGrupoMateriais;
+window.freqDitado=freqDitado; window.freqMelhorarIA=freqMelhorarIA;
 </script>
 
 <!-- POPUP NFSe MODELO -->
