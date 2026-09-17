@@ -430,6 +430,13 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       </div>
     </div>
 
+    <!-- Total geral -->
+    <div style="margin-top:18px;padding:14px 16px;background:var(--ink);border-radius:12px;display:flex;gap:24px;flex-wrap:wrap;">
+      <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#ffffffaa;">Total geral (mensalidades + avulsos)</div><div style="font-size:20px;font-weight:900;color:#fff;" id="geral-total">R$ 0</div></div>
+      <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#8fd9a8;">Recebido</div><div style="font-size:20px;font-weight:900;color:#8fd9a8;" id="geral-rec">R$ 0</div></div>
+      <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#f0c98a;">Pendente</div><div style="font-size:20px;font-weight:900;color:#f0c98a;" id="geral-pend">R$ 0</div></div>
+    </div>
+
     <!-- MODAL EDITAR AVULSO -->
     <div class="overlay hidden" id="modal-avulso">
       <div class="modal">
@@ -2118,6 +2125,7 @@ async function freqMelhorarIA(textareaId, alunoId, key, btn){
 }
 
 // ── FINANCEIRO ───────────────────────────────────────
+let finMensalidadeTotais = {tot:0, rec:0, pend:0};
 function renderFin(){
   const ta=document.getElementById('pix-msg');if(ta&&!ta.value)ta.value=PIX_MSG_DEFAULT.replace('{codigo}','');
   const mes=document.getElementById('mes-fin').value;
@@ -2152,6 +2160,7 @@ function renderFin(){
   document.getElementById('fin-total').textContent=`R$ ${tot.toFixed(2)}`;
   document.getElementById('fin-rec').textContent=`R$ ${rec.toFixed(2)}`;
   document.getElementById('fin-pend').textContent=`R$ ${pend.toFixed(2)}`;
+  finMensalidadeTotais = {tot, rec, pend};
   popularSelectAvulso();
   renderAvulsos();
 }
@@ -2173,6 +2182,7 @@ function renderAvulsos(){
     el.innerHTML = '<div style="padding:14px;text-align:center;color:var(--ink-muted);font-size:12px;">Nenhum lançamento avulso registrado ainda.</div>';
     document.getElementById('av-rec').textContent = 'R$ 0';
     document.getElementById('av-pend').textContent = 'R$ 0';
+    atualizarTotalGeral(0, 0);
     return;
   }
   let rec = 0, pend = 0;
@@ -2182,6 +2192,7 @@ function renderAvulsos(){
     if(av.status==='pago') rec += av.valor||0; else pend += av.valor||0;
     const bc = av.status==='pago' ? 'badge-pago' : 'badge-pendente';
     const bl = av.status==='pago' ? 'Pago' : 'Pendente';
+    const nfseBtn = av.status==='pago' ? `<button class="btn btn-sm" style="background:#e8f0fb;color:#3a6bc4;border:1px solid #b3c9f0;font-size:11px;" onclick="abrirNFSeAvulso(${av.id})">📄 NFSe modelo</button>` : '';
     return `<div class="aluno-card" style="margin-bottom:8px;">
       <div class="aluno-card-header" style="cursor:default;">
         <div style="flex:1">
@@ -2190,6 +2201,7 @@ function renderAvulsos(){
         </div>
         <span class="badge ${bc}" style="margin-right:8px;">${bl}</span>
         <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;">
+          ${nfseBtn}
           ${av.status!=='pago'?`<button class="btn btn-success btn-sm" onclick="toggleStatusAvulso(${av.id})">✓ Pago</button>`:`<button class="btn btn-sm" style="background:#f5f5f5;color:var(--ink-muted);border:1px solid var(--border);" onclick="toggleStatusAvulso(${av.id})" title="Voltar para pendente">↩</button>`}
           <button class="btn btn-sm" style="background:#fff;border:1px solid var(--border);color:var(--ink-soft);" onclick="editarAvulso(${av.id})">✏️</button>
           <button class="btn btn-danger btn-sm" onclick="excluirAvulso(${av.id})">🗑</button>
@@ -2199,6 +2211,16 @@ function renderAvulsos(){
   }).join('');
   document.getElementById('av-rec').textContent = `R$ ${rec.toFixed(2)}`;
   document.getElementById('av-pend').textContent = `R$ ${pend.toFixed(2)}`;
+  atualizarTotalGeral(rec, pend);
+}
+
+function atualizarTotalGeral(avRec, avPend){
+  const elT=document.getElementById('geral-total'), elR=document.getElementById('geral-rec'), elP=document.getElementById('geral-pend');
+  if(!elT) return;
+  const m = finMensalidadeTotais;
+  elT.textContent = `R$ ${(m.tot + avRec + avPend).toFixed(2)}`;
+  elR.textContent = `R$ ${(m.rec + avRec).toFixed(2)}`;
+  elP.textContent = `R$ ${(m.pend + avPend).toFixed(2)}`;
 }
 
 function salvarAvulso(){
@@ -2648,6 +2670,25 @@ function abrirNFSe(aid, mes){
 }
 
 function fecharNFSe(){document.getElementById('overlay-nfse').classList.add('hidden');}
+
+function abrirNFSeAvulso(id){
+  const av = avulsos.find(x=>x.id===id);
+  if(!av) return;
+  let cliente;
+  if(av.alunoId){
+    const a = alunos.find(x=>x.id===av.alunoId);
+    cliente = a ? (a.resp||a.nome) : (av.nome||'Cliente');
+  } else {
+    cliente = av.nome || 'Cliente';
+  }
+  const d = av.data ? new Date(av.data+'T00:00:00') : new Date();
+  const dataFmt = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  document.getElementById('nfse-cliente').value = cliente.toUpperCase();
+  document.getElementById('nfse-valor').value = `R$ ${(av.valor||0).toFixed(2).replace('.',',')}`;
+  document.getElementById('nfse-data').value = dataFmt;
+  document.getElementById('nfse-rps').value = localStorage.getItem('jd_rps') || '';
+  document.getElementById('overlay-nfse').classList.remove('hidden');
+}
 
 // ── MAPA ─────────────────────────────────────────────
 // ── VR ───────────────────────────────────────────────
@@ -3601,6 +3642,7 @@ window.salvarEdicaoAvulso=salvarEdicaoAvulso; window.excluirAvulso=excluirAvulso
 window.toggleOrigemOutro=toggleOrigemOutro;
 window.setCrescPeriodo=setCrescPeriodo;
 window.setAlunosFiltroStatus=setAlunosFiltroStatus; window.toggleStatusAluno=toggleStatusAluno;
+window.abrirNFSeAvulso=abrirNFSeAvulso;
 </script>
 
 <!-- POPUP NFSe MODELO -->
