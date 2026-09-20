@@ -3361,12 +3361,22 @@ Foro: Comarca de Sobradinho-DF.`;
 
 function iaResumoAluno(a, numRelats) {
   numRelats = numRelats || 3;
-  const freqKeys = Object.keys(a.freq || {}).sort().slice(-4);
-  const freq = freqKeys.map(function(k) {
-    const f = a.freq[k];
-    const p = Array.isArray(f) ? f.filter(function(d){return d==='P';}).length : 0;
-    return k.slice(5)+':'+p+'P';
+  const f = a.freq || {};
+  const porSemana = {};
+  Object.keys(f).forEach(function(k){
+    const mm = k.match(/^(\d{4}-\d{2})-(?:([A-Z]{3}-\d{4})-)?s(\d)-(p|f|obs)$/);
+    if (!mm) return;
+    const chave = mm[1]+(mm[2]?' '+mm[2]:'')+' s'+mm[3];
+    porSemana[chave] = porSemana[chave] || {};
+    porSemana[chave][mm[4]] = f[k];
+  });
+  const chaves = Object.keys(porSemana).sort();
+  const freq = chaves.slice(-4).map(function(ch){
+    const r = porSemana[ch];
+    return ch+':'+(r.p?'P':r.f?'F':'-');
   }).join(' ');
+  const ultimaObsChave = chaves.slice().reverse().find(function(ch){ return porSemana[ch].obs; });
+  const ultimaObs = ultimaObsChave ? porSemana[ultimaObsChave].obs : '';
   const nomeKey = a.nome.split(' ')[0].toLowerCase();
   const relats = Object.entries(notasItens || {})
     .filter(function(e){return e[0].toLowerCase().includes(nomeKey);})
@@ -3375,7 +3385,7 @@ function iaResumoAluno(a, numRelats) {
     .map(function(e){return e[0].slice(5)+': '+String(e[1]).slice(0,200);})
     .join(' | ');
   const idade = a.nasc ? (new Date().getFullYear() - new Date(a.nasc).getFullYear())+'a' : '';
-  return a.nome+(idade?' ('+idade+')':'')+' | '+(a.perfil||'perfil?')+' | obs: '+(a.obs||'—').slice(0,100)+' | freq: '+(freq||'—')+' | relatos: '+(relats||'—');
+  return a.nome+(idade?' ('+idade+')':'')+' | '+(a.perfil||'perfil?')+(a.turmas&&a.turmas.length?' | turma(s): '+a.turmas.join(', '):'')+' | obs cadastro: '+(a.obs||'\u2014').slice(0,100)+' | freq recente: '+(freq||'\u2014')+(ultimaObs?' | \u00faltima observa\u00e7\u00e3o: '+ultimaObs.slice(0,300):'')+' | relatos: '+(relats||'\u2014');
 }
 
 function iaListaAlunos() {
@@ -3410,12 +3420,12 @@ function iaColetarObservacoes(meses, listaAlunos) {
     const f = a.freq || {};
     const porSemana = {};
     Object.keys(f).forEach(function(k){
-      const mm = k.match(/^(\d{4}-\d{2})-s(\d)-(p|f|obs)$/);
+      const mm = k.match(/^(\d{4}-\d{2})-(?:([A-Z]{3}-\d{4})-)?s(\d)-(p|f|obs)$/);
       if (!mm) return;
       if (meses && meses.indexOf(mm[1]) === -1) return;
-      const chave = mm[1]+' semana '+mm[2];
+      const chave = mm[1]+(mm[2]?' '+mm[2]:'')+' semana '+mm[3];
       porSemana[chave] = porSemana[chave] || {};
-      porSemana[chave][mm[3]] = f[k];
+      porSemana[chave][mm[4]] = f[k];
     });
     const regs = Object.keys(porSemana).sort().map(function(ch){
       const r = porSemana[ch];
