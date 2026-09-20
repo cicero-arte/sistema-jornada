@@ -375,12 +375,18 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <button class="btn btn-primary btn-sm" onclick="abrirModal()">+ Novo aluno</button>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-      <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;">
+      <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;flex-wrap:wrap;">
         <button id="alunos-btn-ativo" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('ativo')">Ativos</button>
         <button id="alunos-btn-inativo" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('inativo')">Ex-alunos</button>
+        <button id="alunos-btn-espera" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('espera')">Espera</button>
         <button id="alunos-btn-todos" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('todos')">Todos</button>
       </div>
-      <span id="alunos-filtro-contador" style="font-size:11px;color:var(--ink-muted);"></span>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <select id="alunos-filtro-turma" onchange="renderAlunos()" style="padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:'Lato',sans-serif;font-size:12px;">
+          <option value="">Todas as turmas</option>
+        </select>
+        <span id="alunos-filtro-contador" style="font-size:11px;color:var(--ink-muted);"></span>
+      </div>
     </div>
     <div id="lista-alunos"></div>
   </div>
@@ -989,6 +995,10 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
           <option>Neurodivergente / Condição neurológica</option>
         </select>
       </div>
+    </div>
+    <div class="field" style="grid-column:1/-1;margin-top:2px;">
+      <label>Turma(s) — o aluno pode estar em mais de uma</label>
+      <div id="f-turmas" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;"></div>
     </div>
     <div style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--warm);margin:14px 0 10px;">Contratante / Responsável</div>
     <div class="grid2">
@@ -1860,17 +1870,16 @@ function ini(n){return(n||'?').split(' ').map(p=>p[0]).join('').substring(0,2).t
 let alunosFiltroStatus = 'ativo';
 function setAlunosFiltroStatus(v){ alunosFiltroStatus = v; renderAlunos(); }
 
-function toggleStatusAluno(id){
+function mudarStatusAluno(id, novo){
   const a = alunos.find(x=>x.id===id);
   if(!a) return;
-  if(a.status === 'inativo'){
-    a.status = 'ativo';
-    a.dataInativacao = '';
-  } else {
+  if(novo === 'inativo'){
     if(!confirm(`Marcar ${a.nome} como ex-aluno(a)? Os dados continuam guardados, e é possível reativar depois.`)) return;
-    a.status = 'inativo';
     a.dataInativacao = new Date().toISOString().slice(0,10);
+  } else {
+    a.dataInativacao = '';
   }
+  a.status = novo;
   salvar();
   renderAlunos();
 }
@@ -1891,31 +1900,64 @@ function statusContratoAluno(a){
 function renderAlunos(){
   const el=document.getElementById('lista-alunos');
   const contador=document.getElementById('alunos-filtro-contador');
-  const ativos = alunos.filter(a=>a.status!=='inativo');
+  const selTurma=document.getElementById('alunos-filtro-turma');
+  if(selTurma && selTurma.options.length<=1){
+    selTurma.innerHTML='<option value="">Todas as turmas</option>'+TURMAS.map(t=>`<option value="${t}">${t}</option>`).join('');
+  }
+  const filtroTurma = selTurma ? selTurma.value : '';
+
+  const ativos = alunos.filter(a=>!a.status || a.status==='ativo');
   const inativos = alunos.filter(a=>a.status==='inativo');
-  if(contador) contador.textContent = `${ativos.length} ativo(s) · ${inativos.length} ex-aluno(s)`;
+  const esperando = alunos.filter(a=>a.status==='espera');
+  if(contador) contador.textContent = `${ativos.length} ativo(s) · ${esperando.length} em espera · ${inativos.length} ex-aluno(s)`;
   document.querySelectorAll('#tela-gestao .cresc-periodo-btn').forEach(b=>b.classList.remove('ativo'));
   const btnAtivo=document.getElementById('alunos-btn-'+alunosFiltroStatus);
   if(btnAtivo) btnAtivo.classList.add('ativo');
   if(!alunos.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno cadastrado.</p>';return;}
-  const listaBase = alunosFiltroStatus==='ativo' ? ativos : alunosFiltroStatus==='inativo' ? inativos : alunos;
+  let listaBase = alunosFiltroStatus==='ativo' ? ativos : alunosFiltroStatus==='inativo' ? inativos : alunosFiltroStatus==='espera' ? esperando : alunos;
+  if(filtroTurma) listaBase = listaBase.filter(a=>(a.turmas||[]).includes(filtroTurma));
   const alunosOrdenados=[...listaBase].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   if(!alunosOrdenados.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno nesse filtro.</p>';return;}
   el.innerHTML=alunosOrdenados.map(a=>{
     const exAluno = a.status==='inativo';
+    const emEspera = a.status==='espera';
     const badgeEx = exAluno ? `<span class="badge" style="background:#eee;color:var(--ink-muted);margin-left:6px;">Ex-aluno(a)${a.dataInativacao?' · '+fmtData(a.dataInativacao):''}</span>` : '';
-    const btnStatus = exAluno
-      ? `<button class="btn btn-sm btn-success" onclick="toggleStatusAluno(${a.id})" title="Reativar aluno">↺ Reativar</button>`
-      : `<button class="btn btn-sm" style="background:#f0efe8;color:var(--ink-soft);border:1px solid var(--border);" onclick="toggleStatusAluno(${a.id})" title="Marcar como ex-aluno(a)">🚪</button>`;
-    const contratoSt = !exAluno ? statusContratoAluno(a) : null;
+    const badgeEspera = emEspera ? `<span class="badge" style="background:#e6ecf7;color:#3a5a9c;margin-left:6px;">Lista de espera</span>` : '';
+    let btnStatus;
+    if(exAluno){
+      btnStatus = `<button class="btn btn-sm btn-success" onclick="mudarStatusAluno(${a.id},'ativo')" title="Reativar aluno">↺ Reativar</button>`;
+    } else if(emEspera){
+      btnStatus = `<button class="btn btn-sm btn-success" onclick="mudarStatusAluno(${a.id},'ativo')" title="Ativar aluno">✓ Ativar</button><button class="btn btn-sm btn-danger" onclick="mudarStatusAluno(${a.id},'inativo')" title="Marcar como ex-aluno(a)">✕</button>`;
+    } else {
+      btnStatus = `<button class="btn btn-sm" style="background:#eef1fa;color:#3a5a9c;border:1px solid #ccd8f0;" onclick="mudarStatusAluno(${a.id},'espera')" title="Mover para lista de espera">⏳</button><button class="btn btn-sm btn-danger" onclick="mudarStatusAluno(${a.id},'inativo')" title="Marcar como ex-aluno(a)">✕</button>`;
+    }
+    const contratoSt = (!exAluno && !emEspera) ? statusContratoAluno(a) : null;
     const corHeader = contratoSt?.nivel==='vencido' ? 'background:#fbe3e0;' : contratoSt?.nivel==='alerta' ? 'background:#fbeed9;' : '';
     const badgeContrato = contratoSt ? `<span class="badge" style="background:${contratoSt.nivel==='vencido'?'#e0645a':'#d99a3a'};color:#fff;margin-left:6px;">${contratoSt.texto}</span>` : '';
-    return `<div class="aluno-card" style="${exAluno?'opacity:0.75;':''}"><div class="aluno-card-header" style="${corHeader}" onclick="toggleCard('body-${a.id}')"><div class="avatar" style="background:${a.avatar}">${ini(a.nome)}</div><div style="flex:1"><div class="aluno-nome">${a.nome}${badgeEx}${badgeContrato}</div><div class="aluno-perfil">${a.perfil}</div></div><div style="display:flex;gap:5px;" onclick="event.stopPropagation()">${btnStatus}<button class="btn btn-sm" style="background:#f0efe8;color:var(--ink-soft);border:1px solid var(--border);" onclick="editarAluno(${a.id})">✏️</button><button class="btn btn-sm btn-success" onclick="verContrato(${a.id})">📄</button><button class="btn btn-sm btn-danger" onclick="excluirAluno(${a.id})">🗑</button></div></div><div class="aluno-body" id="body-${a.id}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;font-size:13px;"><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Contratante</span><br>${a.resp||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Telefone</span><br>${a.tel||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">E-mail</span><br>${a.email||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Valor promo</span><br>R$ ${(a.valorPromo||0).toFixed(2)}</div></div>${a.obs?`<div style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:9px;font-size:12px;color:var(--ink-soft);">${a.obs}</div>`:''}</div></div>`;
+    const badgesTurma = (a.turmas&&a.turmas.length) ? a.turmas.map(t=>`<span class="badge" style="background:#efe9dc;color:var(--ink-soft);margin-right:4px;">${t}</span>`).join('') : '';
+    return `<div class="aluno-card" style="${(exAluno||emEspera)?'opacity:0.8;':''}"><div class="aluno-card-header" style="${corHeader}" onclick="toggleCard('body-${a.id}')"><div class="avatar" style="background:${a.avatar}">${ini(a.nome)}</div><div style="flex:1"><div class="aluno-nome">${a.nome}${badgeEx}${badgeEspera}${badgeContrato}</div><div class="aluno-perfil">${a.perfil}${badgesTurma?' · '+badgesTurma:''}</div></div><div style="display:flex;gap:5px;" onclick="event.stopPropagation()">${btnStatus}<button class="btn btn-sm" style="background:#f0efe8;color:var(--ink-soft);border:1px solid var(--border);" onclick="editarAluno(${a.id})">✏️</button><button class="btn btn-sm btn-success" onclick="verContrato(${a.id})">📄</button><button class="btn btn-sm btn-danger" onclick="excluirAluno(${a.id})">🗑</button></div></div><div class="aluno-body" id="body-${a.id}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;font-size:13px;"><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Contratante</span><br>${a.resp||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Telefone</span><br>${a.tel||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">E-mail</span><br>${a.email||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Valor promo</span><br>R$ ${(a.valorPromo||0).toFixed(2)}</div></div>${a.obs?`<div style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:9px;font-size:12px;color:var(--ink-soft);">${a.obs}</div>`:''}</div></div>`;
   }).join('');
 }
 
 function toggleCard(id){document.getElementById(id).classList.toggle('aberto');}
 const OPCOES_ORIGEM_FIXAS = ['Indicação','Escola','Igreja','Mural/site','Redes sociais','Google','Passou na rua','ChatGPT','Gemini','Meta AI','Copilot','Perplexity','Claude'];
+
+const TURMAS = ['SEG-1500','SEG-1630','SEG-1800','TER-1500','TER-1630','TER-1800','QUI-1500','QUI-1630','QUI-1800','SEX-1500','SEX-1630','SEX-1800'];
+
+function popularCheckboxesTurmas(selecionadas){
+  const cont = document.getElementById('f-turmas');
+  if(!cont) return;
+  const sel = selecionadas || [];
+  cont.innerHTML = TURMAS.map(t=>{
+    const id = 'ft_'+t;
+    const chk = sel.includes(t) ? 'checked' : '';
+    return `<label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;"><input type="checkbox" id="${id}" value="${t}" ${chk} style="margin:0;">${t}</label>`;
+  }).join('');
+}
+
+function lerTurmasSelecionadas(){
+  return TURMAS.filter(t=>document.getElementById('ft_'+t)?.checked);
+}
 function toggleOrigemOutro(selectId, inputId){
   const sel = document.getElementById(selectId);
   const inp = document.getElementById(inputId);
@@ -1924,6 +1966,7 @@ function toggleOrigemOutro(selectId, inputId){
 }
 
 function editarAluno(id){const a=alunos.find(x=>x.id===id);if(!a)return;document.getElementById('modal-titulo').textContent='Editar aluno';document.getElementById('f-id').value=id;document.getElementById('f-nome').value=a.nome||'';document.getElementById('f-nasc').value=a.nasc||'';setTimeout(calcularIdade,50);document.getElementById('f-perfil').value=a.perfil||'';document.getElementById('f-resp').value=a.resp||'';document.getElementById('f-cpf-resp').value=a.cpfResp||'';document.getElementById('f-tel').value=a.tel||'';document.getElementById('f-email').value=a.email||'';document.getElementById('f-end-resp').value=a.endResp||'';document.getElementById('f-valor-cheio').value=a.valorCheio||440;document.getElementById('f-valor-promo').value=a.valorPromo||240;document.getElementById('f-valor-vr').value=a.valorVR||100;document.getElementById('f-data-inicio').value=a.dataInicio||'';document.getElementById('f-data-contrato').value=a.dataContrato||'';document.getElementById('f-data-assinatura').value=a.dataAssinatura||'';
+  popularCheckboxesTurmas(a.turmas||[]);
   if(a.origem && !OPCOES_ORIGEM_FIXAS.includes(a.origem)){
     document.getElementById('f-origem').value='Outro';
     document.getElementById('f-origem-outro').value=a.origem;
@@ -1934,7 +1977,7 @@ function editarAluno(id){const a=alunos.find(x=>x.id===id);if(!a)return;document
   toggleOrigemOutro('f-origem','f-origem-outro');
   document.getElementById('f-obs').value=a.obs||'';document.getElementById('modal').classList.remove('hidden');}
 function excluirAluno(id){if(!confirm('Atenção: ação irreversível. Excluir este aluno e todos os seus dados?'))return;alunos=alunos.filter(a=>a.id!==id);salvar();renderAlunos();}
-function abrirModal(){document.getElementById('modal-titulo').textContent='Novo aluno';document.getElementById('f-id').value='';['f-nome','f-nasc','f-resp','f-cpf-resp','f-tel','f-email','f-end-resp','f-data-inicio','f-data-contrato','f-data-assinatura','f-obs'].forEach(i=>document.getElementById(i).value='');document.getElementById('f-origem').value='';document.getElementById('f-origem-outro').value='';document.getElementById('f-origem-outro').style.display='none';document.getElementById('f-valor-cheio').value=440;document.getElementById('f-valor-promo').value=240;document.getElementById('f-valor-vr').value=100;document.getElementById('modal').classList.remove('hidden');}
+function abrirModal(){document.getElementById('modal-titulo').textContent='Novo aluno';document.getElementById('f-id').value='';['f-nome','f-nasc','f-resp','f-cpf-resp','f-tel','f-email','f-end-resp','f-data-inicio','f-data-contrato','f-data-assinatura','f-obs'].forEach(i=>document.getElementById(i).value='');document.getElementById('f-origem').value='';document.getElementById('f-origem-outro').value='';document.getElementById('f-origem-outro').style.display='none';document.getElementById('f-valor-cheio').value=440;document.getElementById('f-valor-promo').value=240;document.getElementById('f-valor-vr').value=100;popularCheckboxesTurmas([]);document.getElementById('modal').classList.remove('hidden');}
 function fecharModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('f-idade').textContent='';}
 function calcularIdade(){
   const nasc=document.getElementById('f-nasc').value;
@@ -1951,57 +1994,76 @@ function calcularIdade(){
 function confirmarAluno(){const nome=document.getElementById('f-nome').value.trim();if(!nome){alert('Informe o nome.');return;}const id=parseInt(document.getElementById('f-id').value);
   const origemSel=document.getElementById('f-origem').value;
   const origem = origemSel==='Outro' ? (document.getElementById('f-origem-outro').value.trim() || 'Outro') : origemSel;
-  const dados={nome,nasc:document.getElementById('f-nasc').value,perfil:document.getElementById('f-perfil').value,resp:document.getElementById('f-resp').value,cpfResp:document.getElementById('f-cpf-resp').value,tel:document.getElementById('f-tel').value,email:document.getElementById('f-email').value,endResp:document.getElementById('f-end-resp').value,valorCheio:parseFloat(document.getElementById('f-valor-cheio').value)||440,valorPromo:parseFloat(document.getElementById('f-valor-promo').value)||240,valorVR:parseFloat(document.getElementById('f-valor-vr').value)||100,dataInicio:document.getElementById('f-data-inicio').value,dataContrato:document.getElementById('f-data-contrato').value,dataAssinatura:document.getElementById('f-data-assinatura').value,origem,obs:document.getElementById('f-obs').value};if(id){const a=alunos.find(x=>x.id===id);if(a)Object.assign(a,dados);}else alunos.push({id:pid++,...dados,avatar:cores[alunos.length%cores.length],freq:{},pag:{}});salvar();fecharModal();renderAlunos();}
+  const dados={nome,nasc:document.getElementById('f-nasc').value,perfil:document.getElementById('f-perfil').value,resp:document.getElementById('f-resp').value,cpfResp:document.getElementById('f-cpf-resp').value,tel:document.getElementById('f-tel').value,email:document.getElementById('f-email').value,endResp:document.getElementById('f-end-resp').value,valorCheio:parseFloat(document.getElementById('f-valor-cheio').value)||440,valorPromo:parseFloat(document.getElementById('f-valor-promo').value)||240,valorVR:parseFloat(document.getElementById('f-valor-vr').value)||100,dataInicio:document.getElementById('f-data-inicio').value,dataContrato:document.getElementById('f-data-contrato').value,dataAssinatura:document.getElementById('f-data-assinatura').value,origem,turmas:lerTurmasSelecionadas(),obs:document.getElementById('f-obs').value};if(id){const a=alunos.find(x=>x.id===id);if(a)Object.assign(a,dados);}else alunos.push({id:pid++,...dados,avatar:cores[alunos.length%cores.length],freq:{},pag:{}});salvar();fecharModal();renderAlunos();}
 
 // ── FREQUÊNCIA — checkboxes nativos ──────────────────
+function montarSemanasFreq(a, mes, turmaPrefixo){
+  const pfx = turmaPrefixo ? turmaPrefixo+'-' : '';
+  return [1,2,3,4].map(s=>{
+    const kP=`${mes}-${pfx}s${s}-p`,kF=`${mes}-${pfx}s${s}-f`,kO=`${mes}-${pfx}s${s}-obs`;
+    const chkP=(a.freq&&a.freq[kP])?'checked':'';
+    const chkF=(a.freq&&a.freq[kF])?'checked':'';
+    const obsV=(a.freq&&a.freq[kO])||'';
+    const idBase=`${a.id}_${(turmaPrefixo||'x').replace(/-/g,'')}_${mes.replace('-','_')}_${s}`;
+    const idP=`cp_${idBase}`;
+    const idF=`cf_${idBase}`;
+    return `<div class="freq-sem">
+      <div class="freq-sem-titulo">Semana ${s}</div>
+      <div class="freq-check-row">
+        <input type="checkbox" id="${idP}" ${chkP}
+          onchange="toggleFreq(${a.id},'${kP}','${kF}','${idF}',this.checked)">
+        <label for="${idP}">Presente</label>
+      </div>
+      <div class="freq-check-row falta">
+        <input type="checkbox" id="${idF}" ${chkF}
+          onchange="toggleFreq(${a.id},'${kF}','${kP}','${idP}',this.checked)">
+        <label for="${idF}">Falta</label>
+      </div>
+      <div class="freq-obs-wrap">
+        <textarea class="freq-obs" id="fobs-${a.id}-${kO}" placeholder="Observação..."
+          oninput="salvarObs(${a.id},'${kO}',this.value);autoGrow(this)">${obsV}</textarea>
+        <div class="freq-obs-tools">
+          <button type="button" class="freq-obs-btn" onclick="freqDitado('fobs-${a.id}-${kO}', this)" title="Ditar por voz">🎤 Ditar</button>
+          <button type="button" class="freq-obs-btn" onclick="freqMelhorarIA('fobs-${a.id}-${kO}', ${a.id}, '${kO}', this)" title="Melhorar texto com IA">✨ Melhorar com IA</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderFreq(){
   const mes=document.getElementById('mes-freq').value;
   const el=document.getElementById('freq-cont');
   if(!alunos.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno.</p>';return;}
-  const sorted=[...alunos].filter(a=>a.status!=='inativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const sorted=[...alunos].filter(a=>!a.status||a.status==='ativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   el.innerHTML=sorted.map(a=>{
-    // build resumo: count presences this month
-    const presencas=[1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-s${s}-p`]).length;
-    const faltas=[1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-s${s}-f`]).length;
+    const turmasAluno = a.turmas||[];
+    const multiTurma = turmasAluno.length>1;
+    const prefixos = multiTurma ? turmasAluno : [''];
+
+    let presencas=0, faltas=0;
+    prefixos.forEach(pfx=>{
+      const p2 = pfx ? pfx+'-' : '';
+      presencas += [1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-${p2}s${s}-p`]).length;
+      faltas += [1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-${p2}s${s}-f`]).length;
+    });
     const resumo=presencas||faltas?`${presencas}P ${faltas}F`:'';
-    const semanas=[1,2,3,4].map(s=>{
-      const kP=`${mes}-s${s}-p`,kF=`${mes}-s${s}-f`,kO=`${mes}-s${s}-obs`;
-      const chkP=(a.freq&&a.freq[kP])?'checked':'';
-      const chkF=(a.freq&&a.freq[kF])?'checked':'';
-      const obsV=(a.freq&&a.freq[kO])||'';
-      const idP=`cp_${a.id}_${mes.replace('-','_')}_${s}`;
-      const idF=`cf_${a.id}_${mes.replace('-','_')}_${s}`;
-      return `<div class="freq-sem">
-        <div class="freq-sem-titulo">Semana ${s}</div>
-        <div class="freq-check-row">
-          <input type="checkbox" id="${idP}" ${chkP}
-            onchange="toggleFreq(${a.id},'${kP}','${kF}','${idF}',this.checked)">
-          <label for="${idP}">Presente</label>
-        </div>
-        <div class="freq-check-row falta">
-          <input type="checkbox" id="${idF}" ${chkF}
-            onchange="toggleFreq(${a.id},'${kF}','${kP}','${idP}',this.checked)">
-          <label for="${idF}">Falta</label>
-        </div>
-        <div class="freq-obs-wrap">
-          <textarea class="freq-obs" id="fobs-${a.id}-${kO}" placeholder="Observação..."
-            oninput="salvarObs(${a.id},'${kO}',this.value);autoGrow(this)">${obsV}</textarea>
-          <div class="freq-obs-tools">
-            <button type="button" class="freq-obs-btn" onclick="freqDitado('fobs-${a.id}-${kO}', this)" title="Ditar por voz">🎤 Ditar</button>
-            <button type="button" class="freq-obs-btn" onclick="freqMelhorarIA('fobs-${a.id}-${kO}', ${a.id}, '${kO}', this)" title="Melhorar texto com IA">✨ Melhorar com IA</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
+
+    const semanasHtml = multiTurma
+      ? turmasAluno.map(t=>`<div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--brand);margin-bottom:6px;">${t}</div><div class="freq-semanas">${montarSemanasFreq(a,mes,t)}</div></div>`).join('')
+      : `<div class="freq-semanas">${montarSemanasFreq(a,mes,'')}</div>`;
+
+    const badgesTurma = turmasAluno.length ? ` <span style="font-size:10px;color:var(--ink-muted);font-weight:600;">(${turmasAluno.join(', ')})</span>` : '';
+
     return `<div class="freq-card">
       <div class="freq-card-header" onclick="toggleFreqCard('fq-${a.id}')">
         <div class="avatar" style="background:${a.avatar};width:28px;height:28px;font-size:11px;">${ini(a.nome)}</div>
-        <span style="font-weight:700;font-size:14px;">${a.nome}</span>
+        <span style="font-weight:700;font-size:14px;">${a.nome}</span>${badgesTurma}
         ${resumo?`<span class="freq-resumo">${resumo}</span>`:''}
         <span class="freq-card-arrow" id="fqa-${a.id}">▼</span>
       </div>
       <div class="freq-card-body" id="fq-${a.id}">
-        <div class="freq-semanas">${semanas}</div>
+        ${semanasHtml}
       </div>
     </div>`;
   }).join('');
@@ -2148,7 +2210,7 @@ function renderFin(){
   const mes=document.getElementById('mes-fin').value;
   const el=document.getElementById('fin-cards');
   let tot=0,rec=0,pend=0;
-  const sorted=[...alunos].filter(a=>a.status!=='inativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const sorted=[...alunos].filter(a=>!a.status||a.status==='ativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   el.innerHTML=sorted.map(a=>{
     const st=(a.pag&&a.pag[mes])||'pendente';
     const v=a.valorPromo||0;
@@ -2403,7 +2465,7 @@ function renderCrescimento(){
   const meta=parseInt(document.getElementById('cresc-meta').value)||32;
 
   // KPIs
-  const ativos=alunos.filter(a=>a.status!=='inativo').length;
+  const ativos=alunos.filter(a=>!a.status||a.status==='ativo').length;
   const d30=new Date(hoje.getTime()-30*86400000).toISOString().slice(0,10);
   const d90=new Date(hoje.getTime()-90*86400000).toISOString().slice(0,10);
   const novos30=comData.filter(a=>a.dataInicio>=d30).length;
@@ -3350,7 +3412,7 @@ function iaColetarObservacoes(meses, listaAlunos) {
 function iaResumoFinanceiro(mesRef) {
   const mes = mesRef || new Date().toISOString().slice(0,7);
   let tot=0, rec=0, pend=0, atras=0;
-  const linhas = alunos.filter(function(a){return a.status!=='inativo';}).map(function(a){
+  const linhas = alunos.filter(function(a){return !a.status||a.status==='ativo';}).map(function(a){
     const st = (a.pag && a.pag[mes]) || 'pendente';
     const v = a.valorPromo || 0;
     tot += v;
@@ -3658,7 +3720,8 @@ window.editarAvulso=editarAvulso; window.fecharModalAvulso=fecharModalAvulso;
 window.salvarEdicaoAvulso=salvarEdicaoAvulso; window.excluirAvulso=excluirAvulso;
 window.toggleOrigemOutro=toggleOrigemOutro;
 window.setCrescPeriodo=setCrescPeriodo;
-window.setAlunosFiltroStatus=setAlunosFiltroStatus; window.toggleStatusAluno=toggleStatusAluno;
+window.renderCrescimento=renderCrescimento;
+window.setAlunosFiltroStatus=setAlunosFiltroStatus; window.mudarStatusAluno=mudarStatusAluno;
 window.abrirNFSeAvulso=abrirNFSeAvulso;
 </script>
 
