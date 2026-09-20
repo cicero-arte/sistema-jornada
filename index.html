@@ -392,17 +392,23 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
   </div>
 
   <div class="tela" id="tela-frequencia">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
       <div class="sec-title" style="margin:0;">Frequência e observações</div>
-      <select class="mes-sel" id="mes-freq" onchange="renderFreq()"></select>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <select id="freq-filtro-turma" onchange="renderFreq()" style="padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:'Lato',sans-serif;font-size:12px;"><option value="">Todas as turmas</option></select>
+        <select class="mes-sel" id="mes-freq" onchange="renderFreq()"></select>
+      </div>
     </div>
     <div id="freq-cont"></div>
   </div>
 
   <div class="tela" id="tela-financeiro">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
       <div class="sec-title" style="margin:0;">Financeiro</div>
-      <select class="mes-sel" id="mes-fin" onchange="renderFin()"></select>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <select id="fin-filtro-turma" onchange="renderFin()" style="padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:'Lato',sans-serif;font-size:12px;"><option value="">Todas as turmas</option></select>
+        <select class="mes-sel" id="mes-fin" onchange="renderFin()"></select>
+      </div>
     </div>
     <div id="fin-cards"></div>
     <div style="margin-top:14px;padding:12px 14px;background:var(--bg);border-radius:10px;display:flex;gap:20px;flex-wrap:wrap;">
@@ -2035,14 +2041,21 @@ function renderFreq(){
   const mes=document.getElementById('mes-freq').value;
   const el=document.getElementById('freq-cont');
   if(!alunos.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno.</p>';return;}
-  const sorted=[...alunos].filter(a=>!a.status||a.status==='ativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const selTurma=document.getElementById('freq-filtro-turma');
+  if(selTurma && selTurma.options.length<=1){
+    selTurma.innerHTML='<option value="">Todas as turmas</option>'+TURMAS.map(t=>`<option value="${t}">${t}</option>`).join('');
+  }
+  const filtroTurma = selTurma ? selTurma.value : '';
+  let sorted=[...alunos].filter(a=>!a.status||a.status==='ativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  if(filtroTurma) sorted=sorted.filter(a=>(a.turmas||[]).includes(filtroTurma));
   el.innerHTML=sorted.map(a=>{
     const turmasAluno = a.turmas||[];
+    const turmasExibir = filtroTurma ? [filtroTurma] : turmasAluno;
     const multiTurma = turmasAluno.length>1;
-    const prefixos = multiTurma ? turmasAluno : [''];
+    const prefixosResumo = multiTurma ? turmasExibir : [''];
 
     let presencas=0, faltas=0;
-    prefixos.forEach(pfx=>{
+    prefixosResumo.forEach(pfx=>{
       const p2 = pfx ? pfx+'-' : '';
       presencas += [1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-${p2}s${s}-p`]).length;
       faltas += [1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-${p2}s${s}-f`]).length;
@@ -2050,7 +2063,7 @@ function renderFreq(){
     const resumo=presencas||faltas?`${presencas}P ${faltas}F`:'';
 
     const semanasHtml = multiTurma
-      ? turmasAluno.map(t=>`<div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--brand);margin-bottom:6px;">${t}</div><div class="freq-semanas">${montarSemanasFreq(a,mes,t)}</div></div>`).join('')
+      ? turmasExibir.map(t=>`<div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--brand);margin-bottom:6px;">${t}</div><div class="freq-semanas">${montarSemanasFreq(a,mes,t)}</div></div>`).join('')
       : `<div class="freq-semanas">${montarSemanasFreq(a,mes,'')}</div>`;
 
     const badgesTurma = turmasAluno.length ? ` <span style="font-size:10px;color:var(--ink-muted);font-weight:600;">(${turmasAluno.join(', ')})</span>` : '';
@@ -2210,7 +2223,13 @@ function renderFin(){
   const mes=document.getElementById('mes-fin').value;
   const el=document.getElementById('fin-cards');
   let tot=0,rec=0,pend=0;
-  const sorted=[...alunos].filter(a=>!a.status||a.status==='ativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const selTurma=document.getElementById('fin-filtro-turma');
+  if(selTurma && selTurma.options.length<=1){
+    selTurma.innerHTML='<option value="">Todas as turmas</option>'+TURMAS.map(t=>`<option value="${t}">${t}</option>`).join('');
+  }
+  const filtroTurma = selTurma ? selTurma.value : '';
+  let sorted=[...alunos].filter(a=>!a.status||a.status==='ativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  if(filtroTurma) sorted=sorted.filter(a=>(a.turmas||[]).includes(filtroTurma));
   el.innerHTML=sorted.map(a=>{
     const st=(a.pag&&a.pag[mes])||'pendente';
     const v=a.valorPromo||0;
@@ -3721,7 +3740,7 @@ window.salvarEdicaoAvulso=salvarEdicaoAvulso; window.excluirAvulso=excluirAvulso
 window.toggleOrigemOutro=toggleOrigemOutro;
 window.setCrescPeriodo=setCrescPeriodo;
 window.renderCrescimento=renderCrescimento;
-window.setAlunosFiltroStatus=setAlunosFiltroStatus; window.mudarStatusAluno=mudarStatusAluno;
+window.setAlunosFiltroStatus=setAlunosFiltroStatus; window.mudarStatusAluno=mudarStatusAluno; window.renderAlunos=renderAlunos;
 window.abrirNFSeAvulso=abrirNFSeAvulso;
 </script>
 
