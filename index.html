@@ -347,6 +347,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
   <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> <span>Alunos</span></button>
   <button class="nav-btn" data-tela="frequencia" onclick="ir('frequencia',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> <span>Frequência</span></button>
   <button class="nav-btn" data-tela="financeiro" onclick="ir('financeiro',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> <span>Financeiro</span></button>
+  <button class="nav-btn" data-tela="renovacao" onclick="ir('renovacao',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> <span>Renovação</span></button>
   <button class="nav-btn" data-tela="crescimento" onclick="ir('crescimento',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> <span>Crescimento</span></button>
   <button class="nav-btn" data-tela="conteudo" onclick="ir('conteudo',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1"></circle></svg> <span>Conteúdo</span></button>
   <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> <span>Materiais</span></button>
@@ -360,6 +361,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
     <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this);fecharNavMenu()">👥 Alunos</button>
     <button class="nav-btn" data-tela="frequencia" onclick="ir('frequencia',this);fecharNavMenu()">📅 Frequência</button>
     <button class="nav-btn" data-tela="financeiro" onclick="ir('financeiro',this);fecharNavMenu()">💰 Financeiro</button>
+    <button class="nav-btn" data-tela="renovacao" onclick="ir('renovacao',this);fecharNavMenu()">🔄 Renovação</button>
     <button class="nav-btn" data-tela="crescimento" onclick="ir('crescimento',this);fecharNavMenu()">📈 Crescimento</button>
     <button class="nav-btn" data-tela="conteudo" onclick="ir('conteudo',this);fecharNavMenu()">🌀 Conteúdo</button>
     <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this);fecharNavMenu()">📄 Materiais</button>
@@ -501,6 +503,23 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
 
       <div id="pix-preview-box" style="display:none;margin-top:14px;padding:14px;background:#fff;border:1px solid var(--border);border-radius:8px;font-size:13px;white-space:pre-wrap;line-height:1.6;color:var(--ink);"></div>
       <div id="pix-toast" style="display:none;margin-top:10px;padding:10px 14px;background:#e8f4f0;border-radius:8px;font-size:13px;color:var(--sage);font-weight:700;">✓ Mensagem copiada!</div>
+    </div>
+  </div>
+
+  <div class="tela" id="tela-renovacao">
+    <div class="sec-title">Renovação de contrato</div>
+    <div class="cert-form">
+      <div class="cert-form-title">Comunicado de renovação</div>
+      <div class="grid2">
+        <div class="field"><label>Valor mensal para 1 encontro semanal (R$)</label><input id="ren-valor" type="number" step="0.01" placeholder="300" oninput="renRender()"></div>
+        <div class="field"><label>Início do novo contrato</label><input id="ren-inicio" type="date" onchange="renRender()"></div>
+      </div>
+      <div style="font-size:11px;color:var(--ink-muted);">Alunos com mais de um encontro por semana recebem o valor multiplicado, que pode ser ajustado em cada linha.</div>
+    </div>
+    <div id="ren-lista"></div>
+    <div class="cert-form" id="ren-previa-box" style="display:none;">
+      <div class="cert-form-title">Prévia do comunicado</div>
+      <div id="ren-previa" style="white-space:pre-wrap;font-size:13px;line-height:1.6;"></div>
     </div>
   </div>
 
@@ -1781,7 +1800,7 @@ function gerarMeses(){const nomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ag
 function mesAtual(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
 function popularMeses(){const meses=gerarMeses();const mc=mesAtual();['mes-freq','mes-fin'].forEach(id=>{const s=document.getElementById(id);s.innerHTML=meses.map(m=>`<option value="${m.val}"${m.val===mc?' selected':''}>${m.label}</option>`).join('');});}
 
-function ir(id,btn){document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));document.getElementById('tela-'+id).classList.add('ativa');document.querySelectorAll('.nav-btn[data-tela="'+id+'"]').forEach(b=>b.classList.add('ativo'));if(id==='gestao')renderAlunos();if(id==='frequencia')renderFreq();if(id==='financeiro')renderFin();if(id==='crescimento')renderCrescimento();if(id==='materiais')renderMateriais();if(id==='conteudo'){renderFiltros();renderMapa();}if(id==='config')preencherConfig();if(id==='certificados')popularCertAlunos();if(id==='email')popularEmailChips();if(id==='avaliacao')avalRender();if(id==='ia'){const inp=document.getElementById('ia-input');if(inp)setTimeout(()=>inp.focus(),100);}}
+function ir(id,btn){document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));document.getElementById('tela-'+id).classList.add('ativa');document.querySelectorAll('.nav-btn[data-tela="'+id+'"]').forEach(b=>b.classList.add('ativo'));if(id==='gestao')renderAlunos();if(id==='frequencia')renderFreq();if(id==='financeiro')renderFin();if(id==='renovacao')renInit();if(id==='crescimento')renderCrescimento();if(id==='materiais')renderMateriais();if(id==='conteudo'){renderFiltros();renderMapa();}if(id==='config')preencherConfig();if(id==='certificados')popularCertAlunos();if(id==='email')popularEmailChips();if(id==='avaliacao')avalRender();if(id==='ia'){const inp=document.getElementById('ia-input');if(inp)setTimeout(()=>inp.focus(),100);}}
 function toggleNavMenu(){const m=document.getElementById('nav-menu');m.classList.toggle('aberto');document.getElementById('hamburger').textContent=m.classList.contains('aberto')?'✕':'☰';}
 function fecharNavMenu(){const m=document.getElementById('nav-menu');m.classList.remove('aberto');document.getElementById('hamburger').textContent='☰';}
 
@@ -2942,6 +2961,39 @@ function verContrato(id){
   document.getElementById('contrato-html').innerHTML=html;
   document.getElementById('modal-contrato').classList.remove('hidden');
 }
+
+// ── RENOVAÇÃO ────────────────────────────────────────
+function renDataExt(iso){const m=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];const p=iso.split('-');const d=parseInt(p[2]);return (d===1?'1º':d)+' de '+m[parseInt(p[1])-1]+' de '+p[0];}
+function renAtivos(){return alunos.filter(a=>!a.status||a.status==='ativo');}
+function renInit(){const el=document.getElementById('ren-inicio');if(el&&!el.value)el.value=(new Date().getFullYear()+1)+'-01-01';renRender();}
+function renRender(){
+  const box=document.getElementById('ren-lista');if(!box)return;
+  const base=parseFloat(document.getElementById('ren-valor').value)||0;
+  box.innerHTML=renAtivos().map(a=>{
+    const n=a.encSem||1;const v=base?(base*n):'';
+    return `<div class="cert-form" style="padding:12px;margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;"><div style="flex:1;min-width:170px;"><b>${a.nome}</b><div style="font-size:11px;color:var(--ink-muted);">${a.resp||''} · ${n} encontro(s) por semana · valor atual R$ ${a.valorPromo||'-'}</div></div><div style="display:flex;align-items:center;gap:4px;font-size:12px;">R$ <input type="number" step="0.01" id="ren-v-${a.id}" value="${v}" style="width:90px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'Lato',sans-serif;" oninput="renPrev(${a.id})"></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-sm" style="background:#f0ede8;color:var(--ink-soft);border:1px solid var(--border);" onclick="renPrev(${a.id})">Ver texto</button><button class="btn btn-sm" style="background:var(--warm);color:#fff;border:none;" onclick="renCopiar(${a.id})">Copiar</button><button class="btn btn-sm" style="background:#f0ede8;color:var(--ink-soft);border:1px solid var(--border);" onclick="renZap(${a.id})">WhatsApp</button><button class="btn btn-sm" style="background:#f0ede8;color:var(--ink-soft);border:1px solid var(--border);" onclick="renMail(${a.id})">E-mail</button></div></div>`;
+  }).join('')||'<p style="color:var(--ink-muted);">Nenhum aluno ativo.</p>';
+  document.getElementById('ren-previa-box').style.display='none';
+}
+function renTexto(id){
+  const a=alunos.find(x=>x.id===id);if(!a)return null;
+  const ini=document.getElementById('ren-inicio').value;
+  const inp=document.getElementById('ren-v-'+id);
+  const val=parseFloat(inp&&inp.value);
+  if(!ini||!val){alert('Preencha o valor mensal e a data de início.');return null;}
+  const ano=ini.slice(0,4);
+  const n=a.encSem||1;
+  const nTxt=n===1?'1 encontro semanal':n+' encontros semanais';
+  const anoFim=a.vigCivil?(a.dataInicio||a.dataAssinatura||'').slice(0,4):'';
+  const fimTxt=anoFim?'se encerra em 31 de dezembro de '+anoFim:'está chegando ao fim';
+  const vTxt=val.toFixed(2).replace('.',',');
+  return 'Olá, '+(a.resp||'')+'! Tudo bem?\n\nO contrato de '+a.nome+' na Jornada do Desenho em Espiral '+fimTxt+', e não há renovação automática.\n\nPara continuar, o novo contrato terá início em '+renDataExt(ini)+', com '+nTxt+' de 60 minutos e mensalidade de R$ '+vTxt+', valor que ficará fixo até 31 de dezembro de '+ano+'.\n\nSe deseja continuar, responda esta mensagem confirmando o aceite do valor. Com a sua confirmação, envio o novo contrato para assinatura. Se preferir não renovar, me avise também, para eu organizar as vagas.\n\nUm abraço,\nCícero';
+}
+function renPrev(id){const t=renTexto(id);if(!t)return;document.getElementById('ren-previa').textContent=t;document.getElementById('ren-previa-box').style.display='block';}
+function renCopiar(id){const t=renTexto(id);if(!t)return;navigator.clipboard.writeText(t).then(()=>showToast()).catch(()=>alert('Copie manualmente.'));renPrev(id);}
+function renZap(id){const t=renTexto(id);if(!t)return;const a=alunos.find(x=>x.id===id);let d=(a.tel||'').replace(/\D/g,'');if(!d){alert('Aluno sem telefone cadastrado.');return;}if(d.length<=11)d='55'+d;window.open('https://wa.me/'+d+'?text='+encodeURIComponent(t),'_blank');}
+function renMail(id){const t=renTexto(id);if(!t)return;const a=alunos.find(x=>x.id===id);if(!a.email){alert('Aluno sem e-mail cadastrado.');return;}window.location.href='mailto:'+a.email+'?subject='+encodeURIComponent('Renovação do contrato, Jornada do Desenho em Espiral')+'&body='+encodeURIComponent(t);}
+
 function fecharContrato(){document.getElementById('modal-contrato').classList.add('hidden');}
 function copiarContrato(){navigator.clipboard.writeText(document.getElementById('contrato-html').innerText).then(()=>showToast()).catch(()=>alert('Copie manualmente.'));}
 function imprimirContrato(){const c=document.getElementById('contrato-html').innerHTML;const j=window.open('','_blank');j.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Contrato</title><style>body{font-family:\'Times New Roman\',serif;font-size:13px;line-height:1.8;color:#111;padding:40px;max-width:800px;margin:0 auto;}h2{text-align:center;font-size:15px;letter-spacing:1px;margin-bottom:20px;}h3{font-size:13px;font-weight:bold;margin:18px 0 6px;}p{margin-bottom:10px;text-align:justify;}.rodape{margin-top:40px;border-top:1px solid #ccc;padding-top:16px;font-size:11px;color:#666;text-align:center;}@media print{@page{margin:2cm;}}</style></head><body>'+c+'</body></html>');j.document.close();setTimeout(()=>j.print(),400);}
@@ -3764,7 +3816,7 @@ window.richAplicarTexto=richAplicarTexto; window.richAplicarTitulo=richAplicarTi
 window.richCmd=richCmd; window.salvarConfig=salvarConfig; window.salvarRPS=salvarRPS; window.salvarForcado=salvarForcado; window.sairDaJornada=sairDaJornada;
 window.selecionarNivel=selecionarNivel; window.setPag=setPag; window.toggleCard=toggleCard;
 window.toggleFreqCard=toggleFreqCard; window.toggleFreq=toggleFreq;
-window.toggleNavMenu=toggleNavMenu; window.trocarCert=trocarCert; window.verContrato=verContrato;
+window.toggleNavMenu=toggleNavMenu; window.renInit=renInit; window.renRender=renRender; window.renPrev=renPrev; window.renCopiar=renCopiar; window.renZap=renZap; window.renMail=renMail; window.trocarCert=trocarCert; window.verContrato=verContrato;
 window.fecharNavMenu=fecharNavMenu; window.autoGrow=autoGrow;
 window.calcularIdade=calcularIdade; window.importarDados=importarDados;
 window.preencherCertAluno=preencherCertAluno; window.renderFin=renderFin;
