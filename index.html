@@ -19,27 +19,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --ink:#17181A;--ink-soft:#4a4d51;--ink-muted:#8b9095;
-  --bg:#fff;--card:#F3F4F6;--border:#E7E8EA;
-  --brand:#1E6D94;--brand-tint:#EAF2F6;
-  --warm:#FF9900;--sage:#4b6b58;--ochre:#c9a84c;--teal:#1E6D94;
+  --ink:#1F2A2E;--ink-soft:#3d4a4e;--ink-muted:#9AA0A6;
+  --bg:#F0F1F2;--card:#fff;--border:#E4E4E4;
+  --brand:#1E6D94;--brand-tint:#e8f0f4;
+  --warm:#F49819;--sage:#4b6b58;--ochre:#c9a84c;--teal:#1E6D94;
   --red:#c0392b;--green:#4b6b58;--green-tint:#e4efe8;
 }
 body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;}
-.shell{display:flex;align-items:stretch;max-width:1600px;margin:0 auto;width:100%;}
-body{padding:0 16px;}
-@media (min-width:1700px){ body{padding:0 24px;} }
-.nav{display:flex;flex-direction:column;align-items:stretch;gap:2px;width:230px;flex:none;background:#fff;border-radius:12px 0 0 12px;padding:16px 10px;border-right:1px solid var(--border);}
-.nav-logo{display:flex;align-items:baseline;gap:1px;padding:6px 12px 18px;font-size:18px;font-weight:900;color:var(--brand);}
-.nav-logo span{color:var(--warm);}
-.nav-btn{display:flex;align-items:center;gap:10px;justify-content:flex-start;text-align:left;padding:11px 12px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;color:var(--ink-muted);background:none;border:none;border-radius:8px;cursor:pointer;transition:all 0.15s;width:100%;}
-.nav-icon{width:16px;height:16px;flex-shrink:0;}
-.nav-btn.ativo{color:var(--brand);background:var(--brand-tint);}
-.nav-btn:hover:not(.ativo){color:var(--ink);background:#F7F8F9;}
-.nav-salvar{padding:10px 14px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:var(--brand);background:var(--brand-tint);border:1.5px solid var(--brand-tint);border-radius:7px;cursor:pointer;transition:all 0.2s;white-space:nowrap;width:100%;margin-top:10px;}
-.nav-salvar:hover{background:#dfeaf0;}
+.shell{display:flex;align-items:stretch;max-width:1200px;margin:0 auto;}
+.nav{display:flex;flex-direction:column;align-items:stretch;gap:2px;width:230px;flex:none;background:var(--brand);border-radius:12px 0 0 12px;padding:16px 10px;}
+.nav-btn{display:flex;align-items:center;gap:10px;justify-content:flex-start;text-align:left;padding:11px 12px;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;color:#ffffff88;background:none;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;width:100%;}
+.nav-btn.ativo{color:#fff;background:#ffffff22;}
+.nav-btn:hover:not(.ativo){color:#fff;}
+.nav-salvar{padding:10px 14px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;color:#fff;background:#ffffff22;border:1.5px solid #ffffff44;border-radius:7px;cursor:pointer;transition:all 0.2s;white-space:nowrap;width:100%;margin-top:10px;}
+.nav-salvar:hover{background:#ffffff33;}
 .nav-salvar.salvando{opacity:0.6;cursor:wait;}
-.nav-salvar.erro{background:#fdf0ef;border-color:#f5c6c2;color:var(--red);}
+.nav-salvar.erro{background:#c0392b88;border-color:#e74c3c;}
 .nav-hamburger{display:none;}
 .nav-menu{display:none;}
 .app{background:var(--card);border-radius:0 12px 12px 0;border:1px solid var(--border);border-left:none;flex:1;min-width:0;}
@@ -78,13 +73,6 @@ body{padding:0 16px;}
 .freq-check-row.falta input[type=checkbox]:checked{background:var(--red);border-color:var(--red);}
 .freq-check-row.falta input[type=checkbox]:checked::after{content:'✗';}
 .freq-obs{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:6px;font-family:'Lato',sans-serif;font-size:12px;resize:vertical;min-height:52px;background:#fafaf8;color:var(--ink);margin-top:4px;}
-.freq-obs-wrap{position:relative;}
-.freq-obs-tools{display:flex;gap:6px;margin-top:4px;}
-.freq-obs-btn{padding:4px 9px;font-size:11px;font-weight:700;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--ink-soft);font-family:'Lato',sans-serif;}
-.freq-obs-btn:disabled{opacity:0.5;cursor:wait;}
-.freq-obs-btn.gravando{background:#fdf0ef;border-color:#f5c6c2;color:var(--red);}
-.cresc-periodo-btn{padding:5px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;background:none;cursor:pointer;color:var(--ink-muted);font-family:'Lato',sans-serif;}
-.cresc-periodo-btn.ativo{background:var(--brand);color:#fff;}
 .fin-table{width:100%;border-collapse:collapse;}
 .fin-table th{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);}
 .fin-table td{padding:10px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
@@ -95,7 +83,7 @@ body{padding:0 16px;}
 .badge-atrasado{background:#fdf0ef;color:var(--red);}
 .filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
 .f-btn{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--ink-muted);font-family:'Lato',sans-serif;}
-.f-btn.ativo{background:var(--brand);color:#fff;border-color:var(--brand);}
+.f-btn.ativo{background:var(--ink);color:#fff;border-color:var(--ink);}
 .nucleo{margin-bottom:14px;background:var(--bg);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
 .nucleo details{width:100%;}
 .nucleo summary{list-style:none;cursor:pointer;}
@@ -150,11 +138,11 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
   .nav-btn { display: none; }
   .nav-btn.ativo { display: flex; flex: 1; text-align: left; padding: 14px 4px; font-size: 13px; border-bottom: none; }
   .nav-btn.ativo span { display: inline; }
-  .nav-hamburger { display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; padding: 14px 8px; color: var(--ink); font-size: 22px; line-height: 1; }
-  .nav-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; z-index: 100; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 8px 24px #0002; border: 1px solid var(--border); border-top: none; }
+  .nav-hamburger { display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; padding: 14px 8px; color: #fff; font-size: 22px; line-height: 1; }
+  .nav-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--brand); z-index: 100; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 8px 24px #0003; }
   .nav-menu.aberto { display: block; }
-  .nav-menu .nav-btn { display: block; width: 100%; text-align: left; padding: 14px 18px; font-size: 13px; border-bottom: 1px solid var(--border); border-left: none; border-radius:0; }
-  .nav-menu .nav-btn.ativo { border-bottom: 1px solid var(--border); border-left: 3px solid var(--warm); }
+  .nav-menu .nav-btn { display: block; width: 100%; text-align: left; padding: 14px 18px; font-size: 13px; border-bottom: 1px solid #ffffff11; border-left: none; border-radius:0; }
+  .nav-menu .nav-btn.ativo { border-bottom: 1px solid #ffffff11; border-left: 3px solid var(--warm); }
   .app { border-radius: 0 0 12px 12px; border-left: 1px solid var(--border); }
   .nav-salvar { width: auto; margin: auto 10px auto auto; }
 
@@ -342,19 +330,18 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
 
 <div class="shell">
 <div class="nav">
-  <div class="nav-logo">Jornada<span>.</span></div>
   <button class="nav-hamburger" onclick="toggleNavMenu()" id="hamburger">☰</button>
-  <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> <span>Alunos</span></button>
-  <button class="nav-btn" data-tela="frequencia" onclick="ir('frequencia',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> <span>Frequência</span></button>
-  <button class="nav-btn" data-tela="financeiro" onclick="ir('financeiro',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> <span>Financeiro</span></button>
-  <button class="nav-btn" data-tela="crescimento" onclick="ir('crescimento',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> <span>Crescimento</span></button>
-  <button class="nav-btn" data-tela="conteudo" onclick="ir('conteudo',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1"></circle></svg> <span>Conteúdo</span></button>
-  <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> <span>Materiais</span></button>
-  <button class="nav-btn" data-tela="certificados" onclick="ir('certificados',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg> <span>Certif.</span></button>
-  <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg> <span>Avaliação</span></button>
-  <button class="nav-btn" data-tela="email" onclick="ir('email',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> <span>E-mail</span></button>
-  <button class="nav-btn" data-tela="ia" onclick="ir('ia',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg> <span>IA</span></button>
-  <button class="nav-btn" data-tela="config" onclick="ir('config',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> <span>Config</span></button>
+  <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this)">👥 <span>Alunos</span></button>
+  <button class="nav-btn" data-tela="frequencia" onclick="ir('frequencia',this)">📅 <span>Frequência</span></button>
+  <button class="nav-btn" data-tela="financeiro" onclick="ir('financeiro',this)">💰 <span>Financeiro</span></button>
+  <button class="nav-btn" data-tela="crescimento" onclick="ir('crescimento',this)">📈 <span>Crescimento</span></button>
+  <button class="nav-btn" data-tela="conteudo" onclick="ir('conteudo',this)">🌀 <span>Conteúdo</span></button>
+  <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this)">📄 <span>Materiais</span></button>
+  <button class="nav-btn" data-tela="certificados" onclick="ir('certificados',this)">🎓 <span>Certif.</span></button>
+  <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this)">📋 <span>Avaliação</span></button>
+  <button class="nav-btn" data-tela="email" onclick="ir('email',this)">✉️ <span>E-mail</span></button>
+  <button class="nav-btn" data-tela="ia" onclick="ir('ia',this)">🤖 <span>IA</span></button>
+  <button class="nav-btn" data-tela="config" onclick="ir('config',this)">⚙️ <span>Config</span></button>
   <button class="nav-salvar" id="btn-salvar-forcado" onclick="salvarForcado()">💾 Salvar</button>
   <div class="nav-menu" id="nav-menu">
     <button class="nav-btn ativo" data-tela="gestao" onclick="ir('gestao',this);fecharNavMenu()">👥 Alunos</button>
@@ -373,100 +360,31 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
 
 <div class="app">
   <div class="tela ativa" id="tela-gestao">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <div class="sec-title" style="margin:0;">Alunos</div>
       <button class="btn btn-primary btn-sm" onclick="abrirModal()">+ Novo aluno</button>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-      <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;flex-wrap:wrap;">
-        <button id="alunos-btn-ativo" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('ativo')">Ativos</button>
-        <button id="alunos-btn-inativo" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('inativo')">Ex-alunos</button>
-        <button id="alunos-btn-espera" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('espera')">Espera</button>
-        <button id="alunos-btn-todos" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('todos')">Todos</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <select id="alunos-filtro-turma" onchange="renderAlunos()" style="padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:'Lato',sans-serif;font-size:12px;">
-          <option value="">Todas as turmas</option>
-        </select>
-        <span id="alunos-filtro-contador" style="font-size:11px;color:var(--ink-muted);"></span>
-      </div>
     </div>
     <div id="lista-alunos"></div>
   </div>
 
   <div class="tela" id="tela-frequencia">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <div class="sec-title" style="margin:0;">Frequência e observações</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <select id="freq-filtro-turma" onchange="renderFreq()" style="padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:'Lato',sans-serif;font-size:12px;"><option value="">Todas as turmas</option></select>
-        <select class="mes-sel" id="mes-freq" onchange="renderFreq()"></select>
-      </div>
+      <select class="mes-sel" id="mes-freq" onchange="renderFreq()"></select>
     </div>
     <div id="freq-cont"></div>
   </div>
 
   <div class="tela" id="tela-financeiro">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <div class="sec-title" style="margin:0;">Financeiro</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <select id="fin-filtro-turma" onchange="renderFin()" style="padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:'Lato',sans-serif;font-size:12px;"><option value="">Todas as turmas</option></select>
-        <select class="mes-sel" id="mes-fin" onchange="renderFin()"></select>
-      </div>
+      <select class="mes-sel" id="mes-fin" onchange="renderFin()"></select>
     </div>
     <div id="fin-cards"></div>
     <div style="margin-top:14px;padding:12px 14px;background:var(--bg);border-radius:10px;display:flex;gap:20px;flex-wrap:wrap;">
       <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Total</div><div style="font-size:18px;font-weight:900;" id="fin-total">R$ 0</div></div>
       <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green);">Recebido</div><div style="font-size:18px;font-weight:900;color:var(--green);" id="fin-rec">R$ 0</div></div>
       <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ochre);">Pendente</div><div style="font-size:18px;font-weight:900;color:var(--ochre);" id="fin-pend">R$ 0</div></div>
-    </div>
-
-    <!-- Lançamentos avulsos -->
-    <div style="margin-top:22px;padding:16px;background:var(--bg);border-radius:12px;border:1px solid var(--border);">
-      <div class="sec-title" style="margin-bottom:4px;">Lançamentos avulsos</div>
-      <div style="font-size:12px;color:var(--ink-muted);margin-bottom:14px;">Aulas experimentais e outros recebimentos fora da mensalidade recorrente. Não afeta o cadastro do aluno nem o contrato.</div>
-
-      <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;">
-        <div class="grid2">
-          <div class="field" style="margin-bottom:0;"><label>Aluno cadastrado (opcional)</label><select id="av-aluno-id"><option value="">Nenhum / lead ainda não cadastrado</option></select></div>
-          <div class="field" style="margin-bottom:0;"><label>Nome (se não vinculado)</label><input id="av-nome" type="text" placeholder="Nome do lead ou aluno"></div>
-        </div>
-        <div class="grid2">
-          <div class="field" style="margin-bottom:0;"><label>Valor (R$)</label><input id="av-valor" type="number" step="0.01" placeholder="90.00"></div>
-          <div class="field" style="margin-bottom:0;"><label>Data</label><input id="av-data" type="date"></div>
-        </div>
-        <div class="field" style="margin-bottom:0;"><label>Descrição</label><input id="av-desc" type="text" placeholder="Aula experimental"></div>
-        <button class="btn btn-primary" style="width:fit-content;" onclick="salvarAvulso()">+ Lançar</button>
-      </div>
-
-      <div id="av-lista"></div>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:20px;flex-wrap:wrap;">
-        <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--green);">Avulsos recebidos</div><div style="font-size:16px;font-weight:900;color:var(--green);" id="av-rec">R$ 0</div></div>
-        <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ochre);">Avulsos pendentes</div><div style="font-size:16px;font-weight:900;color:var(--ochre);" id="av-pend">R$ 0</div></div>
-      </div>
-    </div>
-
-    <!-- Total geral -->
-    <div style="margin-top:18px;padding:14px 16px;background:var(--ink);border-radius:12px;display:flex;gap:24px;flex-wrap:wrap;">
-      <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#ffffffaa;">Total geral (mensalidades + avulsos)</div><div style="font-size:20px;font-weight:900;color:#fff;" id="geral-total">R$ 0</div></div>
-      <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#8fd9a8;">Recebido</div><div style="font-size:20px;font-weight:900;color:#8fd9a8;" id="geral-rec">R$ 0</div></div>
-      <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#f0c98a;">Pendente</div><div style="font-size:20px;font-weight:900;color:#f0c98a;" id="geral-pend">R$ 0</div></div>
-    </div>
-
-    <!-- MODAL EDITAR AVULSO -->
-    <div class="overlay hidden" id="modal-avulso">
-      <div class="modal">
-        <h3>Editar lançamento</h3>
-        <input type="hidden" id="av-edit-id">
-        <div class="field"><label>Aluno cadastrado (opcional)</label><select id="av-edit-aluno-id"><option value="">Nenhum / lead ainda não cadastrado</option></select></div>
-        <div class="field"><label>Nome (se não vinculado)</label><input id="av-edit-nome" type="text"></div>
-        <div class="field"><label>Valor (R$)</label><input id="av-edit-valor" type="number" step="0.01"></div>
-        <div class="field"><label>Data</label><input id="av-edit-data" type="date"></div>
-        <div class="field"><label>Descrição</label><input id="av-edit-desc" type="text"></div>
-        <div class="m-actions">
-          <button class="btn btn-neutral" onclick="fecharModalAvulso()">Cancelar</button>
-          <button class="btn btn-primary" onclick="salvarEdicaoAvulso()">Salvar</button>
-        </div>
-      </div>
     </div>
 
     <!-- Gerador de mensagem de cobrança -->
@@ -516,13 +434,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
     <div id="cresc-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px;"></div>
 
     <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:18px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-        <div class="sec-title" style="margin:0;">Novas matrículas por período</div>
-        <div style="display:flex;gap:4px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:3px;">
-          <button id="cresc-btn-mes" class="cresc-periodo-btn" onclick="setCrescPeriodo('mes')">Mês</button>
-          <button id="cresc-btn-ano" class="cresc-periodo-btn" onclick="setCrescPeriodo('ano')">Ano</button>
-        </div>
-      </div>
+      <div class="sec-title" style="margin-bottom:10px;">Matrículas acumuladas</div>
       <div id="cresc-chart" style="width:100%;overflow-x:auto;"></div>
     </div>
 
@@ -559,8 +471,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
           <div style="font-weight:700;font-size:17px;color:var(--ink);">Assistente da Jornada</div>
           <div style="font-size:12px;color:var(--ink-muted);">Planejamento de aulas · Análise de alunos · Sugestões pedagógicas</div>
         </div>
-        <button id="ia-btn-desfazer" onclick="iaDesfazerLimpar()" style="display:none;margin-left:auto;background:var(--brand-tint);border:1px solid var(--brand-tint);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--brand);cursor:pointer;">↩ Desfazer limpeza</button>
-        <button id="ia-btn-limpar" onclick="iaLimpar()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--ink-muted);cursor:pointer;">🗑 Limpar</button>
+        <button onclick="iaLimpar()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--ink-muted);cursor:pointer;">🗑 Limpar</button>
       </div>
 
       <!-- Atalhos rápidos -->
@@ -672,56 +583,18 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
           <option value="">Não especificado</option>
           <option value="Linha e gesto">Linha e gesto</option>
           <option value="Forma e proporção">Forma e proporção</option>
-          <option value="Perspectiva e espaço">Perspectiva e espaço</option>
           <option value="Luz e sombra">Luz e sombra</option>
+          <option value="Perspectiva e espaço">Perspectiva e espaço</option>
           <option value="Materiais e superfícies">Materiais e superfícies</option>
           <option value="Cor">Cor</option>
         </select></div>
       </div>
-      <div class="field"><label>Tema / módulo</label><select id="mat-tema">
-        <option value="">Não especificado</option>
-        <option value="Observação">Observação</option>
-        <option value="Figura humana">Figura humana</option>
-        <option value="Anime/Mangá">Anime/Mangá</option>
-        <option value="Cartoon">Cartoon</option>
-        <option value="Natureza e paisagem">Natureza e paisagem</option>
-        <option value="Narrativa e personagem">Narrativa e personagem</option>
-        <option value="Caricatura">Caricatura</option>
-        <option value="Digital e IA">Digital e IA</option>
-      </select></div>
       <div class="field"><label>Observação (opcional)</label><input id="mat-obs" type="text" placeholder="Quando usar, para qual perfil, variações..."></div>
       <input type="file" id="mat-arquivo" accept="image/png,image/jpeg" style="display:none" onchange="materiaisUpload(this)">
       <button class="btn btn-primary btn-sm" onclick="document.getElementById('mat-titulo').value.trim() ? document.getElementById('mat-arquivo').click() : alert('Preencha o título da folha antes de escolher a imagem.')">⬆️ Enviar folha (PNG/JPG)</button>
       <div id="mat-upload-status" style="font-size:12px;color:var(--ink-muted);margin-top:8px;display:none;"></div>
     </div>
-
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:16px;">
-      <div class="field" style="flex:1;min-width:180px;margin-bottom:0;"><label>Buscar</label><input id="mat-busca" type="text" placeholder="Buscar por título ou observação..." oninput="renderMateriais()"></div>
-      <div class="field" style="min-width:170px;margin-bottom:0;"><label>Filtrar por pilar</label><select id="mat-filtro-pilar" onchange="renderMateriais()">
-        <option value="">Todos os pilares</option>
-        <option value="Linha e gesto">Linha e gesto</option>
-        <option value="Forma e proporção">Forma e proporção</option>
-        <option value="Perspectiva e espaço">Perspectiva e espaço</option>
-        <option value="Luz e sombra">Luz e sombra</option>
-        <option value="Materiais e superfícies">Materiais e superfícies</option>
-        <option value="Cor">Cor</option>
-        <option value="__sem__">Sem pilar definido</option>
-      </select></div>
-      <div class="field" style="min-width:170px;margin-bottom:0;"><label>Filtrar por tema</label><select id="mat-filtro-tema" onchange="renderMateriais()">
-        <option value="">Todos os temas</option>
-        <option value="Observação">Observação</option>
-        <option value="Figura humana">Figura humana</option>
-        <option value="Anime/Mangá">Anime/Mangá</option>
-        <option value="Cartoon">Cartoon</option>
-        <option value="Natureza e paisagem">Natureza e paisagem</option>
-        <option value="Narrativa e personagem">Narrativa e personagem</option>
-        <option value="Caricatura">Caricatura</option>
-        <option value="Digital e IA">Digital e IA</option>
-        <option value="__sem__">Sem tema definido</option>
-      </select></div>
-    </div>
-
-    <div id="mat-lista"></div>
+    <div id="mat-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;"></div>
   </div>
   <div class="tela cert-tela" id="tela-certificados">
     <div class="sec-title">Certificados</div>
@@ -1006,10 +879,6 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
         </select>
       </div>
     </div>
-    <div class="field" style="grid-column:1/-1;margin-top:2px;">
-      <label>Turma(s) — o aluno pode estar em mais de uma</label>
-      <div id="f-turmas" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;"></div>
-    </div>
     <div style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--warm);margin:14px 0 10px;">Contratante / Responsável</div>
     <div class="grid2">
       <div class="field" style="grid-column:1/-1"><label>Nome</label><input id="f-resp" type="text"></div>
@@ -1025,66 +894,13 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <div class="field"><label>Valor encontro VR (R$)</label><input id="f-valor-vr" type="number" placeholder="100"></div>
       <div class="field"><label>Data de início</label><input id="f-data-inicio" type="date"></div>
       <div class="field"><label>Data do contrato (texto)</label><input id="f-data-contrato" type="text" placeholder="Brasília, 17 de outubro de 2025"></div>
-      <div class="field"><label>Data de assinatura (para alerta de vencimento)</label><input id="f-data-assinatura" type="date"></div>
-      <div class="field"><label>Origem da matrícula</label><select id="f-origem" onchange="toggleOrigemOutro('f-origem','f-origem-outro')">
-        <option value="">Não informado</option>
-        <option value="Indicação">Indicação</option>
-        <option value="Escola">Escola</option>
-        <option value="Igreja">Igreja</option>
-        <option value="Mural/site">Mural/site</option>
-        <option value="Redes sociais">Redes sociais</option>
-        <option value="Google">Google (busca)</option>
-        <option value="Passou na rua">Passou na rua</option>
-        <option value="ChatGPT">IA · ChatGPT</option>
-        <option value="Gemini">IA · Gemini</option>
-        <option value="Meta AI">IA · Meta AI</option>
-        <option value="Copilot">IA · Copilot</option>
-        <option value="Perplexity">IA · Perplexity</option>
-        <option value="Claude">IA · Claude</option>
-        <option value="Outro">Outro</option>
-      </select>
-      <input id="f-origem-outro" type="text" placeholder="Especifique a origem..." style="margin-top:6px;display:none;">
-      </div>
+      <div class="field"><label>Origem da matrícula</label><select id="f-origem"><option value="">Não informado</option><option value="Indicação">Indicação</option><option value="Escola">Escola</option><option value="Igreja">Igreja</option><option value="Mural/site">Mural/site</option><option value="Redes sociais">Redes sociais</option><option value="Passou na rua">Passou na rua</option><option value="Outro">Outro</option></select></div>
     </div>
     <div style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--warm);margin:14px 0 10px;">Observações pedagógicas gerais</div>
     <div class="field"><label>Notas</label><textarea id="f-obs"></textarea></div>
     <div class="m-actions">
       <button class="btn btn-neutral" onclick="fecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="confirmarAluno()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL EDITAR FOLHA -->
-<div class="overlay hidden" id="modal-mat">
-  <div class="modal">
-    <h3>Editar folha</h3>
-    <input type="hidden" id="mat-edit-id">
-    <div class="field"><label>Título da folha</label><input id="mat-edit-titulo" type="text"></div>
-    <div class="field"><label>Pilar técnico</label><select id="mat-edit-pilar">
-      <option value="">Não especificado</option>
-      <option value="Linha e gesto">Linha e gesto</option>
-      <option value="Forma e proporção">Forma e proporção</option>
-      <option value="Perspectiva e espaço">Perspectiva e espaço</option>
-      <option value="Luz e sombra">Luz e sombra</option>
-      <option value="Materiais e superfícies">Materiais e superfícies</option>
-      <option value="Cor">Cor</option>
-    </select></div>
-    <div class="field"><label>Tema / módulo</label><select id="mat-edit-tema">
-      <option value="">Não especificado</option>
-      <option value="Observação">Observação</option>
-      <option value="Figura humana">Figura humana</option>
-      <option value="Anime/Mangá">Anime/Mangá</option>
-      <option value="Cartoon">Cartoon</option>
-      <option value="Natureza e paisagem">Natureza e paisagem</option>
-      <option value="Narrativa e personagem">Narrativa e personagem</option>
-      <option value="Caricatura">Caricatura</option>
-      <option value="Digital e IA">Digital e IA</option>
-    </select></div>
-    <div class="field"><label>Observação (opcional)</label><input id="mat-edit-obs" type="text"></div>
-    <div class="m-actions">
-      <button class="btn btn-neutral" onclick="fecharModalMat()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarEdicaoFolha()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1104,7 +920,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
   </div>
 </div>
 
-<div id="splash-loading" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+<div id="splash" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
   <div style="font-size:28px;">🎨</div>
   <div style="font-weight:700;color:var(--ink);font-size:14px;">Carregando dados...</div>
   <div style="font-size:11px;color:var(--ink-muted);">Conectando ao Firebase</div>
@@ -1142,8 +958,7 @@ function _payload(){
     notasItens: JSON.stringify(notasItens),
     cfg: JSON.stringify(cfg),
     vrSet: JSON.stringify([...vrSet]),
-    folhas: JSON.stringify(folhas),
-    avulsos: JSON.stringify(avulsos)
+    folhas: JSON.stringify(folhas)
   };
 }
 
@@ -1204,8 +1019,6 @@ async function carregar(){
       if(d.cfg) cfg = {...cfg, ...JSON.parse(d.cfg)};
       if(d.vrSet) vrSet = new Set(JSON.parse(d.vrSet));
       if(d.folhas) folhas = JSON.parse(d.folhas);
-      if(d.avulsos) avulsos = JSON.parse(d.avulsos);
-      migrarTemasAntigos();
     }
   }catch(e){ console.error('Erro ao carregar:', e); }
 }
@@ -1221,7 +1034,6 @@ let alunos=[
 ];
 let pid=5,statusItens={},notasItens={},filtros=new Set(['todos']);
 let folhas=[];
-let avulsos=[];
 const cores=['#d4825a','#7a9e87','#6b9ab8','#9b7db5','#c9a84c','#5a9e9a','#b5604a','#8a6a9a'];
 
 const orientacoes={
@@ -1877,117 +1689,17 @@ function pixCopiar(){
 
 function ini(n){return(n||'?').split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase();}
 
-let alunosFiltroStatus = 'ativo';
-function setAlunosFiltroStatus(v){ alunosFiltroStatus = v; renderAlunos(); }
-
-function mudarStatusAluno(id, novo){
-  const a = alunos.find(x=>x.id===id);
-  if(!a) return;
-  if(novo === 'inativo'){
-    if(!confirm(`Marcar ${a.nome} como ex-aluno(a)? Os dados continuam guardados, e é possível reativar depois.`)) return;
-    a.dataInativacao = new Date().toISOString().slice(0,10);
-  } else {
-    a.dataInativacao = '';
-  }
-  a.status = novo;
-  salvar();
-  renderAlunos();
-}
-
-function statusContratoAluno(a){
-  if(!a.dataAssinatura) return null;
-  const inicio = new Date(a.dataAssinatura+'T00:00:00');
-  const fim = new Date(inicio);
-  fim.setFullYear(fim.getFullYear()+1);
-  const hoje = new Date();
-  const diasRestantes = Math.floor((fim - hoje)/86400000);
-  const fimTxt = fmtData(fim.toISOString().slice(0,10));
-  if(diasRestantes < 0) return { nivel:'vencido', texto:`Contrato vencido em ${fimTxt} (há ${Math.abs(diasRestantes)} dia(s))` };
-  if(diasRestantes <= 30) return { nivel:'alerta', texto:`Contrato vence em ${fimTxt} (${diasRestantes} dia(s))` };
-  return null;
-}
-
 function renderAlunos(){
   const el=document.getElementById('lista-alunos');
-  const contador=document.getElementById('alunos-filtro-contador');
-  const selTurma=document.getElementById('alunos-filtro-turma');
-  if(selTurma && selTurma.options.length<=1){
-    selTurma.innerHTML='<option value="">Todas as turmas</option>'+TURMAS.map(t=>`<option value="${t}">${t}</option>`).join('');
-  }
-  const filtroTurma = selTurma ? selTurma.value : '';
-
-  const ativos = alunos.filter(a=>!a.status || a.status==='ativo');
-  const inativos = alunos.filter(a=>a.status==='inativo');
-  const esperando = alunos.filter(a=>a.status==='espera');
-  if(contador) contador.textContent = `${ativos.length} ativo(s) · ${esperando.length} em espera · ${inativos.length} ex-aluno(s)`;
-  document.querySelectorAll('#tela-gestao .cresc-periodo-btn').forEach(b=>b.classList.remove('ativo'));
-  const btnAtivo=document.getElementById('alunos-btn-'+alunosFiltroStatus);
-  if(btnAtivo) btnAtivo.classList.add('ativo');
   if(!alunos.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno cadastrado.</p>';return;}
-  let listaBase = alunosFiltroStatus==='ativo' ? ativos : alunosFiltroStatus==='inativo' ? inativos : alunosFiltroStatus==='espera' ? esperando : alunos;
-  if(filtroTurma) listaBase = listaBase.filter(a=>(a.turmas||[]).includes(filtroTurma));
-  const alunosOrdenados=[...listaBase].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
-  if(!alunosOrdenados.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno nesse filtro.</p>';return;}
-  el.innerHTML=alunosOrdenados.map(a=>{
-    const exAluno = a.status==='inativo';
-    const emEspera = a.status==='espera';
-    const badgeEx = exAluno ? `<span class="badge" style="background:#eee;color:var(--ink-muted);margin-left:6px;">Ex-aluno(a)${a.dataInativacao?' · '+fmtData(a.dataInativacao):''}</span>` : '';
-    const badgeEspera = emEspera ? `<span class="badge" style="background:#e6ecf7;color:#3a5a9c;margin-left:6px;">Lista de espera</span>` : '';
-    let btnStatus;
-    if(exAluno){
-      btnStatus = `<button class="btn btn-sm btn-success" onclick="mudarStatusAluno(${a.id},'ativo')" title="Reativar aluno">↺ Reativar</button>`;
-    } else if(emEspera){
-      btnStatus = `<button class="btn btn-sm btn-success" onclick="mudarStatusAluno(${a.id},'ativo')" title="Ativar aluno">✓ Ativar</button><button class="btn btn-sm btn-danger" onclick="mudarStatusAluno(${a.id},'inativo')" title="Marcar como ex-aluno(a)">✕</button>`;
-    } else {
-      btnStatus = `<button class="btn btn-sm" style="background:#eef1fa;color:#3a5a9c;border:1px solid #ccd8f0;" onclick="mudarStatusAluno(${a.id},'espera')" title="Mover para lista de espera">⏳</button><button class="btn btn-sm btn-danger" onclick="mudarStatusAluno(${a.id},'inativo')" title="Marcar como ex-aluno(a)">✕</button>`;
-    }
-    const contratoSt = (!exAluno && !emEspera) ? statusContratoAluno(a) : null;
-    const corHeader = contratoSt?.nivel==='vencido' ? 'background:#fbe3e0;' : contratoSt?.nivel==='alerta' ? 'background:#fbeed9;' : '';
-    const badgeContrato = contratoSt ? `<span class="badge" style="background:${contratoSt.nivel==='vencido'?'#e0645a':'#d99a3a'};color:#fff;margin-left:6px;">${contratoSt.texto}</span>` : '';
-    const badgesTurma = (a.turmas&&a.turmas.length) ? a.turmas.map(t=>`<span class="badge" style="background:#efe9dc;color:var(--ink-soft);margin-right:4px;">${t}</span>`).join('') : '';
-    return `<div class="aluno-card" style="${(exAluno||emEspera)?'opacity:0.8;':''}"><div class="aluno-card-header" style="${corHeader}" onclick="toggleCard('body-${a.id}')"><div class="avatar" style="background:${a.avatar}">${ini(a.nome)}</div><div style="flex:1"><div class="aluno-nome">${a.nome}${badgeEx}${badgeEspera}${badgeContrato}</div><div class="aluno-perfil">${a.perfil}${badgesTurma?' · '+badgesTurma:''}</div></div><div style="display:flex;gap:5px;" onclick="event.stopPropagation()">${btnStatus}<button class="btn btn-sm" style="background:#f0efe8;color:var(--ink-soft);border:1px solid var(--border);" onclick="editarAluno(${a.id})">✏️</button><button class="btn btn-sm btn-success" onclick="verContrato(${a.id})">📄</button><button class="btn btn-sm btn-danger" onclick="excluirAluno(${a.id})">🗑</button></div></div><div class="aluno-body" id="body-${a.id}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;font-size:13px;"><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Contratante</span><br>${a.resp||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Telefone</span><br>${a.tel||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">E-mail</span><br>${a.email||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Valor promo</span><br>R$ ${(a.valorPromo||0).toFixed(2)}</div></div>${a.obs?`<div style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:9px;font-size:12px;color:var(--ink-soft);">${a.obs}</div>`:''}</div></div>`;
-  }).join('');
+  const alunosOrdenados=[...alunos].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  el.innerHTML=alunosOrdenados.map(a=>`<div class="aluno-card"><div class="aluno-card-header" onclick="toggleCard('body-${a.id}')"><div class="avatar" style="background:${a.avatar}">${ini(a.nome)}</div><div style="flex:1"><div class="aluno-nome">${a.nome}</div><div class="aluno-perfil">${a.perfil}</div></div><div style="display:flex;gap:5px;" onclick="event.stopPropagation()"><button class="btn btn-sm" style="background:#f0efe8;color:var(--ink-soft);border:1px solid var(--border);" onclick="editarAluno(${a.id})">✏️</button><button class="btn btn-sm btn-success" onclick="verContrato(${a.id})">📄</button><button class="btn btn-sm btn-danger" onclick="excluirAluno(${a.id})">🗑</button></div></div><div class="aluno-body" id="body-${a.id}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;font-size:13px;"><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Contratante</span><br>${a.resp||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Telefone</span><br>${a.tel||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">E-mail</span><br>${a.email||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Valor promo</span><br>R$ ${(a.valorPromo||0).toFixed(2)}</div></div>${a.obs?`<div style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:9px;font-size:12px;color:var(--ink-soft);">${a.obs}</div>`:''}</div></div>`).join('');
 }
 
 function toggleCard(id){document.getElementById(id).classList.toggle('aberto');}
-const OPCOES_ORIGEM_FIXAS = ['Indicação','Escola','Igreja','Mural/site','Redes sociais','Google','Passou na rua','ChatGPT','Gemini','Meta AI','Copilot','Perplexity','Claude'];
-
-const TURMAS = ['SEG-1500','SEG-1630','SEG-1800','TER-1500','TER-1630','TER-1800','QUI-1500','QUI-1630','QUI-1800','SEX-1500','SEX-1630','SEX-1800'];
-
-function popularCheckboxesTurmas(selecionadas){
-  const cont = document.getElementById('f-turmas');
-  if(!cont) return;
-  const sel = selecionadas || [];
-  cont.innerHTML = TURMAS.map(t=>{
-    const id = 'ft_'+t;
-    const chk = sel.includes(t) ? 'checked' : '';
-    return `<label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;"><input type="checkbox" id="${id}" value="${t}" ${chk} style="margin:0;">${t}</label>`;
-  }).join('');
-}
-
-function lerTurmasSelecionadas(){
-  return TURMAS.filter(t=>document.getElementById('ft_'+t)?.checked);
-}
-function toggleOrigemOutro(selectId, inputId){
-  const sel = document.getElementById(selectId);
-  const inp = document.getElementById(inputId);
-  if(!sel || !inp) return;
-  inp.style.display = sel.value === 'Outro' ? 'block' : 'none';
-}
-
-function editarAluno(id){const a=alunos.find(x=>x.id===id);if(!a)return;document.getElementById('modal-titulo').textContent='Editar aluno';document.getElementById('f-id').value=id;document.getElementById('f-nome').value=a.nome||'';document.getElementById('f-nasc').value=a.nasc||'';setTimeout(calcularIdade,50);document.getElementById('f-perfil').value=a.perfil||'';document.getElementById('f-resp').value=a.resp||'';document.getElementById('f-cpf-resp').value=a.cpfResp||'';document.getElementById('f-tel').value=a.tel||'';document.getElementById('f-email').value=a.email||'';document.getElementById('f-end-resp').value=a.endResp||'';document.getElementById('f-valor-cheio').value=a.valorCheio||440;document.getElementById('f-valor-promo').value=a.valorPromo||240;document.getElementById('f-valor-vr').value=a.valorVR||100;document.getElementById('f-data-inicio').value=a.dataInicio||'';document.getElementById('f-data-contrato').value=a.dataContrato||'';document.getElementById('f-data-assinatura').value=a.dataAssinatura||'';
-  popularCheckboxesTurmas(a.turmas||[]);
-  if(a.origem && !OPCOES_ORIGEM_FIXAS.includes(a.origem)){
-    document.getElementById('f-origem').value='Outro';
-    document.getElementById('f-origem-outro').value=a.origem;
-  } else {
-    document.getElementById('f-origem').value=a.origem||'';
-    document.getElementById('f-origem-outro').value='';
-  }
-  toggleOrigemOutro('f-origem','f-origem-outro');
-  document.getElementById('f-obs').value=a.obs||'';document.getElementById('modal').classList.remove('hidden');}
+function editarAluno(id){const a=alunos.find(x=>x.id===id);if(!a)return;document.getElementById('modal-titulo').textContent='Editar aluno';document.getElementById('f-id').value=id;document.getElementById('f-nome').value=a.nome||'';document.getElementById('f-nasc').value=a.nasc||'';setTimeout(calcularIdade,50);document.getElementById('f-perfil').value=a.perfil||'';document.getElementById('f-resp').value=a.resp||'';document.getElementById('f-cpf-resp').value=a.cpfResp||'';document.getElementById('f-tel').value=a.tel||'';document.getElementById('f-email').value=a.email||'';document.getElementById('f-end-resp').value=a.endResp||'';document.getElementById('f-valor-cheio').value=a.valorCheio||440;document.getElementById('f-valor-promo').value=a.valorPromo||240;document.getElementById('f-valor-vr').value=a.valorVR||100;document.getElementById('f-data-inicio').value=a.dataInicio||'';document.getElementById('f-data-contrato').value=a.dataContrato||'';document.getElementById('f-origem').value=a.origem||'';document.getElementById('f-obs').value=a.obs||'';document.getElementById('modal').classList.remove('hidden');}
 function excluirAluno(id){if(!confirm('Atenção: ação irreversível. Excluir este aluno e todos os seus dados?'))return;alunos=alunos.filter(a=>a.id!==id);salvar();renderAlunos();}
-function abrirModal(){document.getElementById('modal-titulo').textContent='Novo aluno';document.getElementById('f-id').value='';['f-nome','f-nasc','f-resp','f-cpf-resp','f-tel','f-email','f-end-resp','f-data-inicio','f-data-contrato','f-data-assinatura','f-obs'].forEach(i=>document.getElementById(i).value='');document.getElementById('f-origem').value='';document.getElementById('f-origem-outro').value='';document.getElementById('f-origem-outro').style.display='none';document.getElementById('f-valor-cheio').value=440;document.getElementById('f-valor-promo').value=240;document.getElementById('f-valor-vr').value=100;popularCheckboxesTurmas([]);document.getElementById('modal').classList.remove('hidden');}
+function abrirModal(){document.getElementById('modal-titulo').textContent='Novo aluno';document.getElementById('f-id').value='';['f-nome','f-nasc','f-resp','f-cpf-resp','f-tel','f-email','f-end-resp','f-data-inicio','f-data-contrato','f-obs'].forEach(i=>document.getElementById(i).value='');document.getElementById('f-origem').value='';document.getElementById('f-valor-cheio').value=440;document.getElementById('f-valor-promo').value=240;document.getElementById('f-valor-vr').value=100;document.getElementById('modal').classList.remove('hidden');}
 function fecharModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('f-idade').textContent='';}
 function calcularIdade(){
   const nasc=document.getElementById('f-nasc').value;
@@ -2001,86 +1713,51 @@ function calcularIdade(){
   if(idade<0||idade>120){span.textContent='';return;}
   span.textContent=idade+' anos';
 }
-function confirmarAluno(){const nome=document.getElementById('f-nome').value.trim();if(!nome){alert('Informe o nome.');return;}const id=parseInt(document.getElementById('f-id').value);
-  const origemSel=document.getElementById('f-origem').value;
-  const origem = origemSel==='Outro' ? (document.getElementById('f-origem-outro').value.trim() || 'Outro') : origemSel;
-  const dados={nome,nasc:document.getElementById('f-nasc').value,perfil:document.getElementById('f-perfil').value,resp:document.getElementById('f-resp').value,cpfResp:document.getElementById('f-cpf-resp').value,tel:document.getElementById('f-tel').value,email:document.getElementById('f-email').value,endResp:document.getElementById('f-end-resp').value,valorCheio:parseFloat(document.getElementById('f-valor-cheio').value)||440,valorPromo:parseFloat(document.getElementById('f-valor-promo').value)||240,valorVR:parseFloat(document.getElementById('f-valor-vr').value)||100,dataInicio:document.getElementById('f-data-inicio').value,dataContrato:document.getElementById('f-data-contrato').value,dataAssinatura:document.getElementById('f-data-assinatura').value,origem,turmas:lerTurmasSelecionadas(),obs:document.getElementById('f-obs').value};if(id){const a=alunos.find(x=>x.id===id);if(a)Object.assign(a,dados);}else alunos.push({id:pid++,...dados,avatar:cores[alunos.length%cores.length],freq:{},pag:{}});salvar();fecharModal();renderAlunos();}
+function confirmarAluno(){const nome=document.getElementById('f-nome').value.trim();if(!nome){alert('Informe o nome.');return;}const id=parseInt(document.getElementById('f-id').value);const dados={nome,nasc:document.getElementById('f-nasc').value,perfil:document.getElementById('f-perfil').value,resp:document.getElementById('f-resp').value,cpfResp:document.getElementById('f-cpf-resp').value,tel:document.getElementById('f-tel').value,email:document.getElementById('f-email').value,endResp:document.getElementById('f-end-resp').value,valorCheio:parseFloat(document.getElementById('f-valor-cheio').value)||440,valorPromo:parseFloat(document.getElementById('f-valor-promo').value)||240,valorVR:parseFloat(document.getElementById('f-valor-vr').value)||100,dataInicio:document.getElementById('f-data-inicio').value,dataContrato:document.getElementById('f-data-contrato').value,origem:document.getElementById('f-origem').value,obs:document.getElementById('f-obs').value};if(id){const a=alunos.find(x=>x.id===id);if(a)Object.assign(a,dados);}else alunos.push({id:pid++,...dados,avatar:cores[alunos.length%cores.length],freq:{},pag:{}});salvar();fecharModal();renderAlunos();}
 
 // ── FREQUÊNCIA — checkboxes nativos ──────────────────
-function montarSemanasFreq(a, mes, turmaPrefixo){
-  const pfx = turmaPrefixo ? turmaPrefixo+'-' : '';
-  return [1,2,3,4].map(s=>{
-    const kP=`${mes}-${pfx}s${s}-p`,kF=`${mes}-${pfx}s${s}-f`,kO=`${mes}-${pfx}s${s}-obs`;
-    const chkP=(a.freq&&a.freq[kP])?'checked':'';
-    const chkF=(a.freq&&a.freq[kF])?'checked':'';
-    const obsV=(a.freq&&a.freq[kO])||'';
-    const idBase=`${a.id}_${(turmaPrefixo||'x').replace(/-/g,'')}_${mes.replace('-','_')}_${s}`;
-    const idP=`cp_${idBase}`;
-    const idF=`cf_${idBase}`;
-    return `<div class="freq-sem">
-      <div class="freq-sem-titulo">Semana ${s}</div>
-      <div class="freq-check-row">
-        <input type="checkbox" id="${idP}" ${chkP}
-          onchange="toggleFreq(${a.id},'${kP}','${kF}','${idF}',this.checked)">
-        <label for="${idP}">Presente</label>
-      </div>
-      <div class="freq-check-row falta">
-        <input type="checkbox" id="${idF}" ${chkF}
-          onchange="toggleFreq(${a.id},'${kF}','${kP}','${idP}',this.checked)">
-        <label for="${idF}">Falta</label>
-      </div>
-      <div class="freq-obs-wrap">
-        <textarea class="freq-obs" id="fobs-${a.id}-${kO}" placeholder="Observação..."
-          oninput="salvarObs(${a.id},'${kO}',this.value);autoGrow(this)">${obsV}</textarea>
-        <div class="freq-obs-tools">
-          <button type="button" class="freq-obs-btn" onclick="freqDitado('fobs-${a.id}-${kO}', this)" title="Ditar por voz">🎤 Ditar</button>
-          <button type="button" class="freq-obs-btn" onclick="freqMelhorarIA('fobs-${a.id}-${kO}', ${a.id}, '${kO}', this)" title="Melhorar texto com IA">✨ Melhorar com IA</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
 function renderFreq(){
   const mes=document.getElementById('mes-freq').value;
   const el=document.getElementById('freq-cont');
   if(!alunos.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno.</p>';return;}
-  const selTurma=document.getElementById('freq-filtro-turma');
-  if(selTurma && selTurma.options.length<=1){
-    selTurma.innerHTML='<option value="">Todas as turmas</option>'+TURMAS.map(t=>`<option value="${t}">${t}</option>`).join('');
-  }
-  const filtroTurma = selTurma ? selTurma.value : '';
-  let sorted=[...alunos].filter(a=>!a.status||a.status==='ativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
-  if(filtroTurma) sorted=sorted.filter(a=>(a.turmas||[]).includes(filtroTurma));
+  const sorted=[...alunos].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   el.innerHTML=sorted.map(a=>{
-    const turmasAluno = a.turmas||[];
-    const turmasExibir = filtroTurma ? [filtroTurma] : turmasAluno;
-    const multiTurma = turmasAluno.length>1;
-    const prefixosResumo = multiTurma ? turmasExibir : [''];
-
-    let presencas=0, faltas=0;
-    prefixosResumo.forEach(pfx=>{
-      const p2 = pfx ? pfx+'-' : '';
-      presencas += [1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-${p2}s${s}-p`]).length;
-      faltas += [1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-${p2}s${s}-f`]).length;
-    });
+    // build resumo: count presences this month
+    const presencas=[1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-s${s}-p`]).length;
+    const faltas=[1,2,3,4].filter(s=>a.freq&&a.freq[`${mes}-s${s}-f`]).length;
     const resumo=presencas||faltas?`${presencas}P ${faltas}F`:'';
-
-    const semanasHtml = multiTurma
-      ? turmasExibir.map(t=>`<div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--brand);margin-bottom:6px;">${t}</div><div class="freq-semanas">${montarSemanasFreq(a,mes,t)}</div></div>`).join('')
-      : `<div class="freq-semanas">${montarSemanasFreq(a,mes,'')}</div>`;
-
-    const badgesTurma = turmasAluno.length ? ` <span style="font-size:10px;color:var(--ink-muted);font-weight:600;">(${turmasAluno.join(', ')})</span>` : '';
-
+    const semanas=[1,2,3,4].map(s=>{
+      const kP=`${mes}-s${s}-p`,kF=`${mes}-s${s}-f`,kO=`${mes}-s${s}-obs`;
+      const chkP=(a.freq&&a.freq[kP])?'checked':'';
+      const chkF=(a.freq&&a.freq[kF])?'checked':'';
+      const obsV=(a.freq&&a.freq[kO])||'';
+      const idP=`cp_${a.id}_${mes.replace('-','_')}_${s}`;
+      const idF=`cf_${a.id}_${mes.replace('-','_')}_${s}`;
+      return `<div class="freq-sem">
+        <div class="freq-sem-titulo">Semana ${s}</div>
+        <div class="freq-check-row">
+          <input type="checkbox" id="${idP}" ${chkP}
+            onchange="toggleFreq(${a.id},'${kP}','${kF}','${idF}',this.checked)">
+          <label for="${idP}">Presente</label>
+        </div>
+        <div class="freq-check-row falta">
+          <input type="checkbox" id="${idF}" ${chkF}
+            onchange="toggleFreq(${a.id},'${kF}','${kP}','${idP}',this.checked)">
+          <label for="${idF}">Falta</label>
+        </div>
+        <textarea class="freq-obs" placeholder="Observação..."
+          oninput="salvarObs(${a.id},'${kO}',this.value);autoGrow(this)">${obsV}</textarea>
+      </div>`;
+    }).join('');
     return `<div class="freq-card">
       <div class="freq-card-header" onclick="toggleFreqCard('fq-${a.id}')">
         <div class="avatar" style="background:${a.avatar};width:28px;height:28px;font-size:11px;">${ini(a.nome)}</div>
-        <span style="font-weight:700;font-size:14px;">${a.nome}</span>${badgesTurma}
+        <span style="font-weight:700;font-size:14px;">${a.nome}</span>
         ${resumo?`<span class="freq-resumo">${resumo}</span>`:''}
         <span class="freq-card-arrow" id="fqa-${a.id}">▼</span>
       </div>
       <div class="freq-card-body" id="fq-${a.id}">
-        ${semanasHtml}
+        <div class="freq-semanas">${semanas}</div>
       </div>
     </div>`;
   }).join('');
@@ -2114,126 +1791,13 @@ function toggleFreq(aid,keyOn,keyOff,idOff,checked){
 }
 function salvarObs(aid,key,val){const a=alunos.find(x=>x.id===aid);if(!a)return;if(!a.freq)a.freq={};a.freq[key]=val;salvarImediato();}
 
-let freqReconhecimento = null;
-let freqGravandoId = null;
-
-function freqDitado(textareaId, btn){
-  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SpeechRecognitionAPI){
-    alert('Ditado por voz não é suportado neste navegador. Funciona no Chrome, no computador e no Android.');
-    return;
-  }
-  const textarea = document.getElementById(textareaId);
-  if(!textarea) return;
-
-  if(freqGravandoId === textareaId && freqReconhecimento){
-    freqReconhecimento.stop();
-    return;
-  }
-  if(freqReconhecimento){ freqReconhecimento.stop(); }
-
-  const rec = new SpeechRecognitionAPI();
-  rec.lang = 'pt-BR';
-  rec.continuous = true;
-  rec.interimResults = false;
-
-  freqReconhecimento = rec;
-  freqGravandoId = textareaId;
-  btn.classList.add('gravando');
-  btn.textContent = '⏹ Parar';
-
-  rec.onresult = function(e){
-    let textoFinal = '';
-    for(let i = e.resultIndex; i < e.results.length; i++){
-      if(e.results[i].isFinal) textoFinal += e.results[i][0].transcript;
-    }
-    if(textoFinal.trim()){
-      const precisaEspaco = textarea.value && !/[\s\n]$/.test(textarea.value);
-      textarea.value += (precisaEspaco ? ' ' : '') + textoFinal.trim();
-      textarea.dispatchEvent(new Event('input'));
-      autoGrow(textarea);
-    }
-  };
-  rec.onerror = function(e){
-    if(e.error !== 'no-speech' && e.error !== 'aborted') alert('Erro no reconhecimento de voz: ' + e.error);
-  };
-  rec.onend = function(){
-    btn.classList.remove('gravando');
-    btn.textContent = '🎤 Ditar';
-    freqReconhecimento = null;
-    freqGravandoId = null;
-  };
-  rec.start();
-}
-
-async function freqMelhorarIA(textareaId, alunoId, key, btn){
-  const textarea = document.getElementById(textareaId);
-  if(!textarea) return;
-  const textoOriginal = textarea.value.trim();
-  if(!textoOriginal){ alert('Escreva ou dite alguma anotação antes de melhorar com IA.'); return; }
-  if(!cfg.apiKey){ alert('Chave API não configurada. Vá em Config, seção Assistente IA, insira sua chave e salve.'); return; }
-  const aluno = alunos.find(x=>x.id===alunoId);
-  let contextoAluno = '';
-  if(aluno){
-    let idadeTxt = '';
-    if(aluno.nasc){
-      const nasc = new Date(aluno.nasc);
-      const hoje = new Date();
-      let idade = hoje.getFullYear() - nasc.getFullYear();
-      const aindaNaoFezAniversario = (hoje.getMonth() < nasc.getMonth()) || (hoje.getMonth()===nasc.getMonth() && hoje.getDate() < nasc.getDate());
-      if(aindaNaoFezAniversario) idade--;
-      idadeTxt = idade + ' anos';
-    }
-    const partes = [];
-    if(idadeTxt) partes.push(idadeTxt);
-    if(aluno.perfil) partes.push(aluno.perfil);
-    if(partes.length) contextoAluno = '[Contexto do aluno: ' + partes.join(', ') + ']\n\n';
-  }
-  const textoBtn = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = '...';
-  try{
-    const response = await fetch('https://jornada-ia.cicero-arte.workers.dev/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        apiKey: cfg.apiKey,
-        model: 'claude-sonnet-4-5',
-        max_tokens: 2000,
-        system: 'Você recebe anotações rápidas ou uma transcrição de voz, feitas por um professor de desenho logo após uma aula, sobre um aluno específico. A mensagem pode vir precedida de uma linha "[Contexto do aluno: ...]" com idade e perfil, apenas informativa, não faz parte do relato. Use essa informação para calibrar a linguagem e as sugestões ao perfil etário do aluno, sem repeti-la no texto final. Reescreva em português correto, mantendo exatamente os fatos relatados, sem inventar informações novas e sem cortar nada. O tamanho do texto acompanha o que for necessário para não perder nenhum detalhe, sem limite artificial.\n\nFORMATAÇÃO OBRIGATÓRIA: responda em texto corrido puro, sem markdown de nenhum tipo. Proibido usar #, ##, ###, *, **, ***, -, ---, _, |, ou qualquer símbolo de marcação. Não use títulos nem listas com marcadores. Se precisar separar partes do texto (por exemplo, o relato dos fatos e depois a leitura pedagógica), use apenas parágrafos separados por uma linha em branco, nunca um símbolo antes do parágrafo.\n\nSe a anotação for uma observação pedagógica do dia a dia, devolva algo direto, situando-a no pilar técnico envolvido (linha e gesto, forma e proporção, luz e sombra, perspectiva e espaço, materiais e superfícies) ou no momento do currículo em espiral quando fizer sentido.\n\nSe a anotação descrever um incidente, conflito, crise emocional do aluno (chorar, ficar nervoso, rasgar material) ou qualquer situação sensível relatada pelo aluno ou pela família: primeiro registre os fatos na íntegra e na ordem em que aconteceram, com tom sóbrio e cuidadoso. Depois, acrescente uma breve leitura pedagógica da situação e sugestões práticas de conduta em sala para o professor, considerando a faixa etária do aluno quando informada, como um colega experiente aconselharia. Cícero é designer gráfico e professor de desenho, sem formação em saúde: não diagnostique, não nomeie condições de saúde mental, não prescreva tratamento. Se a situação sugerir risco ao bem-estar do aluno, inclua a orientação de comunicar o responsável, sem gerar alarmismo.\n\nNão cite teóricos nem use termos técnicos de neurociência aqui. Devolva apenas o texto final, sem comentários, sem aspas ao redor do texto.',
-        messages: [{ role: 'user', content: contextoAluno + textoOriginal }]
-      })
-    });
-    const data = await response.json();
-    if(data.error) throw new Error(data.error.message || 'Erro da API');
-    const melhorado = data.content && data.content[0] ? data.content[0].text.trim() : '';
-    if(melhorado){
-      textarea.value = melhorado;
-      salvarObs(alunoId, key, melhorado);
-      autoGrow(textarea);
-    }
-  } catch(e){
-    alert('Não foi possível melhorar o texto: ' + e.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = textoBtn;
-  }
-}
-
 // ── FINANCEIRO ───────────────────────────────────────
-let finMensalidadeTotais = {tot:0, rec:0, pend:0};
 function renderFin(){
   const ta=document.getElementById('pix-msg');if(ta&&!ta.value)ta.value=PIX_MSG_DEFAULT.replace('{codigo}','');
   const mes=document.getElementById('mes-fin').value;
   const el=document.getElementById('fin-cards');
   let tot=0,rec=0,pend=0;
-  const selTurma=document.getElementById('fin-filtro-turma');
-  if(selTurma && selTurma.options.length<=1){
-    selTurma.innerHTML='<option value="">Todas as turmas</option>'+TURMAS.map(t=>`<option value="${t}">${t}</option>`).join('');
-  }
-  const filtroTurma = selTurma ? selTurma.value : '';
-  let sorted=[...alunos].filter(a=>!a.status||a.status==='ativo').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
-  if(filtroTurma) sorted=sorted.filter(a=>(a.turmas||[]).includes(filtroTurma));
+  const sorted=[...alunos].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   el.innerHTML=sorted.map(a=>{
     const st=(a.pag&&a.pag[mes])||'pendente';
     const v=a.valorPromo||0;
@@ -2262,208 +1826,10 @@ function renderFin(){
   document.getElementById('fin-total').textContent=`R$ ${tot.toFixed(2)}`;
   document.getElementById('fin-rec').textContent=`R$ ${rec.toFixed(2)}`;
   document.getElementById('fin-pend').textContent=`R$ ${pend.toFixed(2)}`;
-  finMensalidadeTotais = {tot, rec, pend};
-  popularSelectAvulso();
-  renderAvulsos();
 }
 function setPag(aid,mes,val){const a=alunos.find(x=>x.id===aid);if(!a)return;if(!a.pag)a.pag={};a.pag[mes]=val;salvar();renderFin();}
 
-function popularSelectAvulso(){
-  const opts = '<option value="">Nenhum / lead ainda não cadastrado</option>' +
-    [...alunos].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).map(a=>`<option value="${a.id}">${a.nome}</option>`).join('');
-  ['av-aluno-id','av-edit-aluno-id'].forEach(id=>{
-    const sel = document.getElementById(id);
-    if(sel && sel.innerHTML !== opts) sel.innerHTML = opts;
-  });
-}
-
-function renderAvulsos(){
-  const el = document.getElementById('av-lista');
-  if(!el) return;
-  if(!avulsos.length){
-    el.innerHTML = '<div style="padding:14px;text-align:center;color:var(--ink-muted);font-size:12px;">Nenhum lançamento avulso registrado ainda.</div>';
-    document.getElementById('av-rec').textContent = 'R$ 0';
-    document.getElementById('av-pend').textContent = 'R$ 0';
-    atualizarTotalGeral(0, 0);
-    return;
-  }
-  let rec = 0, pend = 0;
-  const ordenados = [...avulsos].sort((a,b)=> (b.data||'').localeCompare(a.data||''));
-  el.innerHTML = ordenados.map(av=>{
-    const nome = av.alunoId ? (alunos.find(a=>a.id===av.alunoId)?.nome || av.nome || 'Aluno removido') : (av.nome || 'Sem nome');
-    if(av.status==='pago') rec += av.valor||0; else pend += av.valor||0;
-    const bc = av.status==='pago' ? 'badge-pago' : 'badge-pendente';
-    const bl = av.status==='pago' ? 'Pago' : 'Pendente';
-    const nfseBtn = av.status==='pago' ? `<button class="btn btn-sm" style="background:#e8f0fb;color:#3a6bc4;border:1px solid #b3c9f0;font-size:11px;" onclick="abrirNFSeAvulso(${av.id})">📄 NFSe modelo</button>` : '';
-    return `<div class="aluno-card" style="margin-bottom:8px;">
-      <div class="aluno-card-header" style="cursor:default;">
-        <div style="flex:1">
-          <div class="aluno-nome">${nome}</div>
-          <div class="aluno-perfil">${av.descricao||'Lançamento avulso'} · ${fmtData(av.data)} · R$ ${(av.valor||0).toFixed(2)}</div>
-        </div>
-        <span class="badge ${bc}" style="margin-right:8px;">${bl}</span>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;">
-          ${nfseBtn}
-          ${av.status!=='pago'?`<button class="btn btn-success btn-sm" onclick="toggleStatusAvulso(${av.id})">✓ Pago</button>`:`<button class="btn btn-sm" style="background:#f5f5f5;color:var(--ink-muted);border:1px solid var(--border);" onclick="toggleStatusAvulso(${av.id})" title="Voltar para pendente">↩</button>`}
-          <button class="btn btn-sm" style="background:#fff;border:1px solid var(--border);color:var(--ink-soft);" onclick="editarAvulso(${av.id})">✏️</button>
-          <button class="btn btn-danger btn-sm" onclick="excluirAvulso(${av.id})">🗑</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  document.getElementById('av-rec').textContent = `R$ ${rec.toFixed(2)}`;
-  document.getElementById('av-pend').textContent = `R$ ${pend.toFixed(2)}`;
-  atualizarTotalGeral(rec, pend);
-}
-
-function atualizarTotalGeral(avRec, avPend){
-  const elT=document.getElementById('geral-total'), elR=document.getElementById('geral-rec'), elP=document.getElementById('geral-pend');
-  if(!elT) return;
-  const m = finMensalidadeTotais;
-  elT.textContent = `R$ ${(m.tot + avRec + avPend).toFixed(2)}`;
-  elR.textContent = `R$ ${(m.rec + avRec).toFixed(2)}`;
-  elP.textContent = `R$ ${(m.pend + avPend).toFixed(2)}`;
-}
-
-function salvarAvulso(){
-  const alunoId = parseInt(document.getElementById('av-aluno-id').value) || null;
-  const nome = document.getElementById('av-nome').value.trim();
-  const valor = parseFloat(document.getElementById('av-valor').value);
-  const data = document.getElementById('av-data').value || new Date().toISOString().slice(0,10);
-  const descricao = document.getElementById('av-desc').value.trim();
-  if(!alunoId && !nome){ alert('Vincule a um aluno cadastrado ou informe um nome.'); return; }
-  if(!valor || valor <= 0){ alert('Informe um valor válido.'); return; }
-  avulsos.push({ id: Date.now(), alunoId, nome: alunoId?'':nome, valor, data, descricao, status: 'pendente' });
-  salvar();
-  document.getElementById('av-aluno-id').value = '';
-  document.getElementById('av-nome').value = '';
-  document.getElementById('av-valor').value = '';
-  document.getElementById('av-data').value = '';
-  document.getElementById('av-desc').value = '';
-  renderAvulsos();
-}
-
-function toggleStatusAvulso(id){
-  const av = avulsos.find(x=>x.id===id);
-  if(!av) return;
-  av.status = av.status==='pago' ? 'pendente' : 'pago';
-  salvar();
-  renderAvulsos();
-}
-
-function editarAvulso(id){
-  const av = avulsos.find(x=>x.id===id);
-  if(!av) return;
-  popularSelectAvulso();
-  document.getElementById('av-edit-id').value = av.id;
-  document.getElementById('av-edit-aluno-id').value = av.alunoId || '';
-  document.getElementById('av-edit-nome').value = av.nome || '';
-  document.getElementById('av-edit-valor').value = av.valor || '';
-  document.getElementById('av-edit-data').value = av.data || '';
-  document.getElementById('av-edit-desc').value = av.descricao || '';
-  document.getElementById('modal-avulso').classList.remove('hidden');
-}
-
-function fecharModalAvulso(){
-  document.getElementById('modal-avulso').classList.add('hidden');
-}
-
-function salvarEdicaoAvulso(){
-  const id = parseInt(document.getElementById('av-edit-id').value);
-  const av = avulsos.find(x=>x.id===id);
-  if(!av) return;
-  const alunoId = parseInt(document.getElementById('av-edit-aluno-id').value) || null;
-  const nome = document.getElementById('av-edit-nome').value.trim();
-  const valor = parseFloat(document.getElementById('av-edit-valor').value);
-  if(!alunoId && !nome){ alert('Vincule a um aluno cadastrado ou informe um nome.'); return; }
-  if(!valor || valor <= 0){ alert('Informe um valor válido.'); return; }
-  av.alunoId = alunoId;
-  av.nome = alunoId ? '' : nome;
-  av.valor = valor;
-  av.data = document.getElementById('av-edit-data').value;
-  av.descricao = document.getElementById('av-edit-desc').value.trim();
-  salvar();
-  fecharModalAvulso();
-  renderAvulsos();
-}
-
-function excluirAvulso(id){
-  if(!confirm('Excluir este lançamento avulso?')) return;
-  avulsos = avulsos.filter(x=>x.id!==id);
-  salvar();
-  renderAvulsos();
-}
-
 // ── CRESCIMENTO ──────────────────────────────────────
-let crescPeriodo = 'mes';
-
-function setCrescPeriodo(p){
-  crescPeriodo = p;
-  renderCrescimento();
-}
-
-function renderCrescimentoBarras(comData){
-  const chartEl = document.getElementById('cresc-chart');
-  if(!chartEl) return;
-  const MESES_ABREV = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  const hoje = new Date();
-  const dIni = new Date(comData[0].dataInicio+'T00:00:00');
-
-  let buckets = [];
-  if(crescPeriodo === 'mes'){
-    let y = dIni.getFullYear(), m = dIni.getMonth();
-    const yFim = hoje.getFullYear(), mFim = hoje.getMonth();
-    while(y < yFim || (y === yFim && m <= mFim)){
-      const key = y+'-'+String(m+1).padStart(2,'0');
-      buckets.push({ key, label: MESES_ABREV[m]+'/'+String(y).slice(2), qtd: 0 });
-      m++; if(m>11){ m=0; y++; }
-    }
-    comData.forEach(a=>{
-      const key = a.dataInicio.slice(0,7);
-      const b = buckets.find(x=>x.key===key);
-      if(b) b.qtd++;
-    });
-  } else {
-    let y = dIni.getFullYear();
-    const yFim = hoje.getFullYear();
-    while(y <= yFim){
-      buckets.push({ key: String(y), label: String(y), qtd: 0 });
-      y++;
-    }
-    comData.forEach(a=>{
-      const key = a.dataInicio.slice(0,4);
-      const b = buckets.find(x=>x.key===key);
-      if(b) b.qtd++;
-    });
-  }
-
-  const W = Math.max(320, buckets.length*50+40), H=190, padL=28, padB=30, padT=24, padR=10;
-  const plotW = W-padL-padR, plotH = H-padT-padB;
-  const maxQtd = Math.max(1, ...buckets.map(b=>b.qtd));
-  const barW = Math.min(34, plotW/buckets.length*0.6);
-  const slot = plotW/buckets.length;
-  const xAt = i => padL + i*slot + slot/2;
-  const barH = qtd => qtd>0 ? (qtd/maxQtd)*plotH : 0;
-
-  const bars = buckets.map((b,i)=>{
-    const h = barH(b.qtd);
-    const x = xAt(i)-barW/2;
-    const yTopo = padT+plotH-h;
-    return b.qtd>0
-      ? `<rect x="${x.toFixed(1)}" y="${yTopo.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="#1E6D94"><title>${b.label}: ${b.qtd}</title></rect>
-         <text x="${xAt(i).toFixed(1)}" y="${(yTopo-5).toFixed(1)}" font-size="10" font-weight="700" fill="#1E6D94" text-anchor="middle" font-family="Lato,sans-serif">${b.qtd}</text>`
-      : `<line x1="${x.toFixed(1)}" y1="${(padT+plotH).toFixed(1)}" x2="${(x+barW).toFixed(1)}" y2="${(padT+plotH).toFixed(1)}" stroke="#d8d3c8" stroke-width="2"/>`;
-  }).join('');
-  const labels = buckets.map((b,i)=>`<text x="${xAt(i).toFixed(1)}" y="${H-10}" font-size="9" fill="#8a8a8a" text-anchor="middle" font-family="Lato,sans-serif">${b.label}</text>`).join('');
-  const linhaBase = `<line x1="${padL}" y1="${padT+plotH}" x2="${W-padR}" y2="${padT+plotH}" stroke="#e4dfd7" stroke-width="1"/>`;
-
-  chartEl.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;min-width:${W}px;">
-    ${linhaBase}
-    ${bars}
-    ${labels}
-  </svg>`;
-}
-
 function renderCrescimento(){
   const kpiEl=document.getElementById('cresc-kpis');
   const chartEl=document.getElementById('cresc-chart');
@@ -2488,7 +1854,7 @@ function renderCrescimento(){
   const meta=parseInt(document.getElementById('cresc-meta').value)||32;
 
   // KPIs
-  const ativos=alunos.filter(a=>!a.status||a.status==='ativo').length;
+  const ativos=alunos.length;
   const d30=new Date(hoje.getTime()-30*86400000).toISOString().slice(0,10);
   const d90=new Date(hoje.getTime()-90*86400000).toISOString().slice(0,10);
   const novos30=comData.filter(a=>a.dataInicio>=d30).length;
@@ -2506,10 +1872,27 @@ function renderCrescimento(){
     kpi('Faltam p/ meta',faltam)+
     kpi('Estimativa p/ meta',mesesParaMeta===null?'—':(mesesParaMeta<1?'< 1 mês':Math.round(mesesParaMeta)+' meses'));
 
-  // Gráfico de barras — novas matrículas por período (mês ou ano)
-  renderCrescimentoBarras(comData);
-  document.querySelectorAll('.cresc-periodo-btn').forEach(b=>b.classList.remove('ativo'));
-  document.getElementById('cresc-btn-'+crescPeriodo).classList.add('ativo');
+  // Gráfico SVG — cumulativo
+  const W=Math.max(320,comData.length*46+60), H=180, padL=34, padB=28, padT=14, padR=14;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const pontos=comData.map((a,i)=>({x:i,y:i+1,data:a.dataInicio,nome:a.nome}));
+  const maxY=pontos.length;
+  const xAt=i=>padL+(pontos.length>1?(i/(pontos.length-1))*plotW:0);
+  const yAt=v=>padT+plotH-(v/maxY)*plotH;
+  const linePath=pontos.map((p,i)=>(i===0?'M':'L')+xAt(i).toFixed(1)+' '+yAt(p.y).toFixed(1)).join(' ');
+  const areaPath=linePath+` L ${xAt(pontos.length-1).toFixed(1)} ${(padT+plotH).toFixed(1)} L ${xAt(0).toFixed(1)} ${(padT+plotH).toFixed(1)} Z`;
+  const fmtCurta=iso=>{const[a,m,d]=iso.split('-');return d+'/'+m+'/'+a.slice(2);};
+  const dots=pontos.map((p,i)=>`<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(p.y).toFixed(1)}" r="3.5" fill="#1E6D94"><title>${p.nome} — ${fmtCurta(p.data)}</title></circle>`).join('');
+  const labels=pontos.map((p,i)=>`<text x="${xAt(i).toFixed(1)}" y="${H-8}" font-size="9" fill="#8a8a8a" text-anchor="middle" font-family="Lato,sans-serif">${fmtCurta(p.data)}</text>`).join('');
+  const gridY=[0,Math.ceil(maxY/2),maxY];
+  const gridLines=gridY.map(v=>`<line x1="${padL}" y1="${yAt(v).toFixed(1)}" x2="${W-padR}" y2="${yAt(v).toFixed(1)}" stroke="#e4dfd7" stroke-width="1"/><text x="${padL-6}" y="${(yAt(v)+3).toFixed(1)}" font-size="9" fill="#8a8a8a" text-anchor="end" font-family="Lato,sans-serif">${v}</text>`).join('');
+  chartEl.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;min-width:${W}px;">
+    ${gridLines}
+    <path d="${areaPath}" fill="#1E6D9422" stroke="none"/>
+    <path d="${linePath}" fill="none" stroke="#1E6D94" stroke-width="2"/>
+    ${dots}
+    ${labels}
+  </svg>`;
 
   // Origem
   const porOrigem={};
@@ -2581,7 +1964,6 @@ async function materiaisUpload(input){
   const titulo = document.getElementById('mat-titulo').value.trim();
   if(!titulo){ alert('Preencha o título da folha antes de enviar.'); input.value=''; return; }
   const pilar = document.getElementById('mat-pilar').value;
-  const tema = document.getElementById('mat-tema').value;
   const obs = document.getElementById('mat-obs').value.trim();
   const statusEl = document.getElementById('mat-upload-status');
   statusEl.style.display = 'block';
@@ -2596,7 +1978,7 @@ async function materiaisUpload(input){
     const url = await getDownloadURL(sref);
     folhas.push({
       id: Date.now(),
-      titulo, pilar, tema, obs,
+      titulo, pilar, obs,
       path: caminho,
       url,
       dataUpload: new Date().toISOString().slice(0,10),
@@ -2606,7 +1988,6 @@ async function materiaisUpload(input){
     document.getElementById('mat-titulo').value = '';
     document.getElementById('mat-obs').value = '';
     document.getElementById('mat-pilar').value = '';
-    document.getElementById('mat-tema').value = '';
     statusEl.textContent = 'Enviado com sucesso.';
     setTimeout(()=>{ statusEl.style.display='none'; }, 2000);
     renderMateriais();
@@ -2629,127 +2010,27 @@ async function excluirFolha(id){
   renderMateriais();
 }
 
-const TEMAS_VALIDOS = ['Observação','Figura humana','Anime/Mangá','Cartoon','Natureza e paisagem','Narrativa e personagem','Caricatura','Digital e IA'];
-
-function migrarTemasAntigos(){
-  let mudou = false;
-  folhas.forEach(f=>{
-    if(f.pilar && TEMAS_VALIDOS.includes(f.pilar) && !f.tema){
-      f.tema = f.pilar;
-      f.pilar = '';
-      mudou = true;
-    }
-  });
-  if(mudou) salvar();
-}
-
-let matGruposAbertos = new Set();
-
 function renderMateriais(){
   const el = document.getElementById('mat-lista');
   if(!el) return;
   if(!folhas.length){
-    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink-muted);font-size:13px;">Nenhuma folha enviada ainda. Envie fotos ou exports das folhas que você usa em aula (PNG ou JPG).</div>';
+    el.innerHTML = '<div style="grid-column:1/-1;padding:24px;text-align:center;color:var(--ink-muted);font-size:13px;">Nenhuma folha enviada ainda. Envie fotos ou exports das folhas que você usa em aula (PNG ou JPG).</div>';
     return;
   }
-  const busca = (document.getElementById('mat-busca')?.value || '').trim().toLowerCase();
-  const filtroPilar = document.getElementById('mat-filtro-pilar')?.value || '';
-  const filtroTema = document.getElementById('mat-filtro-tema')?.value || '';
-
-  let filtradas = [...folhas];
-  if(busca){
-    filtradas = filtradas.filter(f => (f.titulo||'').toLowerCase().includes(busca) || (f.obs||'').toLowerCase().includes(busca));
-  }
-  if(filtroPilar === '__sem__'){
-    filtradas = filtradas.filter(f => !f.pilar);
-  } else if(filtroPilar){
-    filtradas = filtradas.filter(f => f.pilar === filtroPilar);
-  }
-  if(filtroTema === '__sem__'){
-    filtradas = filtradas.filter(f => !f.tema);
-  } else if(filtroTema){
-    filtradas = filtradas.filter(f => f.tema === filtroTema);
-  }
-
-  if(!filtradas.length){
-    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink-muted);font-size:13px;">Nenhuma folha encontrada com esses filtros.</div>';
-    return;
-  }
-
-  const filtroAtivo = !!(busca || filtroPilar || filtroTema);
-
-  // Agrupa por pilar (mantém ordenação por data mais recente dentro de cada grupo)
-  const ordenadas = [...filtradas].sort((a,b)=> (b.dataUpload||'').localeCompare(a.dataUpload||''));
-  const grupos = {};
-  ordenadas.forEach(f=>{
-    const chave = f.pilar || 'Sem pilar definido';
-    if(!grupos[chave]) grupos[chave] = [];
-    grupos[chave].push(f);
-  });
-  const chavesOrdenadas = Object.keys(grupos).sort((a,b)=> a==='Sem pilar definido' ? 1 : b==='Sem pilar definido' ? -1 : a.localeCompare(b));
-
-  const cardHtml = f => `
+  const ordenadas = [...folhas].sort((a,b)=> (b.dataUpload||'').localeCompare(a.dataUpload||''));
+  el.innerHTML = ordenadas.map(f=>`
     <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-      <img src="${f.url}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#fff;">
+      <img src="${f.url}" style="width:100%;aspect-ratio:1/1.3;object-fit:cover;display:block;background:#fff;">
       <div style="padding:10px;">
         <div style="font-size:12px;font-weight:700;line-height:1.3;margin-bottom:4px;">${f.titulo}</div>
-        ${f.tema?`<div style="font-size:10px;color:var(--brand);font-weight:700;margin-bottom:4px;">${f.tema}</div>`:''}
+        ${f.pilar?`<div style="font-size:10px;color:var(--brand);font-weight:700;margin-bottom:4px;">${f.pilar}</div>`:''}
         ${f.obs?`<div style="font-size:11px;color:var(--ink-muted);margin-bottom:6px;">${f.obs}</div>`:''}
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div style="display:flex;gap:6px;">
           <a href="${f.url}" target="_blank" class="btn btn-sm" style="background:#fff;border:1px solid var(--border);color:var(--ink-soft);text-decoration:none;">🔍 Ver</a>
-          <button class="btn btn-sm" style="background:#fff;border:1px solid var(--border);color:var(--ink-soft);" onclick="editarFolha(${f.id})">✏️</button>
           <button class="btn btn-danger btn-sm" onclick="excluirFolha(${f.id})">🗑</button>
         </div>
       </div>
-    </div>`;
-
-  el.innerHTML = chavesOrdenadas.map(chave => {
-    const aberto = filtroAtivo || matGruposAbertos.has(chave);
-    return `
-    <div style="margin-bottom:10px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-      <div onclick="toggleGrupoMateriais(this.dataset.chave)" data-chave="${chave}" style="padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--bg);user-select:none;">
-        <span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--ink-soft);">${chave} <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-muted);">(${grupos[chave].length})</span></span>
-        <span style="font-size:12px;color:var(--ink-muted);">${aberto?'▲':'▼'}</span>
-      </div>
-      ${aberto ? `<div style="padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">${grupos[chave].map(cardHtml).join('')}</div>` : ''}
-    </div>`;
-  }).join('');
-}
-
-function toggleGrupoMateriais(chave){
-  if(matGruposAbertos.has(chave)) matGruposAbertos.delete(chave);
-  else matGruposAbertos.add(chave);
-  renderMateriais();
-}
-
-function editarFolha(id){
-  const f = folhas.find(x=>x.id===id);
-  if(!f) return;
-  document.getElementById('mat-edit-id').value = f.id;
-  document.getElementById('mat-edit-titulo').value = f.titulo || '';
-  document.getElementById('mat-edit-pilar').value = f.pilar || '';
-  document.getElementById('mat-edit-tema').value = f.tema || '';
-  document.getElementById('mat-edit-obs').value = f.obs || '';
-  document.getElementById('modal-mat').classList.remove('hidden');
-}
-
-function fecharModalMat(){
-  document.getElementById('modal-mat').classList.add('hidden');
-}
-
-function salvarEdicaoFolha(){
-  const id = parseInt(document.getElementById('mat-edit-id').value);
-  const f = folhas.find(x=>x.id===id);
-  if(!f) return;
-  const titulo = document.getElementById('mat-edit-titulo').value.trim();
-  if(!titulo){ alert('O título não pode ficar em branco.'); return; }
-  f.titulo = titulo;
-  f.pilar = document.getElementById('mat-edit-pilar').value;
-  f.tema = document.getElementById('mat-edit-tema').value;
-  f.obs = document.getElementById('mat-edit-obs').value.trim();
-  salvar();
-  fecharModalMat();
-  renderMateriais();
+    </div>`).join('');
 }
 
 function salvarRPS(v){localStorage.setItem('jd_rps',v);}
@@ -2772,25 +2053,6 @@ function abrirNFSe(aid, mes){
 }
 
 function fecharNFSe(){document.getElementById('overlay-nfse').classList.add('hidden');}
-
-function abrirNFSeAvulso(id){
-  const av = avulsos.find(x=>x.id===id);
-  if(!av) return;
-  let cliente;
-  if(av.alunoId){
-    const a = alunos.find(x=>x.id===av.alunoId);
-    cliente = a ? (a.resp||a.nome) : (av.nome||'Cliente');
-  } else {
-    cliente = av.nome || 'Cliente';
-  }
-  const d = av.data ? new Date(av.data+'T00:00:00') : new Date();
-  const dataFmt = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-  document.getElementById('nfse-cliente').value = cliente.toUpperCase();
-  document.getElementById('nfse-valor').value = `R$ ${(av.valor||0).toFixed(2).replace('.',',')}`;
-  document.getElementById('nfse-data').value = dataFmt;
-  document.getElementById('nfse-rps').value = localStorage.getItem('jd_rps') || '';
-  document.getElementById('overlay-nfse').classList.remove('hidden');
-}
 
 // ── MAPA ─────────────────────────────────────────────
 // ── VR ───────────────────────────────────────────────
@@ -2910,6 +2172,8 @@ function verContrato(id){
 <p>11.2. O descumprimento desta cláusula implicará a suspensão imediata da participação do aluno e poderá ensejar a rescisão contratual motivada, sem direito a restituição de valores já pagos, além de comunicação às autoridades competentes quando aplicável.</p>
 <h3>CLÁUSULA DÉCIMA SEGUNDA - RESCISÃO CONTRATUAL</h3>
 <p>12.1. Qualquer das partes que desejar rescindir o contrato antecipadamente (antes dos 12 meses) deve comunicar a outra com antecedência mínima de 7 (sete) dias corridos antes da data de vencimento da próxima mensalidade.</p>
+<p>12.1.1. A rescisão contratual não acarretará qualquer custo, ônus ou penalidade às partes. A comunicação realizada dentro do prazo previsto no item 12.1 não implicará, em hipótese alguma, a cobrança de multa rescisória.</p>
+<p>12.1.2. Caso o Contratante (responsável legal ou aluno) desista das aulas antes do término do mês de referência sem ter usufruído de todas as aulas pagas antecipadamente, não haverá devolução, restituição ou compensação do valor da mensalidade correspondente.</p>
 <h3>CLÁUSULA DÉCIMA TERCEIRA - DISPOSIÇÕES FINAIS</h3>
 <p>13.1. O presente instrumento é regido pelas leis brasileiras.</p>
 <h3>CLÁUSULA DÉCIMA QUARTA - DO FORO</h3>
@@ -3267,8 +2531,6 @@ async function confirmarSenha() {
 // ── ASSISTENTE IA ────────────────────────────────────────
 
 let iaHistorico = [];
-let iaMensagens = [];
-let iaBackupLimpeza = null;
 let iaCustoSessao = 0;
 let iaImagemAnexada = null;
 let iaMicAtivo = false;
@@ -3357,7 +2619,7 @@ Valor: mantido fixo pelos 12 meses do contrato; reajuste só em novo contrato.
 Faltas: aviso com mínimo 24h de antecedência. Reposição sujeita à disponibilidade; não é garantida automaticamente. Aviso com menos de 24h não gera direito a reposição — Cícero pode disponibilizar material como cortesia, sem obrigação.
 Feriados e cancelamentos por Cícero: sem encontro regular; reposição em data acordada ou abatimento proporcional na mensalidade seguinte.
 Quinta semana: meses com 5ª semana não têm encontro regular automático. Cícero pode oferecer encontro adicional opcional, cobrado proporcionalmente, confirmação formal do contratante em até 3 dias antes.
-Rescisão antecipada: qualquer parte com aviso mínimo de 7 dias corridos antes do vencimento da próxima mensalidade. Sem multa rescisória.
+Rescisão antecipada: qualquer parte com aviso mínimo de 7 dias corridos antes do vencimento da próxima mensalidade. Sem multa rescisória e sem custo algum quando comunicada no prazo. Desistência antes do fim do mês sem ter assistido todas as aulas pagas antecipadamente: sem devolução do valor.
 Menor de idade: contrato celebrado e assinado pelo responsável legal, que assume todas as obrigações.
 Imagem e obras: autorização gratuita para uso em divulgação comercial, revogável a qualquer tempo por escrito, com efeitos a partir do recebimento (publicações já feitas não são afetadas). Propriedade intelectual das obras permanece com o aluno.
 LGPD: dados coletados para execução do contrato e gestão pedagógica/administrativa; armazenados em nuvem; podem ser processados por ferramentas de IA; vedado compartilhamento com terceiros para fins alheios ao serviço.
@@ -3367,22 +2629,12 @@ Foro: Comarca de Sobradinho-DF.`;
 
 function iaResumoAluno(a, numRelats) {
   numRelats = numRelats || 3;
-  const f = a.freq || {};
-  const porSemana = {};
-  Object.keys(f).forEach(function(k){
-    const mm = k.match(/^(\d{4}-\d{2})-(?:([A-Z]{3}-\d{4})-)?s(\d)-(p|f|obs)$/);
-    if (!mm) return;
-    const chave = mm[1]+(mm[2]?' '+mm[2]:'')+' s'+mm[3];
-    porSemana[chave] = porSemana[chave] || {};
-    porSemana[chave][mm[4]] = f[k];
-  });
-  const chaves = Object.keys(porSemana).sort();
-  const freq = chaves.slice(-4).map(function(ch){
-    const r = porSemana[ch];
-    return ch+':'+(r.p?'P':r.f?'F':'-');
+  const freqKeys = Object.keys(a.freq || {}).sort().slice(-4);
+  const freq = freqKeys.map(function(k) {
+    const f = a.freq[k];
+    const p = Array.isArray(f) ? f.filter(function(d){return d==='P';}).length : 0;
+    return k.slice(5)+':'+p+'P';
   }).join(' ');
-  const ultimaObsChave = chaves.slice().reverse().find(function(ch){ return porSemana[ch].obs; });
-  const ultimaObs = ultimaObsChave ? porSemana[ultimaObsChave].obs : '';
   const nomeKey = a.nome.split(' ')[0].toLowerCase();
   const relats = Object.entries(notasItens || {})
     .filter(function(e){return e[0].toLowerCase().includes(nomeKey);})
@@ -3391,7 +2643,7 @@ function iaResumoAluno(a, numRelats) {
     .map(function(e){return e[0].slice(5)+': '+String(e[1]).slice(0,200);})
     .join(' | ');
   const idade = a.nasc ? (new Date().getFullYear() - new Date(a.nasc).getFullYear())+'a' : '';
-  return a.nome+(idade?' ('+idade+')':'')+' | '+(a.perfil||'perfil?')+(a.turmas&&a.turmas.length?' | turma(s): '+a.turmas.join(', '):'')+' | obs cadastro: '+(a.obs||'\u2014').slice(0,100)+' | freq recente: '+(freq||'\u2014')+(ultimaObs?' | \u00faltima observa\u00e7\u00e3o: '+ultimaObs.slice(0,300):'')+' | relatos: '+(relats||'\u2014');
+  return a.nome+(idade?' ('+idade+')':'')+' | '+(a.perfil||'perfil?')+' | obs: '+(a.obs||'—').slice(0,100)+' | freq: '+(freq||'—')+' | relatos: '+(relats||'—');
 }
 
 function iaListaAlunos() {
@@ -3426,12 +2678,12 @@ function iaColetarObservacoes(meses, listaAlunos) {
     const f = a.freq || {};
     const porSemana = {};
     Object.keys(f).forEach(function(k){
-      const mm = k.match(/^(\d{4}-\d{2})-(?:([A-Z]{3}-\d{4})-)?s(\d)-(p|f|obs)$/);
+      const mm = k.match(/^(\d{4}-\d{2})-s(\d)-(p|f|obs)$/);
       if (!mm) return;
       if (meses && meses.indexOf(mm[1]) === -1) return;
-      const chave = mm[1]+(mm[2]?' '+mm[2]:'')+' semana '+mm[3];
+      const chave = mm[1]+' semana '+mm[2];
       porSemana[chave] = porSemana[chave] || {};
-      porSemana[chave][mm[4]] = f[k];
+      porSemana[chave][mm[3]] = f[k];
     });
     const regs = Object.keys(porSemana).sort().map(function(ch){
       const r = porSemana[ch];
@@ -3447,26 +2699,15 @@ function iaColetarObservacoes(meses, listaAlunos) {
 function iaResumoFinanceiro(mesRef) {
   const mes = mesRef || new Date().toISOString().slice(0,7);
   let tot=0, rec=0, pend=0, atras=0;
-  const linhas = alunos.filter(function(a){return !a.status||a.status==='ativo';}).map(function(a){
+  const linhas = alunos.map(function(a){
     const st = (a.pag && a.pag[mes]) || 'pendente';
     const v = a.valorPromo || 0;
     tot += v;
     if (st==='pago') rec += v; else if (st==='atrasado') { pend += v; atras++; } else pend += v;
     return '- '+a.nome+' | R$ '+v.toFixed(2)+' | '+st;
   }).join('\n');
-  let bloco = '[FINANCEIRO \u2014 compet\u00eancia '+mes+']\n'+linhas+
+  return '[FINANCEIRO \u2014 compet\u00eancia '+mes+']\n'+linhas+
     '\nTotal esperado: R$ '+tot.toFixed(2)+' | Recebido: R$ '+rec.toFixed(2)+' | Pendente/atrasado: R$ '+pend.toFixed(2)+' | Alunos em atraso: '+atras;
-  if (avulsos.length) {
-    let avRec=0, avPend=0;
-    const linhasAv = avulsos.map(function(av){
-      const nome = av.alunoId ? ((alunos.find(function(a){return a.id===av.alunoId;})||{}).nome || av.nome || 'aluno removido') : (av.nome||'sem nome');
-      if (av.status==='pago') avRec += av.valor||0; else avPend += av.valor||0;
-      return '- '+nome+' | R$ '+(av.valor||0).toFixed(2)+' | '+(av.descricao||'lan\u00e7amento avulso')+' | '+av.data+' | '+av.status;
-    }).join('\n');
-    bloco += '\n\n[LAN\u00c7AMENTOS AVULSOS \u2014 fora da mensalidade recorrente, ex: aulas experimentais]\n'+linhasAv+
-      '\nRecebido em avulsos: R$ '+avRec.toFixed(2)+' | Pendente em avulsos: R$ '+avPend.toFixed(2);
-  }
-  return bloco;
 }
 
 function iaResumoCrescimento() {
@@ -3492,24 +2733,10 @@ function iaResumoCrescimento() {
 
 function iaResumoMateriais() {
   if (!folhas.length) return '[MATERIAIS DE AULA]\nNenhuma folha cadastrada ainda no sistema.';
-  const grupos = {};
-  folhas.forEach(function(f){
-    const chave = f.pilar || 'Sem pilar definido';
-    if (!grupos[chave]) grupos[chave] = [];
-    grupos[chave].push(f);
-  });
-  const chaves = Object.keys(grupos).sort(function(a,b){
-    if (a==='Sem pilar definido') return 1;
-    if (b==='Sem pilar definido') return -1;
-    return a.localeCompare(b);
-  });
-  const blocos = chaves.map(function(chave){
-    const linhas = grupos[chave].map(function(f){
-      return '  - '+f.titulo+(f.tema?' | tema: '+f.tema:'')+(f.obs?' | obs: '+f.obs:'')+' | enviada em '+f.dataUpload;
-    }).join('\n');
-    return chave+' ('+grupos[chave].length+'):\n'+linhas;
+  const linhas = folhas.map(function(f){
+    return '- '+f.titulo+' | pilar: '+(f.pilar||'n\u00e3o especificado')+(f.obs?' | obs: '+f.obs:'')+' | enviada em '+f.dataUpload;
   }).join('\n');
-  return '[MATERIAIS DE AULA \u2014 '+folhas.length+' folha(s) cadastradas, agrupadas por pilar t\u00e9cnico, apenas t\u00edtulo/observa\u00e7\u00e3o, sem acesso \u00e0 imagem em si]\n'+blocos;
+  return '[MATERIAIS DE AULA \u2014 '+folhas.length+' folha(s) cadastradas, apenas t\u00edtulo/pilar/observa\u00e7\u00e3o, sem acesso \u00e0 imagem em si]\n'+linhas;
 }
 
 function iaInjetarDados(pergunta) {
@@ -3572,7 +2799,7 @@ function iaLimparMarkdown(texto) {
     .trim();
 }
 
-function iaAdicionarMensagem(tipo, texto, restaurando) {
+function iaAdicionarMensagem(tipo, texto) {
   const chat = document.getElementById('ia-chat');
   const bv = document.getElementById('ia-boas-vindas');
   if (bv) bv.remove();
@@ -3584,7 +2811,6 @@ function iaAdicionarMensagem(tipo, texto, restaurando) {
   div.innerHTML = '<div class="ia-label" style="display:flex;justify-content:space-between;align-items:center;"><span>'+(tipo==='user'?'Você':'🤖 Assistente')+'</span>'+acoes+'</div><div class="ia-bubble">'+textoLimpo.replace(/\n/g,'<br>')+'</div>';
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
-  if (!restaurando) { iaMensagens.push({ tipo: tipo, texto: texto }); iaSalvarChat(); }
   return div;
 }
 
@@ -3654,8 +2880,6 @@ async function iaEnviar() {
     return;
   }
   input.value = '';
-  localStorage.removeItem('jornada_ia_rascunho');
-  iaEsconderDesfazer();
   document.getElementById('ia-btn-enviar').disabled = true;
   iaAdicionarMensagem('user', pergunta || '(imagem anexada)');
   const pensandoEl = iaAdicionarPensando();
@@ -3683,7 +2907,6 @@ async function iaEnviar() {
     pensandoEl.remove();
     iaAdicionarMensagem('ia', resposta);
     iaHistorico.push({ role: 'assistant', content: resposta });
-    iaSalvarChat();
     if (data.usage) {
       const inp = data.usage.input_tokens, out = data.usage.output_tokens;
       const custo = (inp * 3 / 1000000) + (out * 15 / 1000000);
@@ -3697,8 +2920,6 @@ async function iaEnviar() {
     pensandoEl.remove();
     iaAdicionarMensagem('ia', 'Erro ao conectar com a IA. Detalhe: '+(e.message||e));
     iaHistorico.pop();
-    iaSalvarChat();
-    if (!input.value && pergunta) input.value = pergunta;
   }
   document.getElementById('ia-btn-enviar').disabled = false;
 }
@@ -3708,96 +2929,20 @@ function iaAtalho(texto) {
   iaEnviar();
 }
 
-function iaTextoHistorico(h) {
-  return h.map(function(m){
-    return { role: m.role, content: Array.isArray(m.content) ? ((m.content.find(function(c){return c.type==='text';})||{}).text||'') : m.content };
-  });
-}
-
-function iaSalvarChat() {
-  const dados = { mensagens: iaMensagens.slice(-200), historico: iaTextoHistorico(iaHistorico), custo: iaCustoSessao };
-  try { localStorage.setItem('jornada_ia_chat', JSON.stringify(dados)); }
-  catch(e) {
-    try { dados.historico = []; localStorage.setItem('jornada_ia_chat', JSON.stringify(dados)); } catch(e2) {}
-  }
-}
-
-function iaMostrarBoasVindas() {
-  document.getElementById('ia-chat').innerHTML = '<div id="ia-boas-vindas" style="text-align:center;padding:24px 16px;color:var(--ink-muted);"><div style="font-size:32px;margin-bottom:8px;">🌀</div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">Olá, Cícero!</div><div style="font-size:13px;line-height:1.5;">Use os atalhos acima ou escreva uma pergunta.<br>Tenho acesso aos dados pedagógicos e administrativos do sistema.</div></div>';
-}
-
-function iaMostrarDesfazer() {
-  document.getElementById('ia-btn-desfazer').style.display = 'inline-block';
-  document.getElementById('ia-btn-limpar').style.display = 'none';
-}
-
-function iaEsconderDesfazer() {
-  document.getElementById('ia-btn-desfazer').style.display = 'none';
-  document.getElementById('ia-btn-limpar').style.display = 'inline-block';
-}
-
 function iaLimpar() {
-  if (!iaMensagens.length && !iaHistorico.length) return;
-  if (!confirm('Limpar toda a conversa com o Assistente? Logo depois você poderá desfazer.')) return;
-  iaBackupLimpeza = { mensagens: iaMensagens.slice(-200), historico: iaTextoHistorico(iaHistorico), custo: iaCustoSessao };
-  try { localStorage.setItem('jornada_ia_chat_backup', JSON.stringify(iaBackupLimpeza)); } catch(e) {}
-  iaHistorico = []; iaMensagens = []; iaCustoSessao = 0; iaImagemAnexada = null;
-  localStorage.removeItem('jornada_ia_chat');
+  iaHistorico = []; iaCustoSessao = 0; iaImagemAnexada = null;
   document.getElementById('ia-img-preview').style.display = 'none';
   const el = document.getElementById('ia-tokens');
   if (el) el.style.display = 'none';
-  iaMostrarBoasVindas();
-  iaMostrarDesfazer();
-}
-
-function iaRenderizarConversa(dados) {
-  iaMensagens = dados.mensagens || [];
-  iaHistorico = dados.historico || [];
-  iaCustoSessao = dados.custo || 0;
-  document.getElementById('ia-chat').innerHTML = '';
-  iaMensagens.forEach(function(m){ iaAdicionarMensagem(m.tipo, m.texto, true); });
-  if (!iaMensagens.length) iaMostrarBoasVindas();
-}
-
-function iaDesfazerLimpar() {
-  let dados = iaBackupLimpeza;
-  if (!dados) {
-    try { dados = JSON.parse(localStorage.getItem('jornada_ia_chat_backup') || 'null'); } catch(e) {}
-  }
-  if (!dados) { iaEsconderDesfazer(); return; }
-  iaRenderizarConversa(dados);
-  iaSalvarChat();
-  localStorage.removeItem('jornada_ia_chat_backup');
-  iaBackupLimpeza = null;
-  iaEsconderDesfazer();
-}
-
-function iaRestaurar() {
-  try {
-    const salvo = JSON.parse(localStorage.getItem('jornada_ia_chat') || 'null');
-    if (salvo && salvo.mensagens && salvo.mensagens.length) iaRenderizarConversa(salvo);
-    else if (localStorage.getItem('jornada_ia_chat_backup')) iaMostrarDesfazer();
-  } catch(e) {}
-  const input = document.getElementById('ia-input');
-  if (input) {
-    const rascunho = localStorage.getItem('jornada_ia_rascunho');
-    if (rascunho && !input.value) input.value = rascunho;
-    input.addEventListener('input', function(){
-      if (input.value) localStorage.setItem('jornada_ia_rascunho', input.value);
-      else localStorage.removeItem('jornada_ia_rascunho');
-    });
-  }
+  document.getElementById('ia-chat').innerHTML = '<div id="ia-boas-vindas" style="text-align:center;padding:24px 16px;color:var(--ink-muted);"><div style="font-size:32px;margin-bottom:8px;">🌀</div><div style="font-size:14px;font-weight:600;margin-bottom:4px;">Olá, Cícero!</div><div style="font-size:13px;line-height:1.5;">Use os atalhos acima ou escreva uma pergunta.<br>Tenho acesso aos dados pedagógicos e administrativos do sistema.</div></div>';
 }
 
 window.iaEnviar = iaEnviar;
 window.iaAtalho = iaAtalho;
 window.iaLimpar = iaLimpar;
-window.iaDesfazerLimpar = iaDesfazerLimpar;
 window.iaAnexarImagem = iaAnexarImagem;
 window.iaRemoverImagem = iaRemoverImagem;
 window.iaMicrofone = iaMicrofone;
-
-iaRestaurar();
 
 // ── FIM ASSISTENTE IA ─────────────────────────────────────
 
@@ -3828,18 +2973,6 @@ window.calcularIdade=calcularIdade; window.importarDados=importarDados;
 window.preencherCertAluno=preencherCertAluno; window.renderFin=renderFin;
 window.renderFreq=renderFreq; window.toggleVRInline=toggleVRInline; window.toggleVRPanel=toggleVRPanel;
 window.salvarObs=salvarObs; window.salvarForcado=salvarForcado; window.salvarImediato=salvarImediato;
-window.materiaisUpload=materiaisUpload; window.excluirFolha=excluirFolha;
-window.editarFolha=editarFolha; window.fecharModalMat=fecharModalMat; window.salvarEdicaoFolha=salvarEdicaoFolha;
-window.renderMateriais=renderMateriais; window.toggleGrupoMateriais=toggleGrupoMateriais;
-window.freqDitado=freqDitado; window.freqMelhorarIA=freqMelhorarIA;
-window.salvarAvulso=salvarAvulso; window.toggleStatusAvulso=toggleStatusAvulso;
-window.editarAvulso=editarAvulso; window.fecharModalAvulso=fecharModalAvulso;
-window.salvarEdicaoAvulso=salvarEdicaoAvulso; window.excluirAvulso=excluirAvulso;
-window.toggleOrigemOutro=toggleOrigemOutro;
-window.setCrescPeriodo=setCrescPeriodo;
-window.renderCrescimento=renderCrescimento;
-window.setAlunosFiltroStatus=setAlunosFiltroStatus; window.mudarStatusAluno=mudarStatusAluno; window.renderAlunos=renderAlunos;
-window.abrirNFSeAvulso=abrirNFSeAvulso;
 </script>
 
 <!-- POPUP NFSe MODELO -->
