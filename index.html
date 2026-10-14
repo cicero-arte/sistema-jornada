@@ -1940,7 +1940,7 @@ function statusAniversarioAluno(a){
   let alvo=proximo(hoje.getFullYear());
   if(alvo<hoje) alvo=proximo(hoje.getFullYear()+1);
   const dias=Math.round((alvo-hoje)/86400000);
-  if(dias>7) return null;
+  if(dias>30) return null;
   const idade=alvo.getFullYear()-p[0];
   const dm=String(alvo.getDate()).padStart(2,'0')+'/'+String(alvo.getMonth()+1).padStart(2,'0');
   const idTxt=idade>0?` (${idade} anos)`:'';
@@ -1971,7 +1971,7 @@ function renderAlunos(){
   const alunosOrdenados=[...listaBase].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   if(!alunosOrdenados.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno nesse filtro.</p>';return;}
   const nivers=alunosOrdenados.filter(a=>a.status!=='inativo'&&a.status!=='espera').map(a=>({a,s:statusAniversarioAluno(a)})).filter(x=>x.s).sort((x,y)=>x.s.dias-y.s.dias);
-  const faixaAniv=nivers.length?`<div style="background:#e3eef4;border-left:4px solid #1E6C93;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--ink-soft);"><b style="color:#1E6C93;">Aniversários nos próximos 7 dias:</b> ${nivers.map(x=>`${x.a.nome} (${x.s.curto})`).join(', ')}</div>`:'';
+  const faixaAniv=nivers.length?`<div style="background:#e3eef4;border-left:4px solid #1E6C93;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--ink-soft);"><b style="color:#1E6C93;">Aniversários nos próximos 30 dias:</b> ${nivers.map(x=>`${x.a.nome} (${x.s.curto})`).join(', ')}</div>`:'';
   el.innerHTML=faixaAniv+alunosOrdenados.map(a=>{
     const exAluno = a.status==='inativo';
     const emEspera = a.status==='espera';
