@@ -1930,6 +1930,25 @@ function statusContratoAluno(a){
   return null;
 }
 
+function statusAniversarioAluno(a){
+  if(!a.nasc) return null;
+  const p=a.nasc.split('-').map(Number);
+  if(p.length<3||!p[0]||!p[1]||!p[2]) return null;
+  const hoje=new Date();hoje.setHours(0,0,0,0);
+  const bissexto=y=>(y%4===0&&y%100!==0)||y%400===0;
+  const proximo=y=>{let d=p[2];if(p[1]===2&&d===29&&!bissexto(y))d=28;return new Date(y,p[1]-1,d);};
+  let alvo=proximo(hoje.getFullYear());
+  if(alvo<hoje) alvo=proximo(hoje.getFullYear()+1);
+  const dias=Math.round((alvo-hoje)/86400000);
+  if(dias>7) return null;
+  const idade=alvo.getFullYear()-p[0];
+  const dm=String(alvo.getDate()).padStart(2,'0')+'/'+String(alvo.getMonth()+1).padStart(2,'0');
+  const idTxt=idade>0?` (${idade} anos)`:'';
+  if(dias===0) return {dias,curto:'hoje',texto:`Aniversário hoje${idTxt}`};
+  if(dias===1) return {dias,curto:'amanhã',texto:`Aniversário amanhã, ${dm}${idTxt}`};
+  return {dias,curto:dm,texto:`Aniversário em ${dias} dias, ${dm}${idTxt}`};
+}
+
 function renderAlunos(){
   const el=document.getElementById('lista-alunos');
   const contador=document.getElementById('alunos-filtro-contador');
@@ -1951,7 +1970,9 @@ function renderAlunos(){
   if(filtroTurma) listaBase = listaBase.filter(a=>(a.turmas||[]).includes(filtroTurma));
   const alunosOrdenados=[...listaBase].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   if(!alunosOrdenados.length){el.innerHTML='<p style="color:var(--ink-muted);">Nenhum aluno nesse filtro.</p>';return;}
-  el.innerHTML=alunosOrdenados.map(a=>{
+  const nivers=alunosOrdenados.filter(a=>a.status!=='inativo'&&a.status!=='espera').map(a=>({a,s:statusAniversarioAluno(a)})).filter(x=>x.s).sort((x,y)=>x.s.dias-y.s.dias);
+  const faixaAniv=nivers.length?`<div style="background:#e3eef4;border-left:4px solid #1E6C93;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--ink-soft);"><b style="color:#1E6C93;">Aniversários nos próximos 7 dias:</b> ${nivers.map(x=>`${x.a.nome} (${x.s.curto})`).join(', ')}</div>`:'';
+  el.innerHTML=faixaAniv+alunosOrdenados.map(a=>{
     const exAluno = a.status==='inativo';
     const emEspera = a.status==='espera';
     const badgeEx = exAluno ? `<span class="badge" style="background:#eee;color:var(--ink-muted);margin-left:6px;">Ex-aluno(a)${a.dataInativacao?' · '+fmtData(a.dataInativacao):''}</span>` : '';
@@ -1965,10 +1986,12 @@ function renderAlunos(){
       btnStatus = `<button class="btn btn-sm" style="background:#eef1fa;color:#3a5a9c;border:1px solid #ccd8f0;" onclick="mudarStatusAluno(${a.id},'espera')" title="Mover para lista de espera">⏳</button><button class="btn btn-sm btn-danger" onclick="mudarStatusAluno(${a.id},'inativo')" title="Marcar como ex-aluno(a)">✕</button>`;
     }
     const contratoSt = (!exAluno && !emEspera) ? statusContratoAluno(a) : null;
-    const corHeader = contratoSt?.nivel==='vencido' ? 'background:#fbe3e0;' : contratoSt?.nivel==='alerta' ? 'background:#fbeed9;' : '';
+    const aniv = (!exAluno && !emEspera) ? statusAniversarioAluno(a) : null;
+    const corHeader = contratoSt?.nivel==='vencido' ? 'background:#fbe3e0;' : contratoSt?.nivel==='alerta' ? 'background:#fbeed9;' : aniv ? 'background:#e3eef4;' : '';
+    const badgeAniv = aniv ? `<span class="badge" style="background:#1E6C93;color:#fff;margin-left:6px;">${aniv.texto}</span>` : '';
     const badgeContrato = contratoSt ? `<span class="badge" style="background:${contratoSt.nivel==='vencido'?'#e0645a':'#d99a3a'};color:#fff;margin-left:6px;">${contratoSt.texto}</span>` : '';
     const badgesTurma = (a.turmas&&a.turmas.length) ? a.turmas.map(t=>`<span class="badge" style="background:#efe9dc;color:var(--ink-soft);margin-right:4px;">${t}</span>`).join('') : '';
-    return `<div class="aluno-card" style="${(exAluno||emEspera)?'opacity:0.8;':''}"><div class="aluno-card-header" style="${corHeader}" onclick="toggleCard('body-${a.id}')"><div class="avatar" style="background:${a.avatar}">${ini(a.nome)}</div><div style="flex:1"><div class="aluno-nome">${a.nome}${badgeEx}${badgeEspera}${badgeContrato}</div><div class="aluno-perfil">${a.perfil}${badgesTurma?' · '+badgesTurma:''}</div></div><div style="display:flex;gap:5px;" onclick="event.stopPropagation()">${btnStatus}<button class="btn btn-sm" style="background:#f0efe8;color:var(--ink-soft);border:1px solid var(--border);" onclick="editarAluno(${a.id})">✏️</button><button class="btn btn-sm btn-success" onclick="verContrato(${a.id})">📄</button><button class="btn btn-sm btn-danger" onclick="excluirAluno(${a.id})">🗑</button></div></div><div class="aluno-body" id="body-${a.id}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;font-size:13px;"><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Contratante</span><br>${a.resp||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Telefone</span><br>${a.tel||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">E-mail</span><br>${a.email||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Valor promo</span><br>R$ ${(a.valorPromo||0).toFixed(2)}</div></div>${a.obs?`<div style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:9px;font-size:12px;color:var(--ink-soft);">${a.obs}</div>`:''}</div></div>`;
+    return `<div class="aluno-card" style="${(exAluno||emEspera)?'opacity:0.8;':''}"><div class="aluno-card-header" style="${corHeader}" onclick="toggleCard('body-${a.id}')"><div class="avatar" style="background:${a.avatar}">${ini(a.nome)}</div><div style="flex:1"><div class="aluno-nome">${a.nome}${badgeEx}${badgeEspera}${badgeContrato}${badgeAniv}</div><div class="aluno-perfil">${a.perfil}${badgesTurma?' · '+badgesTurma:''}</div></div><div style="display:flex;gap:5px;" onclick="event.stopPropagation()">${btnStatus}<button class="btn btn-sm" style="background:#f0efe8;color:var(--ink-soft);border:1px solid var(--border);" onclick="editarAluno(${a.id})">✏️</button><button class="btn btn-sm btn-success" onclick="verContrato(${a.id})">📄</button><button class="btn btn-sm btn-danger" onclick="excluirAluno(${a.id})">🗑</button></div></div><div class="aluno-body" id="body-${a.id}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;font-size:13px;"><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Contratante</span><br>${a.resp||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Telefone</span><br>${a.tel||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">E-mail</span><br>${a.email||'—'}</div><div><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Valor promo</span><br>R$ ${(a.valorPromo||0).toFixed(2)}</div></div>${a.obs?`<div style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:9px;font-size:12px;color:var(--ink-soft);">${a.obs}</div>`:''}</div></div>`;
   }).join('');
 }
 
