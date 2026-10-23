@@ -80,6 +80,11 @@ body{padding:0 16px;}
 .freq-obs{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:6px;font-family:'Lato',sans-serif;font-size:12px;resize:vertical;min-height:52px;background:#fafaf8;color:var(--ink);margin-top:4px;}
 .freq-obs-wrap{position:relative;}
 .freq-obs-tools{display:flex;gap:6px;margin-top:4px;}
+.freq-fotos{margin-top:8px;}
+.freq-fotos-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px;}
+.freq-foto{position:relative;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#f6f4f0;aspect-ratio:1/1;}
+.freq-foto img{width:100%;height:100%;object-fit:cover;display:block;}
+.freq-foto-x{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:1;cursor:pointer;padding:0;}
 .freq-obs-btn{padding:4px 9px;font-size:11px;font-weight:700;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--ink-soft);font-family:'Lato',sans-serif;}
 .freq-obs-btn:disabled{opacity:0.5;cursor:wait;}
 .freq-obs-btn.gravando{background:#fdf0ef;border-color:#f5c6c2;color:var(--red);}
@@ -1004,14 +1009,6 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <div style="font-size:13px;color:var(--ink-muted);">Selecione as notas para ver o resultado</div>
     </div>
 
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px;">
-      <div class="sec-title">Fotos dos desenhos (opcional)</div>
-      <div style="font-size:12px;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">As imagens entram no relatório e na impressão. Elas ficam apenas nesta tela e não são salvas no sistema. Use "Limpar avaliação" para recomeçar.</div>
-      <input type="file" accept="image/*" multiple onchange="avalAddFotos(this)">
-      <div id="aval-fotos-status" style="font-size:12px;color:var(--ink-muted);margin-top:6px;"></div>
-      <div id="aval-fotos-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:10px;"></div>
-    </div>
-
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
       <button class="btn btn-neutral" onclick="avalReset()">↺ Limpar avaliação</button>
     </div>
@@ -1036,10 +1033,6 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
         <div class="aval-rel-linha"><span class="aval-rel-linha-label">Pontuação total</span><span class="aval-rel-linha-valor" id="aval-rel-total">—</span></div>
         <div class="aval-rel-linha"><span class="aval-rel-linha-label">Nível alcançado</span><span id="aval-rel-nivel-badge" class="aval-rel-nivel-badge">—</span></div>
         <div id="aval-rel-nivel-desc" style="font-size:13px;font-weight:700;color:var(--ink);text-align:right;margin-top:4px;line-height:1.5;"></div>
-      </div>
-      <div class="aval-rel-secao" id="aval-rel-fotos-sec" style="display:none;">
-        <div class="aval-rel-secao-titulo">Registro visual dos desenhos</div>
-        <div id="aval-rel-fotos" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"></div>
       </div>
       <div class="aval-rel-rodape" id="aval-rel-rodape"></div>
       <div style="margin-top:14px;">
@@ -2325,7 +2318,7 @@ function editarAluno(id){const a=alunos.find(x=>x.id===id);if(!a)return;document
   }
   toggleOrigemOutro('f-origem','f-origem-outro');
   document.getElementById('f-obs').value=a.obs||'';document.getElementById('modal').classList.remove('hidden');}
-function excluirAluno(id){if(!confirm('Atenção: ação irreversível. Excluir este aluno e todos os seus dados?'))return;alunos=alunos.filter(a=>a.id!==id);salvar();renderAlunos();}
+function excluirAluno(id){if(!confirm('Atenção: ação irreversível. Excluir este aluno e todos os seus dados?'))return;{const x=alunos.find(a=>a.id===id);if(x&&x.fotosFreq)Object.values(x.fotosFreq).forEach(l=>l.forEach(f=>{if(f.path)deleteObject(storageRef(storage,f.path)).catch(()=>{});}));}alunos=alunos.filter(a=>a.id!==id);salvar();renderAlunos();}
 function abrirModal(){document.getElementById('modal-titulo').textContent='Novo aluno';document.getElementById('f-id').value='';['f-nome','f-nasc','f-resp','f-cpf-resp','f-tel','f-email','f-end-resp','f-data-inicio','f-data-contrato','f-data-assinatura','f-obs'].forEach(i=>document.getElementById(i).value='');document.getElementById('f-origem').value='';document.getElementById('f-origem-outro').value='';document.getElementById('f-origem-outro').style.display='none';document.getElementById('f-valor-cheio').value=440;document.getElementById('f-valor-promo').value=240;document.getElementById('f-valor-vr').value=100;document.getElementById('f-enc-sem').value='1';document.getElementById('f-vig-civil').value='1';document.getElementById('f-vr-clausula').value='1';popularCheckboxesTurmas([]);document.getElementById('modal').classList.remove('hidden');}
 function fecharModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('f-idade').textContent='';}
 function calcularIdade(){
@@ -2346,6 +2339,59 @@ function confirmarAluno(){const nome=document.getElementById('f-nome').value.tri
   const dados={nome,nasc:document.getElementById('f-nasc').value,perfil:document.getElementById('f-perfil').value,resp:document.getElementById('f-resp').value,cpfResp:document.getElementById('f-cpf-resp').value,tel:document.getElementById('f-tel').value,email:document.getElementById('f-email').value,endResp:document.getElementById('f-end-resp').value,valorCheio:parseFloat(document.getElementById('f-valor-cheio').value)||440,valorPromo:parseFloat(document.getElementById('f-valor-promo').value)||240,valorVR:parseFloat(document.getElementById('f-valor-vr').value)||100,dataInicio:document.getElementById('f-data-inicio').value,dataContrato:document.getElementById('f-data-contrato').value,dataAssinatura:document.getElementById('f-data-assinatura').value,encSem:parseInt(document.getElementById('f-enc-sem').value)||1,vigCivil:document.getElementById('f-vig-civil').value==='1',vrClausula:document.getElementById('f-vr-clausula').value!=='0',origem,turmas:lerTurmasSelecionadas(),obs:document.getElementById('f-obs').value};if(id){const a=alunos.find(x=>x.id===id);if(a)Object.assign(a,dados);}else alunos.push({id:pid++,...dados,avatar:cores[alunos.length%cores.length],freq:{},pag:{}});salvar();fecharModal();renderAlunos();}
 
 // ── FREQUÊNCIA — checkboxes nativos ──────────────────
+
+// ── FOTOS DOS DESENHOS NA FREQUÊNCIA ─────────────────
+function freqFotosHtml(a,k){
+  const l=(a.fotosFreq&&a.fotosFreq[k])||[];
+  return l.map(f=>`<div class="freq-foto"><a href="${f.url}" target="_blank" rel="noopener"><img src="${f.url}" alt="Foto do desenho" loading="lazy"></a><button type="button" class="freq-foto-x" title="Remover foto" onclick="freqFotoDel(${a.id},'${k}',${f.id})">×</button></div>`).join('');
+}
+function freqFotosRender(a,k){
+  const el=document.getElementById('ffotos-'+a.id+'-'+k);
+  if(el) el.innerHTML=freqFotosHtml(a,k);
+}
+async function freqFotosAdd(aid,k,input){
+  const files=Array.from(input.files||[]);
+  const a=alunos.find(x=>x.id===aid);
+  if(!a||!files.length) return;
+  const st=document.getElementById('ffst-'+aid+'-'+k);
+  if(!a.fotosFreq) a.fotosFreq={};
+  if(!a.fotosFreq[k]) a.fotosFreq[k]=[];
+  let ok=0;
+  for(let i=0;i<files.length;i++){
+    try{
+      if(st) st.textContent='Enviando '+(i+1)+' de '+files.length+'...';
+      const blob=await materiaisComprimirImagem(files[i]);
+      const fid=Date.now()+i;
+      const caminho='freq/'+aid+'/'+fid+'.jpg';
+      const sref=storageRef(storage,caminho);
+      await uploadBytes(sref,blob,{contentType:'image/jpeg'});
+      const url=await getDownloadURL(sref);
+      a.fotosFreq[k].push({id:fid,url,path:caminho,data:new Date().toISOString().slice(0,10)});
+      ok++;
+      freqFotosRender(a,k);
+      salvar();
+    }catch(e){
+      console.error('Erro ao enviar foto da frequência:',e);
+      if(st) st.textContent='Erro ao enviar: '+(e.code||e.message||'falha');
+      input.value='';
+      return;
+    }
+  }
+  if(st){ st.textContent=ok+' foto(s) anexada(s).'; setTimeout(()=>{ if(st.textContent.indexOf('anexada')>-1) st.textContent=''; },2500); }
+  input.value='';
+}
+async function freqFotoDel(aid,k,fid){
+  if(!confirm('Remover esta foto? A ação não pode ser desfeita.')) return;
+  const a=alunos.find(x=>x.id===aid);
+  if(!a||!a.fotosFreq||!a.fotosFreq[k]) return;
+  const f=a.fotosFreq[k].find(x=>x.id===fid);
+  if(f&&f.path){ await deleteObject(storageRef(storage,f.path)).catch(()=>{}); }
+  a.fotosFreq[k]=a.fotosFreq[k].filter(x=>x.id!==fid);
+  if(!a.fotosFreq[k].length) delete a.fotosFreq[k];
+  salvar();
+  freqFotosRender(a,k);
+}
+
 function montarSemanasFreq(a, mes, turmaPrefixo){
   const pfx = turmaPrefixo ? turmaPrefixo+'-' : '';
   return [1,2,3,4].map(s=>{
@@ -2374,6 +2420,13 @@ function montarSemanasFreq(a, mes, turmaPrefixo){
         <div class="freq-obs-tools">
           <button type="button" class="freq-obs-btn" onclick="freqDitado('fobs-${a.id}-${kO}', this)" title="Ditar por voz">🎤 Ditar</button>
           <button type="button" class="freq-obs-btn" onclick="freqMelhorarIA('fobs-${a.id}-${kO}', ${a.id}, '${kO}', this)" title="Melhorar texto com IA">✨ Melhorar com IA</button>
+        </div>
+        <div class="freq-fotos">
+          <div class="freq-fotos-lista" id="ffotos-${a.id}-${kO}">${freqFotosHtml(a,kO)}</div>
+          <label class="freq-obs-btn" style="display:inline-block;cursor:pointer;margin-top:6px;">📷 Anexar fotos
+            <input type="file" accept="image/*" multiple style="display:none" onchange="freqFotosAdd(${a.id},'${kO}',this)">
+          </label>
+          <span id="ffst-${a.id}-${kO}" style="font-size:11px;color:var(--ink-muted);margin-left:6px;"></span>
         </div>
       </div>
     </div>`;
@@ -3492,7 +3545,6 @@ function avalGerarRelatorio(total, nivel) {
   }
   document.getElementById('aval-rel-criterios').innerHTML = html;
   document.getElementById('aval-rel-rodape').textContent = 'Este relatório é um registro de avaliação pedagógica. CL Design Gráfico & Ilustração — cicero.art.br';
-  avalRenderRelFotos();
   document.getElementById('aval-relatorio').classList.add('visivel');
 }
 
@@ -3530,66 +3582,10 @@ function avalRecalcHoras() {
   if (document.getElementById('aval-relatorio').classList.contains('visivel')) avalCalcular();
 }
 
-// ── Fotos dos desenhos no relatório ──
-var avalFotos = [];
-function avalFotoParaDataUrl(file) {
-  return materiaisComprimirImagem(file).then(function(blob){
-    return new Promise(function(res, rej){
-      var r = new FileReader();
-      r.onload = function(){ res(r.result); };
-      r.onerror = rej;
-      r.readAsDataURL(blob);
-    });
-  });
-}
-async function avalAddFotos(input) {
-  var files = Array.prototype.slice.call(input.files || []);
-  if (!files.length) return;
-  var st = document.getElementById('aval-fotos-status');
-  st.textContent = 'Preparando ' + files.length + ' imagem(ns)...';
-  for (var i = 0; i < files.length; i++) {
-    try {
-      var url = await avalFotoParaDataUrl(files[i]);
-      avalFotos.push({ src: url, leg: '' });
-    } catch (e) { console.error('Erro na foto', e); }
-  }
-  st.textContent = '';
-  input.value = '';
-  avalRenderFotos();
-}
-function avalRemoverFoto(i) { avalFotos.splice(i, 1); avalRenderFotos(); }
-function avalLegendaFoto(i, v) { if (avalFotos[i]) avalFotos[i].leg = v; avalRenderRelFotos(); }
-function avalRenderFotos() {
-  var el = document.getElementById('aval-fotos-lista');
-  if (!el) return;
-  el.innerHTML = avalFotos.map(function(f, i){
-    return '<div style="border:1px solid var(--border);border-radius:10px;padding:8px;background:#fff;">' +
-      '<img src="' + f.src + '" alt="Foto do desenho ' + (i+1) + '" style="width:100%;height:130px;object-fit:contain;background:#f6f4f0;border-radius:6px;">' +
-      '<input type="text" value="' + f.leg.replace(/"/g,'&quot;') + '" placeholder="Legenda (ex: folha, caderno, pintura)" ' +
-      'oninput="avalLegendaFoto(' + i + ',this.value)" style="width:100%;margin-top:6px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:Lato,sans-serif;font-size:12px;box-sizing:border-box;">' +
-      '<button type="button" class="btn btn-neutral" style="margin-top:6px;padding:4px 10px;font-size:12px;" onclick="avalRemoverFoto(' + i + ')">Remover</button>' +
-      '</div>';
-  }).join('');
-  avalRenderRelFotos();
-}
-function avalRenderRelFotos() {
-  var sec = document.getElementById('aval-rel-fotos-sec');
-  var box = document.getElementById('aval-rel-fotos');
-  if (!sec || !box) return;
-  if (!avalFotos.length) { sec.style.display = 'none'; box.innerHTML = ''; return; }
-  sec.style.display = 'block';
-  box.innerHTML = avalFotos.map(function(f){
-    var leg = f.leg ? f.leg.replace(/</g,'&lt;') : '';
-    return '<figure style="margin:0;"><img src="' + f.src + '" alt="" style="width:100%;height:180px;object-fit:contain;background:#f6f4f0;border:1px solid var(--border);border-radius:6px;">' +
-      (leg ? '<figcaption style="font-size:11px;color:var(--ink-muted);text-align:center;margin-top:4px;">' + leg + '</figcaption>' : '') + '</figure>';
-  }).join('');
-}
-
 function avalReset() {
   avalNotas = {};
-  avalAlunoSel = null; avalHorasManual = false; avalFotos = [];
+  avalAlunoSel = null; avalHorasManual = false;
   var hi = document.getElementById('aval-horas-info'); if (hi) hi.textContent = 'Escolha o aluno para estimar. Você pode corrigir o valor.';
-  avalRenderFotos();
   document.getElementById('aval-nome').value = '';
   document.getElementById('aval-nome-busca').value = '';
   document.getElementById('aval-horas').value = '';
@@ -3622,7 +3618,7 @@ function avalImprimir() {
     '@page{margin:1.2cm;size:A4 landscape;}' +
     '@page{margin-header:0;margin-footer:0;}' +
     'html,body{margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
-    'body{font-family:Arial,sans-serif;font-size:11.5px;color:#222;line-height:1.45;max-width:100%;}' +
+    'body{font-family:Arial,sans-serif;font-size:11.5px;color:#222;line-height:1.45;max-width:100%;overflow:hidden;}' +
     'h1{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:#888;text-align:center;margin:0 0 3px 0;}' +
     'h2{font-size:15px;font-weight:900;color:#222;margin:0 0 10px 0;padding-bottom:8px;border-bottom:2px solid #eee;}' +
     '.secao{margin-bottom:10px;}' +
@@ -3652,10 +3648,6 @@ function avalImprimir() {
     '<div class="linha"><span class="label">Nível alcançado</span><span class="badge">' + nivelLabel + '</span></div>' +
     (nivelDesc ? '<div style="font-size:11.5px;font-weight:700;color:#222;text-align:right;margin-top:3px;line-height:1.4;">' + nivelDesc + '</div>' : '') +
     '</div>' +
-    (avalFotos.length ? '<div class="secao" style="page-break-inside:avoid;"><div class="secao-titulo">Registro visual dos desenhos</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">' +
-      avalFotos.map(function(f){ return '<figure style="margin:0;"><img src="' + f.src + '" style="width:100%;height:150px;object-fit:contain;background:#f6f4f0;border:1px solid #e4e4e4;border-radius:4px;">' +
-        (f.leg ? '<figcaption style="font-size:9.5px;color:#777;text-align:center;margin-top:3px;">' + f.leg.replace(/</g,'&lt;') + '</figcaption>' : '') + '</figure>'; }).join('') +
-      '</div></div>' : '') +
     '<div class="rodape">' + rodape + '</div>' +
     '<'+'script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<'+'/script>' +
     '</body></html>';
@@ -4536,8 +4528,8 @@ window.toggleNavMenu=toggleNavMenu; window.renInit=renInit; window.renRender=ren
 window.fecharNavMenu=fecharNavMenu; window.autoGrow=autoGrow;
 window.avalFiltrarBusca=avalFiltrarBusca; window.avalMostrarLista=avalMostrarLista; window.avalOcultarLista=avalOcultarLista;
 window.emailFiltrarBusca=emailFiltrarBusca; window.emailMostrarLista=emailMostrarLista; window.emailOcultarLista=emailOcultarLista;
+window.freqFotosAdd=freqFotosAdd; window.freqFotoDel=freqFotoDel;
 window.certAplicarNome=certAplicarNome; window.avalRecalcHoras=avalRecalcHoras; window.avalMarcarHorasManual=avalMarcarHorasManual;
-window.avalAddFotos=avalAddFotos; window.avalRemoverFoto=avalRemoverFoto; window.avalLegendaFoto=avalLegendaFoto;
 window.renderMetodo=renderMetodo; window.metodoEditar=metodoEditar; window.metodoAddNota=metodoAddNota; window.metodoDelNota=metodoDelNota; window.metodoRestaurar=metodoRestaurar;
 window.calcularIdade=calcularIdade; window.importarDados=importarDados;
 window.preencherCertAluno=preencherCertAluno; window.renderFin=renderFin;
