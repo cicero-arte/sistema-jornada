@@ -419,6 +419,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
   <button class="nav-btn" data-tela="crescimento" onclick="ir('crescimento',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> <span>Crescimento</span></button>
   <button class="nav-btn" data-tela="conteudo" onclick="ir('conteudo',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1"></circle></svg> <span>Conteúdo</span></button>
   <button class="nav-btn" data-tela="fases" onclick="ir('fases',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h5v-5h5v-5h5V6h3"></path></svg> <span>Fases</span></button>
+  <button class="nav-btn" data-tela="metodo" onclick="ir('metodo',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> <span>Método</span></button>
   <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> <span>Materiais</span></button>
   <button class="nav-btn" data-tela="certificados" onclick="ir('certificados',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg> <span>Certif.</span></button>
   <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg> <span>Avaliação</span></button>
@@ -434,6 +435,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
     <button class="nav-btn" data-tela="crescimento" onclick="ir('crescimento',this);fecharNavMenu()">📈 Crescimento</button>
     <button class="nav-btn" data-tela="conteudo" onclick="ir('conteudo',this);fecharNavMenu()">🌀 Conteúdo</button>
     <button class="nav-btn" data-tela="fases" onclick="ir('fases',this);fecharNavMenu()">🌱 Fases</button>
+    <button class="nav-btn" data-tela="metodo" onclick="ir('metodo',this);fecharNavMenu()">🧭 Método</button>
     <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this);fecharNavMenu()">📄 Materiais</button>
     <button class="nav-btn" data-tela="certificados" onclick="ir('certificados',this);fecharNavMenu()">🎓 Certificados</button>
     <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this);fecharNavMenu()">📋 Avaliação</button>
@@ -867,6 +869,10 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
             <option value="">— digitar manualmente —</option>
           </select>
         </div>
+        <div class="field">
+          <label>Nome no certificado (editável)</label>
+          <input id="cert-nome" type="text" placeholder="Escolha ao lado ou digite o nome" oninput="certAplicarNome(this.value)">
+        </div>
 
       </div>
       <div id="cert-nivel-wrap" style="display:none;margin-top:12px;">
@@ -929,7 +935,14 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
           </div>
         </div>
         <div class="field"><label>Data da avaliação</label><input id="aval-data" type="date"></div>
-        <div class="field"><label>Horas de prática (estimado)</label><input id="aval-horas" type="number" placeholder="ex: 48"></div>
+        <div class="field"><label>Horas de prática (estimado pela Frequência)</label>
+          <div style="display:flex;gap:6px;">
+            <input id="aval-horas" type="number" min="0" step="0.5" placeholder="ex: 48" oninput="avalMarcarHorasManual()">
+            <button type="button" class="btn btn-neutral" onclick="avalRecalcHoras()" title="Recalcular a partir da aba Frequência">↻ Recalcular</button>
+          </div>
+          <div id="aval-horas-info" style="font-size:11px;color:var(--ink-muted);margin-top:4px;line-height:1.4;">Escolha o aluno para estimar. Você pode corrigir o valor.</div>
+        </div>
+        <div class="field"><label>Duração de cada encontro (horas)</label><input id="aval-h-enc" type="number" min="0.5" step="0.5" value="1" oninput="avalRecalcHoras()"></div>
       </div>
     </div>
 
@@ -991,6 +1004,14 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <div style="font-size:13px;color:var(--ink-muted);">Selecione as notas para ver o resultado</div>
     </div>
 
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px;">
+      <div class="sec-title">Fotos dos desenhos (opcional)</div>
+      <div style="font-size:12px;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">As imagens entram no relatório e na impressão. Elas ficam apenas nesta tela e não são salvas no sistema. Use "Limpar avaliação" para recomeçar.</div>
+      <input type="file" accept="image/*" multiple onchange="avalAddFotos(this)">
+      <div id="aval-fotos-status" style="font-size:12px;color:var(--ink-muted);margin-top:6px;"></div>
+      <div id="aval-fotos-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:10px;"></div>
+    </div>
+
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
       <button class="btn btn-neutral" onclick="avalReset()">↺ Limpar avaliação</button>
     </div>
@@ -1016,10 +1037,41 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
         <div class="aval-rel-linha"><span class="aval-rel-linha-label">Nível alcançado</span><span id="aval-rel-nivel-badge" class="aval-rel-nivel-badge">—</span></div>
         <div id="aval-rel-nivel-desc" style="font-size:13px;font-weight:700;color:var(--ink);text-align:right;margin-top:4px;line-height:1.5;"></div>
       </div>
+      <div class="aval-rel-secao" id="aval-rel-fotos-sec" style="display:none;">
+        <div class="aval-rel-secao-titulo">Registro visual dos desenhos</div>
+        <div id="aval-rel-fotos" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"></div>
+      </div>
       <div class="aval-rel-rodape" id="aval-rel-rodape"></div>
       <div style="margin-top:14px;">
         <button class="btn btn-neutral" onclick="avalImprimir()">🖨️ Imprimir relatório</button>
       </div>
+    </div>
+  </div>
+
+  <div class="tela" id="tela-metodo">
+    <div class="sec-title">Método e objetivo do curso</div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-bottom:14px;line-height:1.5;">Tudo aqui é editável e salvo automaticamente. A IA do sistema lê o objetivo, o método e as anotações recentes ao responder.</div>
+
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;">
+      <div class="sec-title">Objetivo do curso</div>
+      <textarea id="met-objetivo" rows="3" oninput="metodoEditar('objetivo',this.value);autoGrow(this)" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:'Lato',sans-serif;font-size:14px;line-height:1.6;box-sizing:border-box;resize:vertical;"></textarea>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <div class="sec-title" style="margin:0;">Método</div>
+        <button class="btn btn-neutral" style="padding:5px 10px;font-size:12px;" onclick="metodoRestaurar()">Restaurar texto inicial</button>
+      </div>
+      <textarea id="met-texto" rows="20" oninput="metodoEditar('texto',this.value);autoGrow(this)" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;font-family:'Lato',sans-serif;font-size:14px;line-height:1.65;box-sizing:border-box;resize:vertical;"></textarea>
+      <div id="met-status" style="font-size:11px;color:var(--ink-muted);margin-top:6px;"></div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;">
+      <div class="sec-title">Anotações sobre o método</div>
+      <div style="font-size:12px;color:var(--ink-muted);margin-bottom:8px;line-height:1.5;">Registre observações, ajustes e resultados com data. Elas ajudam a validar o método ao longo do tempo.</div>
+      <textarea id="met-nota" rows="3" placeholder="Escreva uma anotação..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:'Lato',sans-serif;font-size:14px;line-height:1.5;box-sizing:border-box;resize:vertical;"></textarea>
+      <div style="margin-top:8px;"><button class="btn btn-primary" onclick="metodoAddNota()">Adicionar anotação</button></div>
+      <div id="met-notas" style="margin-top:12px;"></div>
     </div>
   </div>
 
@@ -1275,7 +1327,8 @@ function _payload(){
     cfg: JSON.stringify(cfg),
     vrSet: JSON.stringify([...vrSet]),
     folhas: JSON.stringify(folhas),
-    avulsos: JSON.stringify(avulsos)
+    avulsos: JSON.stringify(avulsos),
+    metodo: JSON.stringify((metodoGarantir(), metodo))
   };
 }
 
@@ -1337,6 +1390,8 @@ async function carregar(){
       if(d.vrSet) vrSet = new Set(JSON.parse(d.vrSet));
       if(d.folhas) folhas = JSON.parse(d.folhas);
       if(d.avulsos) avulsos = JSON.parse(d.avulsos);
+      if(d.metodo) { try{ metodo = JSON.parse(d.metodo); }catch(e){ metodo = null; } }
+      metodoGarantir();
       migrarTemasAntigos();
     }
   }catch(e){ console.error('Erro ao carregar:', e); }
@@ -1353,6 +1408,53 @@ let alunos=[
 ];
 let pid=5,statusItens={},notasItens={},filtros=new Set(['todos']);
 let folhas=[];
+let metodo=null;
+const METODO_OBJ=`A evolução do desenho do aluno, respeitando o seu estilo, com materiais básicos, simples e acessíveis. Cores e materiais diferentes podem ser usados, mas não fazem parte do objetivo.`;
+const METODO_TXT=`OBSERVAÇÕES AO LONGO DE 12 MESES
+
+Habilidade no traço e coordenação motora fina: em adultos, é teoricamente mais fácil trabalhar com exercícios repetidos de linhas e formas. Em crianças e adolescentes, esse tipo de exercício pode ser entediante. O grupo das altas habilidades não pode ser descartado: precisa de desafios avançados e, ao mesmo tempo, de manter o prazer no desenho, muitas vezes a ludicidade.
+
+Desenhar o que se sabe e não o que se vê: em todas as fases esse é um grande desafio, pois todos desenham o que já está armazenado no cérebro e não o que estão vendo. Quanto mais novo o aluno, maior a tendência de se apegar aos símbolos, que são a base do seu desenho. Se um cubo é colocado em uma posição que mostra três faces, o aluno desenha um cubo de três faces, mas não o que está vendo. Seria o mesmo que pedir um cubo de três faces sem mostrar o cubo real: o resultado seria igual nas duas situações. O cérebro já conhece a forma e tende a economizar esforço ou nos poupar de frustrações, transmitindo ao braço apenas o que interessa, que é desenhar um cubo. O aluno segue as instruções certinho, mas nunca desenha exatamente o que vê (o cubo na perspectiva exata, com as sombras exatas e no ângulo exato, como uma reprodução fotográfica).
+
+Volume e perspectiva: para trabalhar formas é importante ter alguma noção de perspectiva, porém o ensino de linhas de fuga e pontos de fuga é complexo demais para iniciantes, e ainda mais difícil para crianças e adolescentes. Nessa faixa de idade, antes de ensinar o conceito é preciso familiarizar a criança com os aspectos do volume, sem se prender a regras. Aos poucos, inserir o conhecimento mais técnico. Este método serve para todas as idades, porém em adultos a evolução deve ser mais rápida.
+
+Altas habilidades e frustração: pessoas com altas habilidades tendem a buscar conhecimento o tempo todo e em diversas fontes, e costumam desenvolver uma forma própria de aprender, o que se reflete no desenho. Quando aprendem a fazer um desenho muito bem de um jeito, buscam o aperfeiçoamento daquele jeito incansavelmente. Se recebem elogios, isso vira combustível para continuar no que aprenderam, limitando os desafios àquela forma. Se experimentam algo que expõe uma habilidade inferior ao que costumam mostrar, isso gera frustração e medo de parecer uma fraude. O resultado é rigidez no aprendizado: o aluno quer evoluir, mas tem uma "reputação" a zelar e não pode expor isso.
+Exemplo comum: a pessoa aprende a fazer veículos de lado, o desenho gera elogios e ela aprimora o traço, o uso de cores e materiais. Até tenta fazer o carro em outros ângulos, mas se o esforço é grande e o resultado fica aquém do que está acostumada, e isso ameaça o seu combustível, começa de forma inconsciente a resistir a tudo que a tire da zona de conforto. A grande maioria costuma desistir das aulas por não conseguir resultados expressivos. Em grande parte a responsabilidade é do professor, pois é obrigação dele perceber o que está acontecendo e buscar soluções.
+
+MÉTODO PARA ATENDER DIVERSAS IDADES E FASES DO DESENHO
+
+1. Pedir que o aluno desenhe em uma folha algo ou situação que nos dias anteriores o tenha deixado feliz. Pode ser uma coisa ou diversas, qualquer coisa, mas tudo tem que ficar em uma folha, e pode e deve ocupar os espaços vazios de toda a folha. É provável que o aluno faça rápido. Se sobrar muito tempo, passar um personagem de que ele goste para copiar ou pintar (crianças e adolescentes). Se for adulto, pedir para copiar um objeto. Com isso o aluno ocupa o restante da aula e treina.
+
+2. Na preparação da próxima aula, pegar um elemento por vez do desenho feito em sala e preparar uma evolução sutil do que o próprio aluno fez, dividida em etapas:
+2.1. Colocar o desenho feito pelo aluno como referência do passo inicial.
+2.2. Aprimorar de forma sutil o mesmo desenho, deixando o aprimoramento bem clarinho para que o aluno possa desenhar por cima.
+2.3. Na mesma folha, o aluno copia ao lado o que acabou de fazer.
+2.4. No caderno, faz o mesmo desenho, desta vez de memória.
+2.5. Se quiser, pode pintar o desenho, mas antes tirar uma foto. Se a pintura ficar boa, tirar nova foto.
+2.6. Em aulas posteriores, pedir para desenhar o mesmo elemento principal da aula anterior, para testar o aprendizado.
+
+Altas habilidades e superdotação: essas etapas podem ser entediantes e nada desafiadoras, principalmente a cópia por cima. Em muitos casos o aluno já tem boa coordenação motora. O aprimoramento não deve ser clarinho, deve estar na opacidade normal. Peça apenas para reproduzir o aprimoramento na folha seguinte, colocando o desenho em outro contexto (situação ou história).
+
+ESTRUTURA DA AULA
+
+Aquecimento (5 min): riscar uma folha A4 conforme modelo no quadro. Retas paralelas, inclinadas. Retas onduladas. Círculos e elipses.
+Atividade do dia (30 a 40 min): conforme demanda.
+Sobrando tempo: cópia de um personagem favorito ou de um objeto. Se for adulto, objeto é prioridade.
+
+SOBRE AS EVIDÊNCIAS
+
+Não há estudo que teste essa sequência exata. O que existe apoia partes dela: o erro de desenhar "o que se sabe" em vez do que se vê (Cohen e Bennett) e o ganho motor fino com intervenções curtas e regulares em crianças pequenas (Akin, Winslow). O contorno cego e outras técnicas de Edwards têm base fraca. Por isso a sequência é uma hipótese de trabalho, e a prova virá dos registros da turma: folha, caderno e fotos datados, mais o desenho de memória refeito na aula seguinte sem aviso.
+
+CUIDADOS PRÁTICOS
+
+Um elemento por aluno por ciclo. A pintura em casa serve como medida de engajamento, com a ressalva de que a ausência pode ser falta de material ou tempo. Para altas habilidades, aprofundar em vez de acelerar. Não esperar salto rápido na percepção, que é mais gradual e depende do desenvolvimento de cada aluno.`;
+function metodoGarantir(){
+  if(!metodo||typeof metodo!=='object') metodo={objetivo:METODO_OBJ,texto:METODO_TXT,notas:[]};
+  if(!Array.isArray(metodo.notas)) metodo.notas=[];
+  if(typeof metodo.objetivo!=='string') metodo.objetivo=METODO_OBJ;
+  if(typeof metodo.texto!=='string') metodo.texto=METODO_TXT;
+}
+
 let avulsos=[];
 const cores=['#d4825a','#7a9e87','#6b9ab8','#9b7db5','#c9a84c','#5a9e9a','#b5604a','#8a6a9a'];
 
@@ -1587,6 +1689,65 @@ const orientacoes={
 const nucleos=[{id:'linha',tipo:'pilar',cor:'#d4825a',titulo:'Linha e gesto',sub:'Pilar técnico',itens:['Aquecimento','Tipos de traço','Linhas retas','Curvas paralelas','Arcos paralelos','Círculos','Molas e ondas','Ziguezagues','Linha viva','Esboço rápido','Gestual']},{id:'forma',tipo:'pilar',cor:'#7a9e87',titulo:'Forma e proporção',sub:'Pilar técnico',itens:['Geométricas 2D','Geométricas 3D','Simplificação','Proporção do corpo','Escala','Cilindro','Esfera','Cubo']},{id:'perspectiva',tipo:'pilar',cor:'#c9a84c',titulo:'Perspectiva e espaço',sub:'Pilar técnico',itens:['1 ponto de fuga','2 pontos de fuga','3 pontos de fuga','Isométrica','Intuitiva','Profundidade','Composição','Figura-fundo']},{id:'luz',tipo:'pilar',cor:'#6b9ab8',titulo:'Luz e sombra',sub:'Pilar técnico',itens:['Fonte de luz','Sombra própria','Sombra projetada','Gradação de valores','Volume 3D','Hachura tonal','Escala de cinza','Esfera','Cubo','Cilindro','Cone','Prisma']},{id:'materiais',tipo:'pilar',cor:'#9b7db5',titulo:'Materiais e superfícies',sub:'Pilar técnico',itens:['Grafite','Lapiseira','Carvão','Nanquim','Lápis de cor','Aquarela','Pastel','Textura com linhas','Textura cruzada','Zentangle','Mandala']},{id:'cor',tipo:'pilar',cor:'#5a9e9a',titulo:'Cor',sub:'Pilar técnico',itens:['Círculo cromático','Psicologia das cores','Técnica lápis de cor','Primárias','Secundárias','Harmonia']},{id:'obs',tipo:'tema',cor:'#d4825a',titulo:'Observação',sub:'Tema disparador',itens:['Maçã','Ovo','Cadeira','Jarro','Latinha','Banana','Boneco articulado','Natureza morta','Slow drawing','Cotidiano']},{id:'figura',tipo:'tema',cor:'#7a9e87',titulo:'Figura humana',sub:'Tema disparador',itens:['Proporção','Poses rápidas','Expressão facial','Mãos','Movimento','Gestual','Anatomia básica']},{id:'anime',tipo:'tema',cor:'#c9a84c',titulo:'Anime / Mangá',sub:'Tema disparador',itens:['Kawai','Chibi','Anime','Proporção anime','Expressões anime','Olhos','Cabelo','Dinâmica']},{id:'cartoon',tipo:'tema',cor:'#6b9ab8',titulo:'Cartoon',sub:'Tema disparador',itens:['Pessoas','Pets','Animais selvagens','Transportes','Expressões cartoon']},{id:'natureza',tipo:'tema',cor:'#9b7db5',titulo:'Natureza e paisagem',sub:'Tema disparador',itens:['Árvores','Rochas','Água','Nuvens','Perspectiva atmosférica','Paisagem urbana','Casa colonial']},{id:'narrativa',tipo:'tema',cor:'#5a9e9a',titulo:'Narrativa e personagem',sub:'Tema disparador',itens:['Criação de personagem','Expressões','Quadrinhos','Storyboard','Cenário','Cena em camadas']},{id:'caricatura',tipo:'tema',cor:'#b5604a',titulo:'Caricatura',sub:'Tema disparador',itens:['Anatomia da cabeça','Proporção','Evidenciando características','Expressões','Esboço','Acabamento']},{id:'digital',tipo:'tema',cor:'#8a8a8a',titulo:'Digital e IA',sub:'Tema disparador (sob demanda)',itens:['Hardware','Software','Esboço digital','Finalização','Planejamento com IA','Prompt','Retoque','Upscale']}];
 
 
+
+// ── MÉTODO E OBJETIVO ────────────────────────────────
+function renderMetodo(){
+  metodoGarantir();
+  var o=document.getElementById('met-objetivo'), t=document.getElementById('met-texto');
+  if(!o||!t) return;
+  o.value=metodo.objetivo; t.value=metodo.texto;
+  autoGrow(o); autoGrow(t);
+  var st=document.getElementById('met-status');
+  st.textContent = metodo.atualizado ? 'Última alteração em ' + new Date(metodo.atualizado).toLocaleString('pt-BR') : 'Texto inicial. Edite à vontade, o salvamento é automático.';
+  renderMetodoNotas();
+}
+function metodoEditar(campo,v){
+  metodoGarantir();
+  metodo[campo]=v;
+  metodo.atualizado=new Date().toISOString();
+  var st=document.getElementById('met-status');
+  if(st) st.textContent='Alterado agora, salvando...';
+  salvar();
+}
+function renderMetodoNotas(){
+  var el=document.getElementById('met-notas');
+  if(!el) return;
+  if(!metodo.notas.length){ el.innerHTML='<div style="font-size:12px;color:var(--ink-muted);">Nenhuma anotação ainda.</div>'; return; }
+  el.innerHTML=metodo.notas.map(function(n){
+    var d=new Date(n.data+'T12:00:00').toLocaleDateString('pt-BR');
+    var tx=String(n.texto).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>');
+    return '<div style="border-top:1px solid var(--border);padding:10px 0;display:flex;gap:10px;justify-content:space-between;align-items:flex-start;">'+
+      '<div style="font-size:13px;line-height:1.55;"><b style="font-size:11px;color:var(--ink-muted);">'+d+'</b><br>'+tx+'</div>'+
+      '<button class="btn btn-neutral" style="padding:3px 9px;font-size:11px;flex-shrink:0;" onclick="metodoDelNota('+n.id+')">Excluir</button></div>';
+  }).join('');
+}
+function metodoAddNota(){
+  metodoGarantir();
+  var i=document.getElementById('met-nota'), v=i.value.trim();
+  if(!v) return;
+  var hoje=new Date(); var iso=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
+  metodo.notas.unshift({id:Date.now(),data:iso,texto:v});
+  metodo.atualizado=new Date().toISOString();
+  i.value='';
+  salvar(); renderMetodoNotas();
+}
+function metodoDelNota(id){
+  if(!confirm('Excluir esta anotação?')) return;
+  metodo.notas=metodo.notas.filter(function(n){return n.id!==id;});
+  salvar(); renderMetodoNotas();
+}
+function metodoRestaurar(){
+  if(!confirm('Voltar o objetivo e o método ao texto inicial? As suas edições nesses dois campos serão substituídas. As anotações não mudam.')) return;
+  metodoGarantir();
+  metodo.objetivo=METODO_OBJ; metodo.texto=METODO_TXT; metodo.atualizado=new Date().toISOString();
+  salvar(); renderMetodo();
+}
+function iaBlocoMetodo(){
+  metodoGarantir();
+  var notas=metodo.notas.slice(0,10).map(function(n){return '- '+n.data+': '+n.texto;}).join('\n');
+  return '\n\nMÉTODO E OBJETIVO REGISTRADOS PELO PROFESSOR (aba Método, versão atual, tratar como hipótese de trabalho em validação):\nOBJETIVO: '+metodo.objetivo+'\n\nMÉTODO:\n'+metodo.texto+(notas?'\n\nANOTAÇÕES RECENTES SOBRE O MÉTODO:\n'+notas:'');
+}
+
 // ── CERTIFICADOS ─────────────────────────────────────
 const certModelos = {
   participacao: {
@@ -1598,11 +1759,13 @@ const certModelos = {
   competencia: {
     titulo: 'Certificado de Avaliação Artística',
     subtitulo: 'Certificação Artística por Competência',
-    texto: 'Certificamos que [Nome do Aluno] apresentou seu Sketchbook de Desenho de Observação e foi avaliado conforme critérios de regularidade, técnica, observação, exploração criativa e evolução.\nDe acordo com o resultado desta avaliação, o aluno(a) alcançou o Nível [NÍVEL], demonstrando progresso artístico consistente.',
+    texto: 'Certificamos que [Nome do Aluno] apresentou seu Sketchbook na Jornada do Desenho e foi avaliado conforme critérios de regularidade, técnica, observação, exploração criativa e evolução.\nDe acordo com o resultado desta avaliação, o aluno(a) alcançou o Nível [NÍVEL], demonstrando progresso artístico consistente.',
     nivel: true
   }
 };
 let certAtivo = 'participacao';
+let certNomeAtual = '';
+let certNivelAtual = '';
 
 function trocarCert(tipo) {
   certAtivo = tipo;
@@ -1615,21 +1778,39 @@ function trocarCert(tipo) {
   document.getElementById('cert-btn-' + (tipo === 'participacao' ? 'participacao' : 'competencia')).classList.add('ativo');
   // reset nivel buttons
   document.querySelectorAll('.cert-nivel-btn').forEach(b => b.classList.remove('ativo'));
+  certNomeAtual = '';
+  certNivelAtual = '';
+  const nm = document.getElementById('cert-nome');
+  if (nm && nm.value.trim()) certAplicarNome(nm.value);
+}
+
+function certAplicarNome(nome) {
+  const txt = document.getElementById('cert-texto');
+  nome = (nome || '').trim();
+  const novo = nome || '[Nome do Aluno]';
+  const antigo = certNomeAtual || '[Nome do Aluno]';
+  if (txt.value.indexOf(antigo) !== -1) txt.value = txt.value.split(antigo).join(novo);
+  else txt.value = txt.value.split('[Nome do Aluno]').join(novo);
+  certNomeAtual = nome;
 }
 
 function selecionarNivel(btn, nivel) {
   document.querySelectorAll('.cert-nivel-btn').forEach(b => b.classList.remove('ativo'));
   btn.classList.add('ativo');
   const txt = document.getElementById('cert-texto');
-  txt.value = txt.value.replace(/\[NÍVEL\]|Fundamentos|Desenvolvimento|Avançado|Profissional/, nivel);
+  const antigo = certNivelAtual || '[NÍVEL]';
+  if (txt.value.indexOf(antigo) !== -1) txt.value = txt.value.split(antigo).join(nivel);
+  else txt.value = txt.value.split('[NÍVEL]').join(nivel);
+  certNivelAtual = nivel;
 }
 
 function preencherCertAluno(id) {
   if (!id) return;
   const a = alunos.find(x => x.id === parseInt(id));
   if (!a) return;
-  const txt = document.getElementById('cert-texto');
-  txt.value = txt.value.replace(/\[Nome do Aluno\]/g, a.nome);
+  const nm = document.getElementById('cert-nome');
+  if (nm) nm.value = a.nome;
+  certAplicarNome(a.nome);
 }
 
 function popularCertAlunos() {
@@ -1641,6 +1822,8 @@ function popularCertAlunos() {
 }
 
 function resetarCert() {
+  const nm = document.getElementById('cert-nome');
+  if (nm) nm.value = '';
   trocarCert(certAtivo);
   document.getElementById('cert-sel-aluno').value = '';
   document.getElementById('cert-local').value = '';
@@ -1911,7 +2094,7 @@ function gerarMeses(){const nomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ag
 function mesAtual(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
 function popularMeses(){const meses=gerarMeses();const mc=mesAtual();['mes-freq','mes-fin'].forEach(id=>{const s=document.getElementById(id);s.innerHTML=meses.map(m=>`<option value="${m.val}"${m.val===mc?' selected':''}>${m.label}</option>`).join('');});}
 
-function ir(id,btn){document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));document.getElementById('tela-'+id).classList.add('ativa');document.querySelectorAll('.nav-btn[data-tela="'+id+'"]').forEach(b=>b.classList.add('ativo'));if(id==='gestao')renderAlunos();if(id==='frequencia')renderFreq();if(id==='financeiro')renderFin();if(id==='renovacao')renInit();if(id==='crescimento')renderCrescimento();if(id==='materiais')renderMateriais();if(id==='conteudo'){renderFiltros();renderMapa();}if(id==='fases')renderFases();if(id==='config')preencherConfig();if(id==='certificados')popularCertAlunos();if(id==='email')popularEmailChips();if(id==='avaliacao')avalRender();if(id==='ia'){const inp=document.getElementById('ia-input');if(inp)setTimeout(()=>inp.focus(),100);}}
+function ir(id,btn){document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));document.getElementById('tela-'+id).classList.add('ativa');document.querySelectorAll('.nav-btn[data-tela="'+id+'"]').forEach(b=>b.classList.add('ativo'));if(id==='gestao')renderAlunos();if(id==='frequencia')renderFreq();if(id==='financeiro')renderFin();if(id==='renovacao')renInit();if(id==='crescimento')renderCrescimento();if(id==='materiais')renderMateriais();if(id==='conteudo'){renderFiltros();renderMapa();}if(id==='fases')renderFases();if(id==='config')preencherConfig();if(id==='certificados')popularCertAlunos();if(id==='email')popularEmailChips();if(id==='avaliacao')avalRender();if(id==='metodo')renderMetodo();if(id==='ia'){const inp=document.getElementById('ia-input');if(inp)setTimeout(()=>inp.focus(),100);}}
 function toggleNavMenu(){const m=document.getElementById('nav-menu');m.classList.toggle('aberto');document.getElementById('hamburger').textContent=m.classList.contains('aberto')?'✕':'☰';}
 function fecharNavMenu(){const m=document.getElementById('nav-menu');m.classList.remove('aberto');document.getElementById('hamburger').textContent='☰';}
 
@@ -3137,7 +3320,8 @@ function imprimirContrato(){const c=document.getElementById('contrato-html').inn
 
 
 async function exportarDados(){
-  const backup={alunos,pid,statusItens,notasItens,cfg,exportadoEm:new Date().toLocaleString('pt-BR')};
+  metodoGarantir();
+  const backup={alunos,pid,statusItens,notasItens,cfg,metodo,exportadoEm:new Date().toLocaleString('pt-BR')};
   const json=JSON.stringify(backup,null,2);
   const now=new Date();
   const data=now.toISOString().slice(0,10);
@@ -3192,6 +3376,7 @@ function importarDados(input){
       statusItens=backup.statusItens||{};
       notasItens=backup.notasItens||{};
       if(backup.cfg) cfg={...cfg,...backup.cfg};
+      if(backup.metodo) metodo=backup.metodo;
       salvar();
       renderAlunos();
       preencherConfig();
@@ -3278,7 +3463,7 @@ function avalCalcular() {
 }
 
 function avalGerarRelatorio(total, nivel) {
-  var nome = document.getElementById('aval-nome').value.trim() || '—';
+  var nome = (document.getElementById('aval-nome').value.trim() || document.getElementById('aval-nome-busca').value.trim()) || '—';
   var dataVal = document.getElementById('aval-data').value;
   var horas = document.getElementById('aval-horas').value;
   var meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -3307,11 +3492,104 @@ function avalGerarRelatorio(total, nivel) {
   }
   document.getElementById('aval-rel-criterios').innerHTML = html;
   document.getElementById('aval-rel-rodape').textContent = 'Este relatório é um registro de avaliação pedagógica. CL Design Gráfico & Ilustração — cicero.art.br';
+  avalRenderRelFotos();
   document.getElementById('aval-relatorio').classList.add('visivel');
+}
+
+
+// ── Horas de prática estimadas pela Frequência ──
+var avalAlunoSel = null;
+var avalHorasManual = false;
+function avalContarPresencas(a) {
+  var n = 0, f = (a && a.freq) || {};
+  for (var k in f) { if (/-p$/.test(k) && f[k] === true) n++; }
+  return n;
+}
+function avalMarcarHorasManual() {
+  avalHorasManual = true;
+  var info = document.getElementById('aval-horas-info');
+  if (info) info.textContent = 'Valor corrigido por você. Use "Recalcular" para voltar à estimativa da Frequência.';
+}
+function avalEstimarHoras(forcar) {
+  var info = document.getElementById('aval-horas-info');
+  var inp = document.getElementById('aval-horas');
+  var a = alunos.find(function(x){ return x.id === avalAlunoSel; });
+  if (!a) { if (info) info.textContent = 'Escolha o aluno na lista para estimar pela Frequência. Você pode digitar o valor.'; return; }
+  if (avalHorasManual && !forcar) return;
+  var dur = parseFloat(document.getElementById('aval-h-enc').value) || 1;
+  var n = avalContarPresencas(a);
+  var h = Math.round(n * dur * 10) / 10;
+  inp.value = n ? h : '';
+  info.textContent = n
+    ? (n + ' presença(s) marcada(s) na Frequência × ' + dur + ' h = ' + h + ' h. Você pode corrigir o valor.')
+    : 'Nenhuma presença marcada na aba Frequência para este aluno. Digite o valor manualmente.';
+}
+function avalRecalcHoras() {
+  avalHorasManual = false;
+  avalEstimarHoras(true);
+  if (document.getElementById('aval-relatorio').classList.contains('visivel')) avalCalcular();
+}
+
+// ── Fotos dos desenhos no relatório ──
+var avalFotos = [];
+function avalFotoParaDataUrl(file) {
+  return materiaisComprimirImagem(file).then(function(blob){
+    return new Promise(function(res, rej){
+      var r = new FileReader();
+      r.onload = function(){ res(r.result); };
+      r.onerror = rej;
+      r.readAsDataURL(blob);
+    });
+  });
+}
+async function avalAddFotos(input) {
+  var files = Array.prototype.slice.call(input.files || []);
+  if (!files.length) return;
+  var st = document.getElementById('aval-fotos-status');
+  st.textContent = 'Preparando ' + files.length + ' imagem(ns)...';
+  for (var i = 0; i < files.length; i++) {
+    try {
+      var url = await avalFotoParaDataUrl(files[i]);
+      avalFotos.push({ src: url, leg: '' });
+    } catch (e) { console.error('Erro na foto', e); }
+  }
+  st.textContent = '';
+  input.value = '';
+  avalRenderFotos();
+}
+function avalRemoverFoto(i) { avalFotos.splice(i, 1); avalRenderFotos(); }
+function avalLegendaFoto(i, v) { if (avalFotos[i]) avalFotos[i].leg = v; avalRenderRelFotos(); }
+function avalRenderFotos() {
+  var el = document.getElementById('aval-fotos-lista');
+  if (!el) return;
+  el.innerHTML = avalFotos.map(function(f, i){
+    return '<div style="border:1px solid var(--border);border-radius:10px;padding:8px;background:#fff;">' +
+      '<img src="' + f.src + '" alt="Foto do desenho ' + (i+1) + '" style="width:100%;height:130px;object-fit:contain;background:#f6f4f0;border-radius:6px;">' +
+      '<input type="text" value="' + f.leg.replace(/"/g,'&quot;') + '" placeholder="Legenda (ex: folha, caderno, pintura)" ' +
+      'oninput="avalLegendaFoto(' + i + ',this.value)" style="width:100%;margin-top:6px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:Lato,sans-serif;font-size:12px;box-sizing:border-box;">' +
+      '<button type="button" class="btn btn-neutral" style="margin-top:6px;padding:4px 10px;font-size:12px;" onclick="avalRemoverFoto(' + i + ')">Remover</button>' +
+      '</div>';
+  }).join('');
+  avalRenderRelFotos();
+}
+function avalRenderRelFotos() {
+  var sec = document.getElementById('aval-rel-fotos-sec');
+  var box = document.getElementById('aval-rel-fotos');
+  if (!sec || !box) return;
+  if (!avalFotos.length) { sec.style.display = 'none'; box.innerHTML = ''; return; }
+  sec.style.display = 'block';
+  box.innerHTML = avalFotos.map(function(f){
+    var leg = f.leg ? f.leg.replace(/</g,'&lt;') : '';
+    return '<figure style="margin:0;"><img src="' + f.src + '" alt="" style="width:100%;height:180px;object-fit:contain;background:#f6f4f0;border:1px solid var(--border);border-radius:6px;">' +
+      (leg ? '<figcaption style="font-size:11px;color:var(--ink-muted);text-align:center;margin-top:4px;">' + leg + '</figcaption>' : '') + '</figure>';
+  }).join('');
 }
 
 function avalReset() {
   avalNotas = {};
+  avalAlunoSel = null; avalHorasManual = false; avalFotos = [];
+  var hi = document.getElementById('aval-horas-info'); if (hi) hi.textContent = 'Escolha o aluno para estimar. Você pode corrigir o valor.';
+  avalRenderFotos();
   document.getElementById('aval-nome').value = '';
   document.getElementById('aval-nome-busca').value = '';
   document.getElementById('aval-horas').value = '';
@@ -3344,7 +3622,7 @@ function avalImprimir() {
     '@page{margin:1.2cm;size:A4 landscape;}' +
     '@page{margin-header:0;margin-footer:0;}' +
     'html,body{margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
-    'body{font-family:Arial,sans-serif;font-size:11.5px;color:#222;line-height:1.45;max-width:100%;overflow:hidden;}' +
+    'body{font-family:Arial,sans-serif;font-size:11.5px;color:#222;line-height:1.45;max-width:100%;}' +
     'h1{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:#888;text-align:center;margin:0 0 3px 0;}' +
     'h2{font-size:15px;font-weight:900;color:#222;margin:0 0 10px 0;padding-bottom:8px;border-bottom:2px solid #eee;}' +
     '.secao{margin-bottom:10px;}' +
@@ -3374,6 +3652,10 @@ function avalImprimir() {
     '<div class="linha"><span class="label">Nível alcançado</span><span class="badge">' + nivelLabel + '</span></div>' +
     (nivelDesc ? '<div style="font-size:11.5px;font-weight:700;color:#222;text-align:right;margin-top:3px;line-height:1.4;">' + nivelDesc + '</div>' : '') +
     '</div>' +
+    (avalFotos.length ? '<div class="secao" style="page-break-inside:avoid;"><div class="secao-titulo">Registro visual dos desenhos</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">' +
+      avalFotos.map(function(f){ return '<figure style="margin:0;"><img src="' + f.src + '" style="width:100%;height:150px;object-fit:contain;background:#f6f4f0;border:1px solid #e4e4e4;border-radius:4px;">' +
+        (f.leg ? '<figcaption style="font-size:9.5px;color:#777;text-align:center;margin-top:3px;">' + f.leg.replace(/</g,'&lt;') + '</figcaption>' : '') + '</figure>'; }).join('') +
+      '</div></div>' : '') +
     '<div class="rodape">' + rodape + '</div>' +
     '<'+'script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<'+'/script>' +
     '</body></html>';
@@ -3384,6 +3666,7 @@ function avalImprimir() {
 }
 
 function avalFiltrarBusca() {
+  document.getElementById('aval-nome').value = document.getElementById('aval-nome-busca').value.trim();
   const q = document.getElementById('aval-nome-busca').value.toLowerCase().trim();
   const drop = document.getElementById('aval-lista-drop');
   const sorted = [...alunos].sort((a,b) => a.nome.localeCompare(b.nome,'pt-BR'));
@@ -3412,6 +3695,10 @@ function avalSelecionarAluno(id) {
   document.getElementById('aval-nome-busca').value = a.nome;
   document.getElementById('aval-nome').value = a.nome;
   document.getElementById('aval-lista-drop').style.display = 'none';
+  avalAlunoSel = a.id;
+  avalHorasManual = false;
+  avalEstimarHoras(true);
+  if (document.getElementById('aval-relatorio').classList.contains('visivel')) avalCalcular();
 }
 
 function avalToggleEscala() {
@@ -3748,6 +4035,15 @@ RELATÓRIOS COM BASE CIENTÍFICA E PEDAGÓGICA:
 Ao emitir relatórios sobre alunos, turmas ou o andamento das aulas, fundamente as observações em literatura pedagógica reconhecida (Bruner, Piaget, Vygotsky, Wallon) e em evidências observáveis descritas pelo professor, evitando afirmações genéricas ou clichês.
 Toda sugestão de atividade, adaptação ou intervenção precisa indicar, em poucas palavras, o pilar técnico envolvido e, quando pertinente, o princípio teórico que a sustenta (currículo em espiral de Bruner, zona de desenvolvimento proximal de Vygotsky, estágios de desenvolvimento de Piaget, dimensão afetivo-motora de Wallon). Cite o teórico só quando o princípio realmente sustenta a sugestão, nunca como enfeite ou credencial. Se não houver base clara para uma sugestão, diga isso em vez de inventar justificativa.
 
+
+VALIDAÇÃO DO MÉTODO E DOCUMENTOS CIENTÍFICOS:
+O professor está registrando e testando um método próprio (texto completo na aba Método, anexado ao final destas instruções). Trate-o como hipótese de trabalho em validação, nunca como fato comprovado.
+- Não há estudo que teste a sequência exata do método. Apoiam partes dela: o erro de desenhar o que se sabe em vez do que se vê (Cohen e Bennett) e o ganho motor fino com intervenções curtas e regulares em crianças pequenas (Akin, Winslow). O contorno cego e outras técnicas de Edwards têm base fraca. Essas referências vieram do professor: confirme autores, ano e fonte antes de qualquer publicação.
+- Nunca invente citação, autor, ano, DOI ou resultado de pesquisa. Se não tiver certeza de uma referência, diga que não tem e oriente a verificar.
+- Quando o professor pedir um documento científico (relato de experiência, estudo de caso, projeto de pesquisa, artigo), use estrutura acadêmica: título, resumo, introdução e problema, fundamentação teórica, método (etapas, amostra, instrumentos), resultados, discussão, limitações, conclusão e referências. Use linguagem impessoal e separe sempre o que foi observado e registrado do que é interpretação.
+- Evidências a coletar para validar: folha, caderno e fotos datados de cada etapa, o desenho de memória refeito na aula seguinte sem aviso e o registro de frequência. Oriente a coleta consistente, um elemento por aluno por ciclo.
+- A maioria dos alunos é menor de idade: em documentos científicos ou publicações, use identificação anonimizada (iniciais ou código) e lembre da necessidade de consentimento dos responsáveis para uso de imagens e dados.
+- A evolução é gradual e depende de cada aluno: não crie expectativa de salto rápido. Para altas habilidades, aprofundar em vez de acelerar. A ausência da pintura feita em casa pode ser falta de material ou de tempo, não desinteresse.
 
 Ordem de prioridade nas decisões e recomendações:
 1. Preservar a integridade do aluno
@@ -4089,7 +4385,7 @@ async function iaEnviar() {
     const response = await fetch('https://jornada-ia.cicero-arte.workers.dev/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey: cfg.apiKey, model: 'claude-sonnet-4-5', max_tokens: 8192, system: IA_SYSTEM, messages: iaHistorico })
+      body: JSON.stringify({ apiKey: cfg.apiKey, model: 'claude-sonnet-4-5', max_tokens: 8192, system: IA_SYSTEM + iaBlocoMetodo(), messages: iaHistorico })
     });
     const data = await response.json();
     if (data.error) throw new Error(data.error.message || 'Erro da API');
@@ -4238,6 +4534,11 @@ window.selecionarNivel=selecionarNivel; window.setPag=setPag; window.toggleCard=
 window.toggleFreqCard=toggleFreqCard; window.toggleFreq=toggleFreq;
 window.toggleNavMenu=toggleNavMenu; window.renInit=renInit; window.renRender=renRender; window.renPrev=renPrev; window.renCopiar=renCopiar; window.renZap=renZap; window.renMail=renMail; window.trocarCert=trocarCert; window.verContrato=verContrato;
 window.fecharNavMenu=fecharNavMenu; window.autoGrow=autoGrow;
+window.avalFiltrarBusca=avalFiltrarBusca; window.avalMostrarLista=avalMostrarLista; window.avalOcultarLista=avalOcultarLista;
+window.emailFiltrarBusca=emailFiltrarBusca; window.emailMostrarLista=emailMostrarLista; window.emailOcultarLista=emailOcultarLista;
+window.certAplicarNome=certAplicarNome; window.avalRecalcHoras=avalRecalcHoras; window.avalMarcarHorasManual=avalMarcarHorasManual;
+window.avalAddFotos=avalAddFotos; window.avalRemoverFoto=avalRemoverFoto; window.avalLegendaFoto=avalLegendaFoto;
+window.renderMetodo=renderMetodo; window.metodoEditar=metodoEditar; window.metodoAddNota=metodoAddNota; window.metodoDelNota=metodoDelNota; window.metodoRestaurar=metodoRestaurar;
 window.calcularIdade=calcularIdade; window.importarDados=importarDados;
 window.preencherCertAluno=preencherCertAluno; window.renderFin=renderFin;
 window.renderFreq=renderFreq; window.toggleVRInline=toggleVRInline; window.toggleVRPanel=toggleVRPanel;
