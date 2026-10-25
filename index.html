@@ -1826,64 +1826,76 @@ function resetarCert() {
 }
 
 function imprimirCert() {
-  // Fill nome if selected
-
-
+  // Impressão nativa do navegador: o texto sai como texto (nítido) e não como imagem,
+  // o que evita troca de fonte e letras sobrepostas do html2canvas.
   const area = document.getElementById('cert-area');
+  const W = Math.round(area.getBoundingClientRect().width);
+  const clone = area.cloneNode(true);
+  const origEls = area.querySelectorAll('*');
+  const cloneEls = clone.querySelectorAll('*');
 
-  // IDs and their CSS classes for replacement
-  const campos = [
-    {id:'cert-titulo',    tag:'div', cls:'cert-field-titulo'},
-    {id:'cert-subtitulo', tag:'div', cls:'cert-field-subtitulo'},
-    {id:'cert-texto',     tag:'div', cls:'cert-field-texto', pre:true},
-    {id:'cert-local',     tag:'span', cls:'cert-campo-input'},
-    {id:'cert-dia',       tag:'span', cls:'cert-campo-input'},
-    {id:'cert-mes',       tag:'span', cls:'cert-campo-input'},
-    {id:'cert-ano',       tag:'span', cls:'cert-campo-input'},
-  ];
-
-  // Replace each field with a static element
-  const restored = [];
-  campos.forEach(c => {
-    const el = document.getElementById(c.id);
-    if (!el) return;
-    const val = el.value || el.placeholder || '';
-    const clone = document.createElement(c.tag);
-    clone.className = el.className;
-    clone.style.cssText = el.style.cssText;
-    clone.id = c.id + '_static';
-    if (c.pre) {
-      // preserve line breaks for textarea
-      clone.style.whiteSpace = 'pre-wrap';
-      clone.textContent = val;
-    } else {
-      clone.textContent = val;
-    }
-    el.parentNode.insertBefore(clone, el);
-    el.style.display = 'none';
-    restored.push({el, clone});
+  // Fixa em px o tamanho resolvido de cada elemento (as fontes usam clamp com vw)
+  origEls.forEach((o, i) => {
+    const c = cloneEls[i];
+    if (!c || o.tagName === 'IMG') return;
+    const cs = getComputedStyle(o);
+    c.style.fontSize = cs.fontSize;
+    c.style.lineHeight = cs.lineHeight;
+    c.style.fontFamily = cs.fontFamily;
+    c.style.fontWeight = cs.fontWeight;
+    c.style.letterSpacing = cs.letterSpacing;
   });
 
-  // Capture
-  setTimeout(() => {
-    html2canvas(area, {
-      scale: 3,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: null,
-      logging: false
-    }).then(canvas => {
-      // Restore original fields
-      restored.forEach(({el, clone}) => {
-        el.style.display = '';
-        clone.parentNode.removeChild(clone);
-      });
-      const imgData = canvas.toDataURL('image/png');
-      const w = window.open('', '_blank');
-      w.document.write('<!DOCTYPE html><html><head><style>@page{margin:0;size:A4 landscape;}body{margin:0;padding:0;}img{width:297mm;height:210mm;display:block;}</style></head><body><img src="' + imgData + '"><'+'script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<'+'/script></body></html>');
-      w.document.close();
-    });
-  }, 150);
+  // Troca campos de formulário por texto estático
+  origEls.forEach((o, i) => {
+    const c = cloneEls[i];
+    if (!c) return;
+    const tag = o.tagName;
+    if (tag !== 'INPUT' && tag !== 'TEXTAREA') return;
+    const el = document.createElement('div');
+    el.className = o.className;
+    el.style.cssText = c.style.cssText;
+    el.style.background = 'transparent';
+    el.style.height = 'auto';
+    el.style.overflow = 'visible';
+    const val = o.value || o.placeholder || '';
+    if (tag === 'TEXTAREA') {
+      el.style.whiteSpace = 'pre-wrap';
+      el.style.width = '100%';
+    } else {
+      el.style.display = 'inline-block';
+      el.style.width = o.getBoundingClientRect().width + 'px';
+      el.style.minHeight = '1.3em';
+      el.style.textAlign = 'center';
+    }
+    el.textContent = val;
+    c.parentNode.replaceChild(el, c);
+  });
+
+  // CSS do app (inclui a fonte Lato) para manter a mesma aparência
+  let css = '';
+  document.querySelectorAll('style').forEach(st => { css += st.textContent + '\n'; });
+  // remove as regras @media print do app (escondem todo o conteúdo na impressão)
+  css = css.replace(/@media\s+print\s*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '');
+
+  const k = (297 / 25.4 * 96) / W; // escala para ocupar 297 mm de largura
+  const html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Certificado</title>' +
+    '<style>' + css + '</style>' +
+    '<style>' +
+    '@page{margin:0;size:A4 landscape;}' +
+    'html,body{margin:0;padding:0;background:#fff;width:297mm;height:210mm;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+    'body{display:block;padding:0;}' +
+    '.cp{width:' + W + 'px;transform:scale(' + k + ');transform-origin:0 0;}' +
+    '.cp .cert-preview-wrap{width:' + W + 'px;max-width:none;margin:0;}' +
+    '.cp .cert-preview-wrap img.cert-bg{border-radius:0;}' +
+    '</style></head><body><div class="cp">' + clone.outerHTML + '</div>' +
+    '<' + 'script>window.onload=function(){var go=function(){setTimeout(function(){window.focus();window.print();},400);};' +
+    'var feito=false;var once=function(){if(!feito){feito=true;go();}};if(document.fonts&&document.fonts.ready){document.fonts.ready.then(once);setTimeout(once,3000);}else{once();}};<' + '/script></body></html>';
+
+  const w = window.open('', '_blank');
+  if (!w) { alert('O navegador bloqueou a janela de impressão. Permita pop-ups para este site e tente de novo.'); return; }
+  w.document.write(html);
+  w.document.close();
 }
 
 
