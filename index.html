@@ -3157,6 +3157,16 @@ function salvarEdicaoFolha(){
 }
 
 function salvarRPS(v){localStorage.setItem('jd_rps',v);}
+const NFSE_DESC='PRESTAÇÃO DE SERVIÇOS EDUCACIONAIS E DE TREINAMENTO, MODALIDADE LIVRE, REFERENTES A AULAS DE DESENHO DO MÊS';
+function nfseDescPadrao(){document.getElementById('nfse-desc').value=NFSE_DESC;}
+function nfseCopiar(id,btn,soNum){
+  let v=document.getElementById(id).value; if(soNum) v=v.replace('R$','').trim();
+  const ok=()=>{const t=btn.textContent;btn.textContent='Copiado!';setTimeout(()=>btn.textContent=t,1200);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(ok).catch(()=>{});}
+  else{const x=document.createElement('textarea');x.value=v;document.body.appendChild(x);x.select();try{document.execCommand('copy');ok();}catch(e){}x.remove();}
+}
+window.nfseDescPadrao=nfseDescPadrao; window.nfseCopiar=nfseCopiar;
+
 
 function abrirNFSe(aid, mes){
   const a = alunos.find(x=>x.id===aid);
@@ -3170,8 +3180,7 @@ function abrirNFSe(aid, mes){
   const dataFmt = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`;
   document.getElementById('nfse-cliente').value = resp.toUpperCase();
   document.getElementById('nfse-valor').value = `R$ ${valorTotal.toFixed(2).replace('.',',')}`;
-  document.getElementById('nfse-data').value = dataFmt;
-  document.getElementById('nfse-rps').value = localStorage.getItem('jd_rps') || '';
+  nfseDescPadrao();
   document.getElementById('overlay-nfse').classList.remove('hidden');
 }
 
@@ -3191,8 +3200,7 @@ function abrirNFSeAvulso(id){
   const dataFmt = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
   document.getElementById('nfse-cliente').value = cliente.toUpperCase();
   document.getElementById('nfse-valor').value = `R$ ${(av.valor||0).toFixed(2).replace('.',',')}`;
-  document.getElementById('nfse-data').value = dataFmt;
-  document.getElementById('nfse-rps').value = localStorage.getItem('jd_rps') || '';
+  nfseDescPadrao();
   document.getElementById('overlay-nfse').classList.remove('hidden');
 }
 
@@ -4561,90 +4569,47 @@ window.setAlunosFiltroStatus=setAlunosFiltroStatus; window.mudarStatusAluno=muda
 window.abrirNFSeAvulso=abrirNFSeAvulso;
 </script>
 
-<!-- POPUP NFSe MODELO -->
+<!-- POPUP NFSe MODELO (emissor nacional, Simples Nacional) -->
 <div id="overlay-nfse" class="overlay hidden" onclick="if(event.target===this)fecharNFSe()">
-  <div class="modal" style="max-width:680px;padding:0;overflow:hidden;">
-
-    <!-- Cabeçalho verde -->
+  <div class="modal" style="max-width:760px;padding:0;overflow:hidden;">
     <div style="background:#c8dfc8;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-weight:700;font-size:15px;color:#2a4a2a;">Emitir NFSe — modelo de referência</span>
+      <span style="font-weight:700;font-size:15px;color:#2a4a2a;">Emitir NFS-e (Emissor Nacional) · modelo de referência</span>
       <button onclick="fecharNFSe()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#2a4a2a;">✕</button>
     </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px;font-family:Arial,sans-serif;">
 
-    <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
-
-      <!-- Cliente -->
-      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Cliente</label>
-          <input id="nfse-cliente" type="text" readonly style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#f5f5f5;box-sizing:border-box;font-family:Arial,sans-serif;">
-        </div>
-        <button style="padding:8px 16px;background:#7aad7a;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:700;cursor:default;white-space:nowrap;">Cadastrar novo cliente</button>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;">
+        <div style="position:relative;border:1px solid #bbb;border-radius:6px;background:#fff;padding:16px 10px 6px;"><span style="position:absolute;top:4px;left:10px;font-size:10px;color:#666;">Cliente</span>
+          <div style="display:flex;gap:6px;align-items:center;"><input id="nfse-cliente" type="text" readonly style="width:100%;border:none;outline:none;font-size:13px;background:transparent;box-sizing:border-box;font-family:Arial,sans-serif;"><button type="button" onclick="nfseCopiar('nfse-cliente',this)" style="border:1px solid #b3c9f0;background:#e8f0fb;color:#3a6bc4;border-radius:4px;font-size:11px;padding:2px 8px;cursor:pointer;">Copiar</button></div></div>
+        <button type="button" style="padding:10px 16px;background:#6cc24a;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:default;white-space:nowrap;">Cadastrar novo cliente</button>
       </div>
 
-      <!-- Valor / Situação / Atividade -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:10px;">
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Valor R$*</label>
-          <input id="nfse-valor" type="text" readonly style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#f5f5f5;text-align:right;box-sizing:border-box;font-family:Arial,sans-serif;">
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Situação*</label>
-          <select id="nfse-situacao" style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#fff;box-sizing:border-box;font-family:Arial,sans-serif;">
-            <option>TRIBUTADO NO PRESTADOR</option>
-            <option>ISENTA</option>
-            <option>TRIBUTADA NO TOMADOR</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Atividade*</label>
-          <select id="nfse-atividade" style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:12px;background:#fff;box-sizing:border-box;font-family:Arial,sans-serif;">
-            <option>8.02 - Instrução, treinamento, orientação pedagógica e vocacional, avaliação de conhecimentos de qualquer natureza. | Anexo III - 6%</option>
-          </select>
-        </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;">
+        <div style="position:relative;border:1px solid #bbb;border-radius:6px;background:#fff;padding:16px 10px 6px;"><span style="position:absolute;top:4px;left:10px;font-size:10px;color:#666;">Valor R$ *</span>
+          <div style="display:flex;gap:6px;align-items:center;"><input id="nfse-valor" type="text" readonly style="width:100%;border:none;outline:none;font-size:13px;background:transparent;box-sizing:border-box;font-family:Arial,sans-serif;"><button type="button" onclick="nfseCopiar('nfse-valor',this,true)" style="border:1px solid #b3c9f0;background:#e8f0fb;color:#3a6bc4;border-radius:4px;font-size:11px;padding:2px 8px;cursor:pointer;">Copiar</button></div></div>
+        <div style="position:relative;border:1px solid #bbb;border-radius:6px;background:#fff;padding:16px 10px 6px;"><span style="position:absolute;top:4px;left:10px;font-size:10px;color:#666;">Situação *</span>
+          <select id="nfse-situacao" style="width:100%;border:none;outline:none;font-size:13px;background:transparent;box-sizing:border-box;font-family:Arial,sans-serif;"><option>NÃO RETIDO</option><option>RETIDO</option></select></div>
+        <div style="position:relative;border:1px solid #bbb;border-radius:6px;background:#fff;padding:16px 10px 6px;"><span style="position:absolute;top:4px;left:10px;font-size:10px;color:#666;">Atividade *</span>
+          <select id="nfse-atividade" style="width:100%;border:none;outline:none;font-size:13px;background:transparent;box-sizing:border-box;font-family:Arial,sans-serif;font-size:12px;"><option>8.02 - Instrução, treinamento, orientação pedagógica e vocacional, avaliação de conhecimentos de qualquer natureza. | Anexo III - 6%</option></select></div>
       </div>
 
-      <!-- Descrição -->
       <div>
-        <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Descrição da NFSe</label>
-        <textarea rows="3" style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#fff;resize:vertical;box-sizing:border-box;font-family:Arial,sans-serif;">PRESTAÇÃO DE SERVIÇOS EDUCACIONAIS E DE TREINAMENTO, MODALIDADE LIVRE, REFERENTES A AULAS DE DESENHO OBSERVACIONAL.</textarea>
+        <div style="position:relative;border:1px solid #bbb;border-radius:6px;background:#fff;padding:16px 10px 6px;"><span style="position:absolute;top:4px;left:10px;font-size:10px;color:#666;">Descrição da NFSe *</span>
+          <textarea id="nfse-desc" rows="4" style="width:100%;border:none;outline:none;font-size:13px;background:transparent;box-sizing:border-box;font-family:Arial,sans-serif;resize:vertical;"></textarea></div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+          <button type="button" onclick="nfseDescPadrao()" style="padding:7px 14px;background:#4a90d9;color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;">Selecionar descrição anterior</button>
+          <button type="button" onclick="nfseCopiar('nfse-desc',this)" style="padding:7px 14px;background:#e8f0fb;color:#3a6bc4;border:1px solid #b3c9f0;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;">Copiar descrição</button>
+        </div>
+        <div style="font-size:11px;color:#888;margin-top:6px;">Texto editável: complete com o mês e o ano de referência antes de copiar.</div>
       </div>
 
-      <!-- Informação Complementar -->
-      <div>
-        <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Informação Complementar da NFSe</label>
-        <textarea rows="3" style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#fff;resize:vertical;box-sizing:border-box;font-family:Arial,sans-serif;">EMPRESA OPTANTE PELO SIMPLES NACIONAL</textarea>
-        <div style="font-size:10px;color:#888;margin-top:4px;">*Caso o imposto seja retido (Situação = Tributada no Tomador), será acrescentado automaticamente no final do texto abaixo o seguinte conteúdo: "VALOR RETIDO DO ISS: ?,??"</div>
+      <label style="display:flex;align-items:center;gap:10px;font-size:12px;color:#333;cursor:pointer;"><input type="checkbox" style="width:34px;height:18px;"> Serviço/fornecimento prestado é um caso de exportação</label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:12px;color:#333;cursor:pointer;"><input type="checkbox" style="width:34px;height:18px;"> Vincular um DPS nesta NFSe</label>
+
+      <div style="border-top:1px solid #eee;padding-top:12px;display:flex;justify-content:flex-end;align-items:center;gap:16px;">
+        <button type="button" onclick="fecharNFSe()" style="background:none;border:none;font-size:13px;font-weight:700;color:#1a3a5a;cursor:pointer;">Cancelar</button>
+        <button type="button" style="padding:9px 18px;background:#4a90d9;color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:700;cursor:default;">Emitir nota fiscal</button>
       </div>
-
-      <!-- RPS -->
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:10px;align-items:end;">
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Número RPS</label>
-          <input id="nfse-rps" type="text" placeholder="Nº RPS" onchange="salvarRPS(this.value)" style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#fff;box-sizing:border-box;font-family:Arial,sans-serif;">
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Série RPS</label>
-          <input type="text" value="3" style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#fff;box-sizing:border-box;font-family:Arial,sans-serif;">
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Data RPS</label>
-          <input id="nfse-data" type="text" readonly style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#f5f5f5;box-sizing:border-box;font-family:Arial,sans-serif;">
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#666;display:block;margin-bottom:4px;">Obs:</label>
-          <input type="text" style="width:100%;padding:8px 10px;border:1px solid #bbb;border-radius:4px;font-size:13px;background:#fff;box-sizing:border-box;font-family:Arial,sans-serif;">
-        </div>
-      </div>
-
-      <div style="font-size:11px;color:#c00;">Aviso: o prazo para cancelamento da mesma é de 24 horas após a emissão!</div>
-
-      <!-- Botões -->
-      <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;">
-        <button onclick="fecharNFSe()" style="padding:10px 22px;background:#fff;border:1px solid #bbb;border-radius:4px;font-size:13px;cursor:pointer;font-family:Arial,sans-serif;">Cancelar</button>
-        <button style="padding:10px 22px;background:#4a90d9;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:700;cursor:default;font-family:Arial,sans-serif;">Emitir nota fiscal</button>
-      </div>
-
     </div>
   </div>
 </div>
