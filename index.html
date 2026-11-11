@@ -465,6 +465,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <button class="btn btn-primary btn-sm" onclick="abrirModal()">+ Novo aluno</button>
     </div>
     <div id="matriculas-novas"></div>
+    <div id="backup-aviso"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
       <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;flex-wrap:wrap;">
         <button id="alunos-btn-ativo" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('ativo')">Ativos</button>
@@ -797,7 +798,18 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
     <button class="btn btn-primary" onclick="salvarConfig()">Salvar configurações</button>
     <div class="config-section" style="margin-top:16px;">
       <div class="config-section-title">Backup dos dados</div>
-      <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.6;">Os dados ficam salvos no seu navegador. Faça exportações periódicas para não perder nada caso o navegador seja limpo ou o computador precise ser formatado.</p>
+      <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.6;">Os dados ficam no Firebase (Google), que também guarda cópias automáticas do banco. Aqui o app guarda uma cópia completa no seu computador: sozinho, na pasta escolhida, ou na hora, pelo botão "Exportar backup".</p>
+      <div style="background:var(--card);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:8px;">Backup automático no computador</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-neutral" onclick="escolherPastaBackup()">📁 Escolher pasta</button>
+          <select id="backup-freq" onchange="mudarFreqBackup(this.value)" style="padding:8px;border-radius:8px;border:1px solid var(--border);font-family:inherit;">
+            <option value="1">Uma vez por dia</option>
+            <option value="7">Uma vez por semana</option>
+          </select>
+        </div>
+        <div id="backup-auto-info" style="margin-top:8px;font-size:12px;color:var(--ink-muted);line-height:1.5;"></div>
+      </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="exportarDados()">⬇️ Exportar backup</button>
         <button class="btn btn-neutral" onclick="document.getElementById('input-importar').click()">⬆️ Importar backup</button>
@@ -3432,14 +3444,18 @@ function copiarContrato(){navigator.clipboard.writeText(document.getElementById(
 function imprimirContrato(){const c=document.getElementById('contrato-html').innerHTML;const j=window.open('','_blank');j.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Contrato</title><style>body{font-family:\'Times New Roman\',serif;font-size:13px;line-height:1.8;color:#111;padding:40px;max-width:800px;margin:0 auto;}h2{text-align:center;font-size:15px;letter-spacing:1px;margin-bottom:20px;}h3{font-size:13px;font-weight:bold;margin:18px 0 6px;}p{margin-bottom:10px;text-align:justify;}.rodape{margin-top:40px;border-top:1px solid #ccc;padding-top:16px;font-size:11px;color:#666;text-align:center;}@media print{@page{margin:2cm;}}</style></head><body>'+c+'</body></html>');j.document.close();setTimeout(()=>j.print(),400);}
 
 
-async function exportarDados(){
+// Tudo o que o app grava em sistema/dados (antes ficavam de fora folhas, avulsos e vrSet).
+function dadosBackup(){
   metodoGarantir();
-  const backup={alunos,pid,statusItens,notasItens,cfg:_cfgSemChave(),metodo,exportadoEm:new Date().toLocaleString('pt-BR')};
-  const json=JSON.stringify(backup,null,2);
+  return {versaoBackup:2,alunos,pid,statusItens,notasItens,cfg:_cfgSemChave(),vrSet:[...vrSet],folhas,avulsos,metodo,exportadoEm:new Date().toLocaleString('pt-BR')};
+}
+function nomeBackup(){
   const now=new Date();
-  const data=now.toISOString().slice(0,10);
-  const hora=now.toTimeString().slice(0,8).replace(/:/g,'-');
-  const nomeArquivo='jornada_backup_'+data+'_'+hora+'.json';
+  return 'jornada_backup_'+now.toISOString().slice(0,10)+'_'+now.toTimeString().slice(0,8).replace(/:/g,'-')+'.json';
+}
+async function exportarDados(){
+  const json=JSON.stringify(dadosBackup(),null,2);
+  const nomeArquivo=nomeBackup();
 
   if(window.showSaveFilePicker){
     try{
@@ -3450,6 +3466,7 @@ async function exportarDados(){
       const writable=await handle.createWritable();
       await writable.write(json);
       await writable.close();
+      marcarBackupFeito();
       document.getElementById('backup-info').textContent='Backup salvo em '+new Date().toLocaleString('pt-BR');
     }catch(err){
       if(err.name==='AbortError'){
@@ -3470,6 +3487,7 @@ async function exportarDados(){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  marcarBackupFeito();
   document.getElementById('backup-info').textContent='Backup exportado em '+new Date().toLocaleString('pt-BR')+' (navegador sem suporte a escolha de pasta, foi para a pasta de Downloads padrão)';
 }
 
@@ -3490,6 +3508,9 @@ function importarDados(input){
       notasItens=backup.notasItens||{};
       if(backup.cfg) cfg={...cfg,...backup.cfg};
       if(backup.metodo) metodo=backup.metodo;
+      if(Array.isArray(backup.vrSet)) vrSet=new Set(backup.vrSet);
+      if(Array.isArray(backup.folhas)) folhas=backup.folhas;
+      if(Array.isArray(backup.avulsos)) avulsos=backup.avulsos;
       salvar();
       renderAlunos();
       preencherConfig();
@@ -3521,6 +3542,7 @@ function iniciar(){
     popularMeses();
     renderAlunos();
     verificarMatriculas();
+    verificarBackupAuto();
   });
 }
 iniciar();
@@ -4683,6 +4705,73 @@ window.confirmarAluno = function(){
   _confirmarAlunoOriginal();
   if (pend && alunos.length > antes) { _matriculaEmCadastro = null; marcarMatriculaImportada(pend); }
 };
+// ── BACKUP AUTOMÁTICO NO COMPUTADOR ──────────────────────
+// Guarda a pasta escolhida (IndexedDB deste navegador) e, quando passa o prazo, grava sozinho
+// um arquivo de backup completo nela. Se o navegador pedir permissão de novo, mostra um botão.
+const BK_ULTIMO = 'jornada_backup_ultimo', BK_FREQ = 'jornada_backup_freq';
+function bkDb(){ return new Promise((ok, falha) => { const r = indexedDB.open('jornada-backup', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => ok(r.result); r.onerror = () => falha(r.error); }); }
+async function bkGet(k){ const db = await bkDb(); return new Promise(ok => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); }); }
+async function bkSet(k, v){ const db = await bkDb(); return new Promise(ok => { const tx = db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = () => ok(); tx.onerror = () => ok(); }); }
+function bkLer(k, padrao){ try { return localStorage.getItem(k) || padrao; } catch(e){ return padrao; } }
+function marcarBackupFeito(){ try { localStorage.setItem(BK_ULTIMO, new Date().toISOString()); } catch(e){} mostrarInfoBackup(); }
+function backupVencido(){
+  const ultimo = bkLer(BK_ULTIMO, ''), dias = Number(bkLer(BK_FREQ, '7')) || 7;
+  return !ultimo || (Date.now() - new Date(ultimo).getTime()) > (dias * 86400000 - 3600000);
+}
+async function mostrarInfoBackup(){
+  const el = document.getElementById('backup-auto-info'); if (!el) return;
+  const sel = document.getElementById('backup-freq'); if (sel) sel.value = bkLer(BK_FREQ, '7');
+  if (!window.showDirectoryPicker) { el.textContent = 'Este navegador não permite salvar sozinho numa pasta (use o Chrome ou o Edge no computador). Aqui, o app avisa quando estiver na hora e o backup vai para a pasta de Downloads com um clique.'; return; }
+  let pasta = null; try { pasta = await bkGet('pasta'); } catch(e){}
+  const ultimo = bkLer(BK_ULTIMO, '');
+  el.textContent = (pasta ? 'Pasta: ' + pasta.name + '. ' : 'Nenhuma pasta escolhida ainda. ') + (ultimo ? 'Último backup: ' + new Date(ultimo).toLocaleString('pt-BR') + '.' : 'Ainda não há backup registrado neste computador.');
+}
+async function gravarNaPasta(pasta){
+  const arq = await pasta.getFileHandle(nomeBackup(), { create: true });
+  const w = await arq.createWritable();
+  await w.write(JSON.stringify(dadosBackup(), null, 2));
+  await w.close();
+  marcarBackupFeito();
+}
+async function escolherPastaBackup(){
+  if (!window.showDirectoryPicker) { alert('Este navegador não permite escolher uma pasta. Use o Chrome ou o Edge no computador.'); return; }
+  try {
+    const pasta = await window.showDirectoryPicker({ id: 'jornada-backup', mode: 'readwrite' });
+    await bkSet('pasta', pasta);
+    await gravarNaPasta(pasta);
+    showToast();
+    document.getElementById('backup-aviso').innerHTML = '';
+  } catch(e) {
+    if (e.name !== 'AbortError') { console.error('Backup:', e); alert('Não foi possível usar essa pasta: ' + e.message); }
+  }
+}
+function mudarFreqBackup(v){ try { localStorage.setItem(BK_FREQ, v); } catch(e){} mostrarInfoBackup(); verificarBackupAuto(); }
+function avisoBackup(html){ const el = document.getElementById('backup-aviso'); if (el) el.innerHTML = html ? `<div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--brand-tint);border-radius:10px;padding:10px 14px;margin-bottom:10px;">${html}</div>` : ''; }
+async function verificarBackupAuto(){
+  mostrarInfoBackup();
+  if (!_dadosCarregados || !backupVencido()) { avisoBackup(''); return; }
+  let pasta = null;
+  if (window.showDirectoryPicker) { try { pasta = await bkGet('pasta'); } catch(e){} }
+  if (pasta) {
+    try {
+      if ((await pasta.queryPermission({ mode: 'readwrite' })) === 'granted') { await gravarNaPasta(pasta); avisoBackup(''); return; }
+    } catch(e) { console.warn('Backup automático:', e); }
+    avisoBackup('<span><b>Hora do backup.</b> O navegador pede a sua permissão para gravar na pasta "' + _escM(pasta.name) + '".</span><button class="btn btn-primary btn-sm" onclick="salvarBackupAgora()">Salvar backup</button>');
+    return;
+  }
+  if (window.showDirectoryPicker) avisoBackup('<span><b>Backup automático:</b> escolha uma vez a pasta do seu computador onde os backups serão guardados.</span><button class="btn btn-primary btn-sm" onclick="escolherPastaBackup()">Escolher pasta</button>');
+  else avisoBackup('<span><b>Hora do backup.</b> Clique para baixar a cópia completa dos dados.</span><button class="btn btn-primary btn-sm" onclick="exportarDados().then(()=>avisoBackup(\'\'))">Baixar backup</button>');
+}
+async function salvarBackupAgora(){
+  let pasta = null; try { pasta = await bkGet('pasta'); } catch(e){}
+  if (!pasta) return escolherPastaBackup();
+  try {
+    if ((await pasta.requestPermission({ mode: 'readwrite' })) !== 'granted') return;
+    await gravarNaPasta(pasta); avisoBackup(''); showToast();
+  } catch(e) { console.error('Backup:', e); alert('Não foi possível salvar o backup: ' + e.message); }
+}
+window.escolherPastaBackup = escolherPastaBackup; window.mudarFreqBackup = mudarFreqBackup;
+window.salvarBackupAgora = salvarBackupAgora; window.avisoBackup = avisoBackup; window.verificarBackupAuto = verificarBackupAuto;
 </script>
 
 <!-- POPUP NFSe MODELO (emissor nacional, Simples Nacional) -->
