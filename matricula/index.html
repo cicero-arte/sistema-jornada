@@ -87,7 +87,7 @@
         <h2 style="margin-top:22px">Endereço completo</h2>
         <p class="ajuda" style="margin-top:-6px">A Receita Federal não aceita endereço incompleto na nota fiscal. Preencha tudo o que existir no seu endereço.</p>
         <div class="linha">
-          <div class="campo"><label for="cep">CEP</label><input type="text" id="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"></div>
+          <div class="campo"><label for="cep">CEP</label><input type="text" id="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"><div class="ajuda" id="cepStatus">Digite o CEP: o resto do endereço aparece sozinho.</div></div>
           <div class="campo"><label for="uf">Estado (UF)</label><input type="text" id="uf" maxlength="2" placeholder="DF" autocomplete="address-level1" style="text-transform:uppercase"></div>
         </div>
         <div class="campo"><label for="logradouro">Rua, avenida ou quadra</label><input type="text" id="logradouro" maxlength="120" placeholder="ex.: Quadra 8" autocomplete="address-line1"></div>
@@ -195,6 +195,32 @@ function mascara(el, f) { el.addEventListener("input", () => { const v = f(soDig
 const fmtCpf = (d) => { d = d.slice(0, 11); return d.replace(/^(\d{3})(\d)/, "$1.$2").replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3").replace(/\.(\d{3})(\d{1,2})$/, ".$1-$2"); };
 const fmtCep = (d) => { d = d.slice(0, 8); return d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d; };
 
+// Endereço pelo CEP (ViaCEP). Só o CEP é enviado. Se falhar, a pessoa preenche à mão.
+let ultimoCep = "";
+async function buscarCep() {
+  const cep = soDigitos($("cep").value);
+  if (cep.length !== 8 || cep === ultimoCep) return;
+  ultimoCep = cep;
+  const st = $("cepStatus");
+  st.textContent = "Buscando o endereço...";
+  try {
+    const e = SIMULACAO
+      ? { logradouro: "Quadra Fictícia 8 Conjunto B", bairro: "Bairro Fictício", localidade: "Brasília", uf: "DF" }
+      : await (await fetch("https://viacep.com.br/ws/" + cep + "/json/")).json();
+    if (soDigitos($("cep").value) !== cep) return;
+    if (!e || e.erro) { st.textContent = "CEP não encontrado. Confira o número ou preencha o endereço à mão."; return; }
+    if (e.logradouro) $("logradouro").value = e.logradouro;
+    if (e.bairro) $("bairro").value = e.bairro;
+    if (e.localidade) $("cidade").value = e.localidade;
+    if (e.uf) $("uf").value = e.uf;
+    st.textContent = "Endereço encontrado. Confira e complete com número" + (e.logradouro ? "" : ", rua ou quadra") + " e o que mais houver.";
+    $(e.logradouro ? "numero" : "logradouro").focus();
+  } catch (err) {
+    console.warn("ViaCEP:", err);
+    ultimoCep = "";
+    st.textContent = "Não consegui buscar o endereço agora. Preencha à mão.";
+  }
+}
 function atualizar() {
   const outra = (document.querySelector("input[name=contratante]:checked") || {}).value === "outra";
   $("blocoOutra").hidden = !(convite && !convite.menor && outra);
@@ -251,6 +277,7 @@ async function enviar(ev, api) {
   $("blocoAdulto").hidden = convite.menor;
   $("avisoMenor").hidden = !convite.menor;
   mascara($("cpf"), fmtCpf); mascara($("cep"), fmtCep);
+  $("cep").addEventListener("input", buscarCep);
   $("form").addEventListener("input", atualizar); $("form").addEventListener("change", atualizar);
   $("form").addEventListener("submit", (ev) => enviar(ev, api));
   atualizar();
