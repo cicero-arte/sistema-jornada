@@ -584,6 +584,8 @@ async function carregar() {
 }
 function desenharLista() {
   const grupos = { revisar: ["aguardando", "fila", "analisando", "erro", "pronto"], aprovado: ["aprovado"], enviado: ["enviado", "matriculado"], todas: null };
+  const novidades = inscricoes.filter(i => !i.status).length + inscricoes.filter(i => i.matriculaDados && !i.matriculaDados.importado).length;
+  if ($("areaRelatorio").hidden) document.title = (novidades ? "(" + novidades + ") " : "") + "Inscrições | Jornada do Desenho";
   const vis = inscricoes.filter(i => !grupos[filtro] || grupos[filtro].includes(situacao(i)));
   [...$("abas").children].forEach(b => b.setAttribute("aria-pressed", String(b.dataset.filtro === filtro)));
   if (!vis.length) { $("lista").innerHTML = `<p class="sub">Nenhuma inscrição aqui.</p>`; return; }

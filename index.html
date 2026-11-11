@@ -41,6 +41,10 @@ body{padding:0 16px;}
 .nav-salvar.salvando{opacity:0.6;cursor:wait;}
 .nav-salvar.erro{background:#fdf0ef;border-color:#f5c6c2;color:var(--red);}
 .nav-hamburger{display:none;}
+.ponto-novidade{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;margin-left:auto;border-radius:99px;background:#d93025;color:#fff;font-size:11px;font-weight:900;line-height:1;}
+.ponto-novidade[hidden]{display:none;}
+.nav-hamburger.tem-novidade{position:relative;}
+.nav-hamburger.tem-novidade::after{content:"";position:absolute;top:10px;right:2px;width:9px;height:9px;border-radius:50%;background:#d93025;}
 .nav-menu{display:none;}
 .app{background:var(--card);border-radius:0 12px 12px 0;border:1px solid var(--border);border-left:none;flex:1;min-width:0;}
 .tela{display:none;padding:20px;}
@@ -430,7 +434,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
   <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> <span>Materiais</span></button>
   <button class="nav-btn" data-tela="certificados" onclick="ir('certificados',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg> <span>Certif.</span></button>
   <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg> <span>Avaliação</span></button>
-  <a class="nav-btn" href="inscricoes.html" style="text-decoration:none"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg> <span>Inscrições</span></a>
+  <a class="nav-btn" href="inscricoes.html" style="text-decoration:none"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg> <span>Inscrições</span><b class="ponto-novidade" hidden></b></a>
   <button class="nav-btn" data-tela="email" onclick="ir('email',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> <span>E-mail</span></button>
   <button class="nav-btn" data-tela="ia" onclick="ir('ia',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg> <span>IA</span></button>
   <button class="nav-btn" data-tela="config" onclick="ir('config',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> <span>Config</span></button>
@@ -447,7 +451,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
     <button class="nav-btn" data-tela="materiais" onclick="ir('materiais',this);fecharNavMenu()">📄 Materiais</button>
     <button class="nav-btn" data-tela="certificados" onclick="ir('certificados',this);fecharNavMenu()">🎓 Certificados</button>
     <button class="nav-btn" data-tela="avaliacao" onclick="ir('avaliacao',this);fecharNavMenu()">📋 Avaliação</button>
-    <a class="nav-btn" href="inscricoes.html" style="text-decoration:none">🖊️ Inscrições</a>
+    <a class="nav-btn" href="inscricoes.html" style="text-decoration:none">🖊️ Inscrições <b class="ponto-novidade" hidden></b></a>
     <button class="nav-btn" data-tela="email" onclick="ir('email',this);fecharNavMenu()">✉️ E-mail</button>
     <button class="nav-btn" data-tela="ia" onclick="ir('ia',this);fecharNavMenu()">🤖 IA</button>
     <button class="nav-btn" data-tela="config" onclick="ir('config',this);fecharNavMenu()">⚙️ Config</button>
@@ -4612,9 +4616,19 @@ async function verificarMatriculas(){
     const porCodigo = {};
     ins.docs.forEach(d => { const x = d.data(); if (x.matricula && x.matricula.codigo) porCodigo[x.matricula.codigo] = { id: d.id, ...x }; });
     _matriculasNovas = ms.docs.filter(m => !m.data().importado && porCodigo[m.id]).map(m => ({ codigo: m.id, m: m.data(), ins: porCodigo[m.id] }));
+    // Ponto vermelho no menu: inscrições ainda sem a sua revisão + matrículas novas.
+    const aRevisar = ins.docs.filter(d => !d.data().status).length;
+    marcarNovidades(aRevisar + _matriculasNovas.length);
   }catch(e){ console.error('Matrículas novas:', e); _matriculasNovas = []; }
   renderMatriculasNovas();
 }
+function marcarNovidades(n){
+  document.querySelectorAll('.ponto-novidade').forEach(el => { el.textContent = n > 9 ? '9+' : String(n); el.hidden = !n; el.title = n + (n === 1 ? ' novidade' : ' novidades') + ' em Inscrições'; });
+  const h = document.getElementById('hamburger'); if (h) h.classList.toggle('tem-novidade', n > 0);
+  document.title = (n ? '(' + n + ') ' : '') + document.title.replace(/^\(\d+\+?\) /, '');
+}
+// Confere de novo a cada 5 minutos enquanto o app estiver aberto.
+setInterval(() => { if (auth.currentUser) verificarMatriculas(); }, 5 * 60 * 1000);
 function renderMatriculasNovas(){
   const el = document.getElementById('matriculas-novas'); if (!el) return;
   el.innerHTML = _matriculasNovas.map((x, i) => `<div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#FEF3E2;border-radius:10px;padding:10px 14px;margin-bottom:10px;">
@@ -4658,6 +4672,7 @@ async function marcarMatriculaImportada(x){
   }catch(e){ console.error('Não foi possível marcar a matrícula como adicionada:', e); }
   _matriculasNovas = _matriculasNovas.filter(y => y !== x);
   renderMatriculasNovas();
+  verificarMatriculas();
 }
 window.abrirMatriculaNova = abrirMatriculaNova;
 const _abrirModalOriginal = abrirModal, _editarAlunoOriginal = editarAluno, _confirmarAlunoOriginal = confirmarAluno;

@@ -169,11 +169,9 @@
       </ul>
       <p>Como funciona:</p>
       <ul class="lista">
-        <li>São 3 desenhos, nesta ordem: 1. uma pessoa de corpo inteiro fazendo alguma coisa; 2. uma paisagem com chão e céu; 3. um objeto da casa, desenhado olhando para ele.</li>
-        <li>A proposta exata de cada desenho só aparece quando ele começa.</li>
+        <li>São 3 desenhos. Cada proposta só aparece na hora em que o desenho começa.</li>
         <li>Cada desenho tem 10 minutos. Faça do seu jeito, não existe certo ou errado.</li>
         <li>No fim, fotografe só a folha, de cima, sem rostos na foto. Você tem 5 minutos para enviar.</li>
-        <li>No terceiro desenho, aparece o objeto da casa que você vai desenhar olhando para ele. Se não tiver esse objeto, dá para trocar por outro. Os 10 minutos só começam depois que você pegar o objeto.</li>
         <li>O aluno desenha sozinho. Os adultos podem ajudar só com a câmera.</li>
       </ul>
     </div>
@@ -297,6 +295,8 @@ const FIREBASE = {
 };
 // Chave pública do reCAPTCHA Enterprise para o App Check. Vazia: App Check desligado.
 const RECAPTCHA_ENTERPRISE_KEY = "";
+// Aviso ao professor (WhatsApp ou e-mail) pelo Worker. Sem dados pessoais. Se falhar, nada muda para quem usa.
+const AVISO_URL = "https://jornada-avaliacao.cicero-arte.workers.dev/aviso";
 const VERSAO_AVISO = "2026-11";
 // Opções padrão. As que valem são as do professor, em "Ajustes" na área de inscrições
 // (documento publico/inscricao); estas só são usadas se aquele documento não puder ser lido.
@@ -420,7 +420,15 @@ async function criarApiFirebase() {
       await new Promise((ok, falha) => tarefa.on("state_changed", s => progresso(s.bytesTransferred / s.totalBytes), falha, ok));
       await F.setDoc(F.doc(db, "inscricoes", u, "envios", String(n)), { enviadoEm: F.serverTimestamp(), tamanho: blob.size });
     },
-    async novaPessoa() { await auth.authStateReady(); await A.signOut(auth); }
+    async novaPessoa() { await auth.authStateReady(); await A.signOut(auth); },
+    async avisar(tipo) {
+      if (EMULADOR) return;
+      try {
+        await auth.authStateReady();
+        const tk = await auth.currentUser.getIdToken();
+        await fetch(AVISO_URL, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tk }, body: JSON.stringify({ tipo }) });
+      } catch (e) { console.warn("Aviso ao professor não enviado:", e); }
+    }
   };
 }
 function criarApiSimulacao() {
@@ -430,7 +438,8 @@ function criarApiSimulacao() {
     async criarInscricao() { await espera(500); return "simulacao"; },
     async iniciarRodada() { await espera(300); },
     async enviarFoto(n, blob, progresso) { for (let i = 1; i <= 10; i++) { await espera(120); progresso(i / 10); } },
-    async novaPessoa() {}
+    async novaPessoa() {},
+    async avisar() {}
   };
 }
 
@@ -700,7 +709,11 @@ function prazoPerdido() {
 }
 function proximaEtapa(texto) {
   pararCamera();
-  if (est.rodada >= 2) { est.etapa = "fim"; gravarEstado(); mostrarFim(); return; }
+  if (est.rodada >= 2) {
+    est.etapa = "fim"; gravarEstado(); mostrarFim();
+    if (!est.avisado && est.enviada.some(x => x === true)) { est.avisado = true; gravarEstado(); api.avisar("inscricao"); }
+    return;
+  }
   est.rodada++; est.etapa = "intervalo"; gravarEstado();
   mostrarIntervalo(texto);
 }

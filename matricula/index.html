@@ -139,6 +139,9 @@ const FIREBASE = {
   appId: "1:572223434002:web:93a1b9e7d3991d4db857cb"
 };
 const RECAPTCHA_ENTERPRISE_KEY = "";
+// Aviso ao professor (WhatsApp ou e-mail) pelo Worker. Sem dados pessoais. Se falhar, nada muda para quem usa.
+const AVISO_URL = "https://jornada-avaliacao.cicero-arte.workers.dev/aviso";
+
 const params = new URLSearchParams(location.search);
 const SIMULACAO = params.has("simulacao");
 const EMULADOR = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && params.has("emulador");
@@ -154,7 +157,8 @@ async function criarApi() {
     const espera = (ms) => new Promise(r => setTimeout(r, ms));
     return {
       async lerConvite() { await espera(300); return { menor: params.get("adulto") === null, validoAte: new Date(Date.now() + 14 * 86400000) }; },
-      async enviar() { await espera(700); }
+      async enviar() { await espera(700); },
+      async avisar() {}
     };
   }
   const b = "https://www.gstatic.com/firebasejs/10.12.2/";
@@ -180,6 +184,13 @@ async function criarApi() {
       await auth.authStateReady();
       if (!auth.currentUser) await A.signInAnonymously(auth);
       await F.setDoc(F.doc(db, "matriculas", c), { ...dados, enviadoEm: F.serverTimestamp() });
+    },
+    async avisar(tipo) {
+      if (EMULADOR) return;
+      try {
+        const tk = await auth.currentUser.getIdToken();
+        await fetch(AVISO_URL, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tk }, body: JSON.stringify({ tipo }) });
+      } catch (e) { console.warn("Aviso ao professor não enviado:", e); }
     }
   };
 }
@@ -258,7 +269,7 @@ async function enviar(ev, api) {
   if (!d.adaptacao) d.autorizaAdaptacao = false;
   if (!d.confirmacao) return erro("Para enviar, confirme que os dados estão corretos.");
   const b = $("btnEnviar"); b.disabled = true; b.textContent = "Enviando...";
-  try { await api.enviar(CODIGO, d); mostrar("tFim"); }
+  try { await api.enviar(CODIGO, d); mostrar("tFim"); api.avisar("matricula"); }
   catch (e) {
     console.error(e);
     const c = (e && (e.code || e.message)) || "";
