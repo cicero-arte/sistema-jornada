@@ -111,7 +111,7 @@
           <div class="opcoes" id="modalidades">
             <label class="opcao"><input type="radio" name="modalidade" value="Aula presencial avulsa"> <span><b>Aula presencial avulsa</b><br><span class="sub">Aula avulsa experimental, para conhecer o método. É uma aula só, em Sobradinho-DF.</span></span></label>
             <label class="opcao"><input type="radio" name="modalidade" value="Aula presencial mensal"> <span><b>Aula presencial mensal</b><br><span class="sub">Aulas toda semana, em Sobradinho-DF.</span></span></label>
-            <label class="opcao"><input type="radio" name="modalidade" value="Aula online"> <span><b>Aula online</b><br><span class="sub">Aulas gravadas e encontros ao vivo, de qualquer lugar.</span></span></label>
+            <label class="opcao" id="opcaoOnline"><input type="radio" name="modalidade" value="Aula online"> <span><b>Aula online</b><br><span class="sub">Aulas gravadas e encontros ao vivo, de qualquer lugar.</span></span></label>
           </div>
         </div>
         <div class="campo" id="blocoHorarios" hidden>
@@ -266,6 +266,8 @@ const FIREBASE = {
 // Chave pública do reCAPTCHA Enterprise para o App Check. Vazia: App Check desligado.
 const RECAPTCHA_ENTERPRISE_KEY = "";
 const VERSAO_AVISO = "2026-11";
+// Aula online ainda não começou: a opção fica escondida. Para mostrar, troque para true.
+const ONLINE_ABERTA = false;
 const TEMPO_DESENHO = 10 * 60 * 1000;
 const PRAZO_ENVIO = 5 * 60 * 1000;
 const SIMULACAO = new URLSearchParams(location.search).has("simulacao");
@@ -639,6 +641,7 @@ async function outraPessoa() {
 
 /* ===== Início ===== */
 async function iniciar() {
+  if (!ONLINE_ABERTA) { const o = $("opcaoOnline"); o.querySelector("input").disabled = true; o.hidden = true; }
   montarGrade(); atualizarCadastro();
   $("form").addEventListener("input", atualizarCadastro);
   $("form").addEventListener("change", atualizarCadastro);
