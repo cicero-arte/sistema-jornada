@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// Regras do Storage do projeto sistema-jornada.
+// 1. O professor (UID abaixo) lê e grava tudo, como antes.
+// 2. Quem se inscreve só pode ENVIAR a foto de cada rodada da própria inscrição,
+//    uma vez, em JPEG de até 2 MB, dentro do prazo. Nunca ler, trocar ou apagar.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function ehProfessor() {
+      return request.auth != null && request.auth.uid == "WWCWsIyLX2U2L2GQjwQx90HBtEo1";
+    }
+
+    match /{todos=**} {
+      allow read, write: if ehProfessor();
+    }
+
+    match /inscricoes/{uid}/{n}/foto.jpg {
+      allow create: if resource == null
+        && request.auth != null
+        && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider == "anonymous"
+        && n in ["1","2","3"]
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType == "image/jpeg"
+        && firestore.exists(/databases/(default)/documents/inscricoes/$(uid)/rodadas/$(n))
+        && request.time <= firestore.get(/databases/(default)/documents/inscricoes/$(uid)/rodadas/$(n)).data.inicio + duration.value(15, "m");
+    }
+  }
+}

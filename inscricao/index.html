@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inscrição e avaliação | Jornada do Desenho</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#1E6D94; --azul-claro:#3E8AB0; --azul-tinta:#EAF2F6; --laranja:#F49819;
+    --fundo:#F0F1F2; --texto:#1F2A2E; --suave:#5B666B; --linha:#E4E4E4; --vermelho:#B3261E; --verde:#2E7D4F;
+    --raio:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:"Lato",system-ui,sans-serif;background:var(--fundo);color:var(--texto);font-size:16px;line-height:1.55}
+  header{background:#fff;border-bottom:1px solid var(--linha)}
+  .topo{max-width:760px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .logo{font-weight:900;font-size:20px;color:var(--azul);text-decoration:none;white-space:nowrap}
+  .logo span{color:var(--laranja)}
+  .passo{font-size:13px;color:var(--suave);text-align:right}
+  main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+  .card{background:#fff;border-radius:var(--raio);padding:24px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  h1{font-weight:300;color:var(--azul);font-size:30px;line-height:1.2;margin:0 0 10px}
+  h2{font-weight:700;font-size:19px;margin:0 0 12px}
+  p{margin:0 0 12px}
+  .sub{color:var(--suave)}
+  .aviso{background:var(--azul-tinta);border-radius:12px;padding:12px 14px;margin:0 0 16px;font-size:15px}
+  .aviso.laranja{background:#FEF3E2}
+  .aviso.erro{background:#FBEAEA;color:var(--vermelho)}
+  label{display:block;font-weight:700;font-size:14px;margin:0 0 6px}
+  .campo{margin-bottom:16px}
+  .ajuda{font-size:13px;color:var(--suave);margin-top:4px}
+  input[type=text],input[type=email],input[type=tel],input[type=date]{width:100%;font:inherit;padding:12px 14px;border:1.5px solid #CBD2D6;border-radius:10px;background:#fff;color:var(--texto)}
+  input:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(30,109,148,.15)}
+  .opcoes{display:grid;gap:8px}
+  .opcao{display:flex;gap:10px;align-items:flex-start;border:1.5px solid #CBD2D6;border-radius:10px;padding:12px 14px;cursor:pointer;font-weight:400}
+  .opcao input{margin-top:4px;accent-color:var(--azul);width:18px;height:18px;flex:none}
+  .opcao:has(input:checked){border-color:var(--azul);background:var(--azul-tinta)}
+  .grade{overflow-x:auto}
+  .grade table{border-collapse:collapse;width:100%;font-size:14px}
+  .grade th,.grade td{padding:6px 4px;text-align:center;border-bottom:1px solid var(--linha)}
+  .grade th:first-child,.grade td:first-child{text-align:left}
+  .grade input{width:20px;height:20px;accent-color:var(--azul)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:14px 26px;border:2px solid transparent;cursor:pointer;text-decoration:none}
+  .btn-laranja{background:var(--laranja);color:#fff}
+  .btn-azul{background:var(--azul);color:#fff}
+  .btn-contorno{background:#fff;color:var(--azul);border-color:var(--azul)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-largo{width:100%}
+  .acoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .lista{margin:0 0 12px;padding-left:20px}
+  .lista li{margin-bottom:6px}
+  .proposta{font-size:24px;font-weight:700;line-height:1.35;background:var(--fundo);border-radius:12px;padding:20px;margin:0 0 16px}
+  .tipo{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--laranja);margin-bottom:6px}
+  .relogio{font-size:72px;font-weight:300;color:var(--azul);text-align:center;font-variant-numeric:tabular-nums;line-height:1;margin:8px 0 6px}
+  .relogio.fim{color:var(--vermelho)}
+  .barra{height:8px;background:var(--linha);border-radius:99px;overflow:hidden;margin-bottom:16px}
+  .barra i{display:block;height:100%;background:var(--azul);width:0}
+  .camera{position:relative;background:#111;border-radius:12px;overflow:hidden;aspect-ratio:3/4;max-height:70vh;margin:0 auto 12px;width:100%}
+  .camera video,.camera img{width:100%;height:100%;object-fit:contain;display:block}
+  .prazo{font-weight:700;text-align:center;margin:0 0 12px}
+  .prazo.urgente{color:var(--vermelho)}
+  .progresso{height:6px;background:var(--linha);border-radius:99px;overflow:hidden;margin:8px 0}
+  .progresso i{display:block;height:100%;background:var(--verde);width:0;transition:width .2s}
+  .rodadas{display:flex;gap:6px;margin-bottom:14px}
+  .rodadas span{flex:1;height:6px;border-radius:99px;background:var(--linha)}
+  .rodadas span.feita{background:var(--verde)}
+  .rodadas span.atual{background:var(--laranja)}
+  .sim{background:#2B2B2B;color:#fff;font-size:13px;text-align:center;padding:6px 10px}
+  .sim button{font:inherit;font-size:12px;margin-left:8px;border-radius:99px;border:1px solid #fff;background:none;color:#fff;padding:2px 10px;cursor:pointer}
+  [hidden]{display:none!important}
+  footer{max-width:760px;margin:0 auto;padding:0 16px 32px;font-size:13px;color:var(--suave)}
+  footer a{color:var(--azul)}
+  @media(max-width:480px){.card{padding:18px}h1{font-size:26px}.relogio{font-size:60px}.proposta{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="sim" id="faixaSim" hidden>Simulação com dados fictícios: nada é gravado. <button type="button" id="simPular">Pular o tempo</button></div>
+<header><div class="topo"><a class="logo" href="https://www.cicero.art.br" target="_blank" rel="noopener">Jornada <span>do Desenho</span></a><span class="passo" id="passo"></span></div></header>
+
+<main>
+  <!-- 0. Carregando -->
+  <section id="tela-carregando" class="card"><p>Carregando...</p></section>
+
+  <!-- 1. Cadastro -->
+  <section id="tela-cadastro" hidden>
+    <div class="card">
+      <h1>Inscrição</h1>
+      <p class="sub">Preencha o cadastro e faça a avaliação online gratuita logo em seguida. São 3 desenhos de 10 minutos, cerca de 40 minutos no total.</p>
+      <div class="aviso laranja"><b>Use um celular ou um computador com câmera.</b> No fim de cada desenho você vai fotografar a folha na hora, pela câmera.</div>
+      <form id="form" novalidate>
+        <div class="campo">
+          <label for="nome">Nome do aluno</label>
+          <input type="text" id="nome" maxlength="100" autocomplete="name" required>
+        </div>
+        <div class="campo">
+          <label for="nascimento">Data de nascimento do aluno</label>
+          <input type="date" id="nascimento" required>
+          <div class="ajuda" id="idadeTxt"></div>
+        </div>
+        <div class="campo" id="blocoResp" hidden>
+          <div class="aviso">O aluno é menor de idade. Este cadastro deve ser feito pelo pai, pela mãe ou pelo responsável legal.</div>
+          <label for="responsavel">Nome do responsável</label>
+          <input type="text" id="responsavel" maxlength="100" autocomplete="name">
+        </div>
+        <div class="campo">
+          <label>Modalidade</label>
+          <div class="opcoes" id="modalidades">
+            <label class="opcao"><input type="radio" name="modalidade" value="Aula presencial avulsa"> <span><b>Aula presencial avulsa</b><br><span class="sub">Uma aula de cada vez, em Sobradinho-DF.</span></span></label>
+            <label class="opcao"><input type="radio" name="modalidade" value="Aula presencial mensal"> <span><b>Aula presencial mensal</b><br><span class="sub">Aulas toda semana, em Sobradinho-DF.</span></span></label>
+            <label class="opcao"><input type="radio" name="modalidade" value="Aula online"> <span><b>Aula online</b><br><span class="sub">Aulas gravadas e encontros ao vivo, de qualquer lugar.</span></span></label>
+          </div>
+        </div>
+        <div class="campo" id="blocoHorarios" hidden>
+          <label>Horários que funcionam para você</label>
+          <p class="ajuda" style="margin-top:0">Marque todos os que puder. Se for possível, monto a turma de acordo com os horários dos interessados.</p>
+          <div class="grade"><table id="grade"></table></div>
+        </div>
+        <div class="campo">
+          <label for="whatsapp">WhatsApp para contato</label>
+          <input type="tel" id="whatsapp" maxlength="25" autocomplete="tel" placeholder="(61) 90000-0000" required>
+        </div>
+        <div class="campo">
+          <label for="email">E-mail para receber o Relatório de Evolução</label>
+          <input type="email" id="email" maxlength="120" autocomplete="email" required>
+        </div>
+        <div class="campo">
+          <label class="opcao"><input type="checkbox" id="autorizacao"> <span id="textoAutorizacao"></span></label>
+          <div class="ajuda">Leia o <a href="privacidade.html" target="_blank" rel="noopener">aviso de privacidade</a>.</div>
+        </div>
+        <div class="aviso erro" id="erroForm" hidden></div>
+        <button class="btn btn-laranja btn-largo" type="submit" id="btnEnviarCadastro">Avaliação online gratuita</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 2. Instruções e teste da câmera -->
+  <section id="tela-instrucoes" hidden>
+    <div class="card">
+      <h1>Antes de começar</h1>
+      <p>Cadastro recebido. Agora vem a avaliação. Separe:</p>
+      <ul class="lista">
+        <li>3 folhas de papel (sulfite serve), lápis e borracha;</li>
+        <li>uma mesa e um lugar com boa luz;</li>
+        <li>cerca de 40 minutos sem interrupção.</li>
+      </ul>
+      <p>Como funciona:</p>
+      <ul class="lista">
+        <li>São 3 desenhos. Cada proposta só aparece quando o desenho começa.</li>
+        <li>Cada desenho tem 10 minutos. Faça do seu jeito, não existe certo ou errado.</li>
+        <li>No fim, fotografe só a folha, de cima, sem rostos na foto. Você tem 5 minutos para enviar.</li>
+        <li>No terceiro desenho, você vai pegar um objeto da casa para desenhar olhando para ele. O tempo já conta enquanto pega.</li>
+        <li>O aluno desenha sozinho. Os adultos podem ajudar só com a câmera.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Teste a câmera</h2>
+      <p class="sub">Assim você não perde tempo na hora da foto. Se o navegador perguntar, permita o uso da câmera.</p>
+      <div class="camera" id="testeCamera" hidden><video id="videoTeste" playsinline muted autoplay></video></div>
+      <div class="aviso erro" id="erroCamera" hidden></div>
+      <div class="acoes">
+        <button class="btn btn-contorno" type="button" id="btnTestarCamera">Testar a câmera</button>
+        <button class="btn btn-laranja" type="button" id="btnComecar" disabled>Começar o desenho 1</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Rodada -->
+  <section id="tela-rodada" hidden>
+    <div class="card">
+      <div class="rodadas" id="marcasRodada"><span></span><span></span><span></span></div>
+      <div class="tipo" id="tipoRodada"></div>
+      <div class="proposta" id="propostaRodada"></div>
+      <div class="relogio" id="relogio">10:00</div>
+      <div class="barra"><i id="barraTempo"></i></div>
+      <p class="sub" style="text-align:center" id="dicaRodada">Quando o tempo acabar, a câmera abre para a foto.</p>
+      <button class="btn btn-contorno btn-largo" type="button" id="btnTerminei">Terminei antes, tirar a foto</button>
+    </div>
+  </section>
+
+  <!-- 4. Foto -->
+  <section id="tela-foto" hidden>
+    <div class="card">
+      <div class="rodadas" id="marcasFoto"><span></span><span></span><span></span></div>
+      <h2 id="tituloFoto">Foto do desenho</h2>
+      <p class="prazo" id="prazo"></p>
+      <div class="camera"><video id="video" playsinline muted autoplay></video><img id="previa" alt="Foto tirada do desenho" hidden></div>
+      <p class="sub" style="text-align:center">Enquadre só a folha, inteira, com boa luz e sem rostos.</p>
+      <div class="aviso erro" id="erroFoto" hidden></div>
+      <div class="progresso" id="barraEnvio" hidden><i></i></div>
+      <div class="acoes" id="acoesCaptura">
+        <button class="btn btn-laranja btn-largo" type="button" id="btnFoto">Tirar a foto</button>
+      </div>
+      <div class="acoes" id="acoesPrevia" hidden>
+        <button class="btn btn-laranja" type="button" id="btnEnviarFoto">Enviar esta foto</button>
+        <button class="btn btn-contorno" type="button" id="btnOutra">Tirar outra</button>
+      </div>
+      <div class="acoes" id="acoesAlternativa" hidden>
+        <label class="btn btn-azul" for="arquivoCamera">Abrir a câmera do aparelho</label>
+        <input type="file" id="arquivoCamera" accept="image/*" capture="environment" hidden>
+      </div>
+      <div class="acoes" id="acoesSim" hidden>
+        <button class="btn btn-contorno" type="button" id="btnFotoExemplo">Usar um desenho de exemplo (simulação)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Entre rodadas -->
+  <section id="tela-intervalo" hidden>
+    <div class="card">
+      <div class="rodadas" id="marcasIntervalo"><span></span><span></span><span></span></div>
+      <h1 id="tituloIntervalo">Foto enviada</h1>
+      <p id="textoIntervalo"></p>
+      <p class="sub">Pode descansar um pouco, beber uma água. Quando estiver pronto, comece o próximo.</p>
+      <button class="btn btn-laranja btn-largo" type="button" id="btnProxima">Começar o próximo desenho</button>
+    </div>
+  </section>
+
+  <!-- 6. Fim -->
+  <section id="tela-fim" hidden>
+    <div class="card">
+      <h1>Avaliação concluída. Obrigado!</h1>
+      <p>Recebi os desenhos. Vou olhar cada um com calma.</p>
+      <p>Em breve você recebe, pelo e-mail ou pelo WhatsApp informados, o <b>Relatório de Evolução inicial</b> e a resposta sobre a matrícula.</p>
+      <p class="sub" id="resumoFim"></p>
+      <p class="sub">Dúvidas? Fale comigo pelo WhatsApp que aparece na minha página.</p>
+      <div class="acoes"><a class="btn btn-azul" href="https://www.cicero.art.br/servi%C3%A7os/jornada-do-desenho" target="_blank" rel="noopener">Voltar para a página do curso</a></div>
+      <hr style="border:none;border-top:1px solid var(--linha);margin:24px 0 16px">
+      <button class="btn btn-contorno" type="button" id="btnOutraPessoa">Inscrever outra pessoa neste aparelho</button>
+    </div>
+  </section>
+
+  <!-- Erro geral -->
+  <section id="tela-erro" hidden>
+    <div class="card">
+      <h1>Algo não funcionou</h1>
+      <p id="textoErro"></p>
+      <button class="btn btn-azul" type="button" onclick="location.reload()">Tentar de novo</button>
+    </div>
+  </section>
+</main>
+<footer>Os dados ficam guardados com segurança e só o professor tem acesso. <a href="privacidade.html" target="_blank" rel="noopener">Aviso de privacidade</a>.</footer>
+
+<script type="module">
+"use strict";
+
+/* ===== Configuração ===== */
+const FIREBASE = {
+  apiKey: "AIzaSyAlBkKt0rDkt6SBEsEXtxJvWbFH26fguGE",
+  authDomain: "sistema-jornada.firebaseapp.com",
+  projectId: "sistema-jornada",
+  storageBucket: "sistema-jornada.firebasestorage.app",
+  messagingSenderId: "572223434002",
+  appId: "1:572223434002:web:93a1b9e7d3991d4db857cb"
+};
+// Chave pública do reCAPTCHA Enterprise para o App Check. Vazia: App Check desligado.
+const RECAPTCHA_ENTERPRISE_KEY = "";
+const VERSAO_AVISO = "2026-11";
+const TEMPO_DESENHO = 10 * 60 * 1000;
+const PRAZO_ENVIO = 5 * 60 * 1000;
+const SIMULACAO = new URLSearchParams(location.search).has("simulacao");
+// Só para testes no computador do desenvolvedor: usa o emulador do Firebase, nunca o projeto real.
+const EMULADOR = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).has("emulador");
+const CHAVE_LOCAL = SIMULACAO ? "jd-inscricao-simulacao" : "jd-inscricao-v1";
+
+/* Propostas: o mesmo banco da ferramenta de avaliação ao vivo. */
+const RODADAS = [
+  { tipo: "Figura humana", propostas: ["Desenhe você mesmo fazendo a coisa de que mais gosta.","Desenhe uma pessoa da sua família, de corpo inteiro.","Desenhe uma pessoa chutando uma bola.","Desenhe uma pessoa andando na chuva com um guarda-chuva.","Desenhe alguém sentado lendo um livro.","Desenhe uma pessoa pulando corda.","Desenhe um astronauta de corpo inteiro acenando."] },
+  { tipo: "Cena com chão e céu", propostas: ["Desenhe uma rua com casas, árvores e o céu.","Desenhe um parque com pessoas brincando.","Desenhe uma praia em um dia de sol.","Desenhe o caminho da sua casa até a escola.","Desenhe uma fazenda com animais.","Desenhe um dia de chuva na cidade.","Desenhe um acampamento à noite."] },
+  { tipo: "Objeto observado", propostas: ["Pegue uma caneca ou um copo, coloque na mesa e desenhe olhando para ele.","Pegue um tênis ou sapato e desenhe olhando para ele.","Pegue uma fruta e desenhe olhando para ela.","Pegue uma mochila ou bolsa e desenhe olhando para ela.","Desenhe a sua mão que não está desenhando, olhando para ela.","Pegue uma tesoura ou um grampeador e desenhe olhando para ele."] }
+];
+const DIAS = ["Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+const PERIODOS = ["Manhã","Tarde","Noite"];
+
+/* ===== Utilidades ===== */
+const $ = (id) => document.getElementById(id);
+const telas = ["carregando","cadastro","instrucoes","rodada","foto","intervalo","fim","erro"];
+function mostrar(nome, passo) {
+  telas.forEach(t => { $("tela-" + t).hidden = t !== nome; });
+  $("passo").textContent = passo || "";
+  window.scrollTo(0, 0);
+}
+function lerEstado() { try { return JSON.parse(localStorage.getItem(CHAVE_LOCAL)) || null; } catch (e) { return null; } }
+function gravarEstado() { try { localStorage.setItem(CHAVE_LOCAL, JSON.stringify(est)); } catch (e) {} }
+function idadeDe(data) {
+  const n = new Date(data + "T12:00:00"); if (isNaN(n)) return null;
+  const h = new Date(); let i = h.getFullYear() - n.getFullYear();
+  if (h.getMonth() < n.getMonth() || (h.getMonth() === n.getMonth() && h.getDate() < n.getDate())) i--;
+  return i;
+}
+function mmss(ms) { ms = Math.max(0, ms); const s = Math.ceil(ms / 1000); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
+function bip() {
+  try {
+    const c = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.35, 0.7].forEach(t => { const o = c.createOscillator(), g = c.createGain(); o.frequency.value = 880; o.connect(g); g.connect(c.destination);
+      g.gain.setValueAtTime(0.25, c.currentTime + t); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + 0.3); o.start(c.currentTime + t); o.stop(c.currentTime + t + 0.3); });
+  } catch (e) {}
+  if (navigator.vibrate) navigator.vibrate([300, 150, 300]);
+}
+function mensagemErro(e) {
+  const c = (e && (e.code || e.message)) || "";
+  if (/permission|unauthorized|PERMISSION_DENIED/i.test(c)) return "O envio foi recusado. Se o prazo já passou, ele não pode mais ser aceito.";
+  if (/network|unavailable|offline|retry-limit/i.test(c)) return "Sem conexão com a internet. Confira a rede e tente de novo.";
+  return "Erro: " + c;
+}
+
+/* ===== Servidor: Firebase ou simulação ===== */
+let api;
+async function criarApiFirebase() {
+  const v = "10.12.2", b = "https://www.gstatic.com/firebasejs/" + v + "/";
+  const [{ initializeApp }, A, F, S] = await Promise.all([
+    import(b + "firebase-app.js"), import(b + "firebase-auth.js"), import(b + "firebase-firestore.js"), import(b + "firebase-storage.js")
+  ]);
+  // Nome próprio: o login anônimo daqui não se mistura com o login do professor no app.
+  const app = initializeApp(FIREBASE, "inscricao");
+  if (RECAPTCHA_ENTERPRISE_KEY) {
+    const C = await import(b + "firebase-app-check.js");
+    C.initializeAppCheck(app, { provider: new C.ReCaptchaEnterpriseProvider(RECAPTCHA_ENTERPRISE_KEY), isTokenAutoRefreshEnabled: true });
+  }
+  const auth = A.getAuth(app), db = F.getFirestore(app), st = S.getStorage(app);
+  if (EMULADOR) {
+    A.connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    F.connectFirestoreEmulator(db, "127.0.0.1", 8085);
+    S.connectStorageEmulator(st, "127.0.0.1", 9199);
+  }
+  const uid = async () => {
+    await auth.authStateReady();
+    if (!auth.currentUser) await A.signInAnonymously(auth);
+    return auth.currentUser.uid;
+  };
+  return {
+    async criarInscricao(d) {
+      const u = await uid();
+      await F.setDoc(F.doc(db, "inscricoes", u), { ...d, criadoEm: F.serverTimestamp() });
+      return u;
+    },
+    async iniciarRodada(n, tipo, proposta) {
+      const u = await uid();
+      await F.setDoc(F.doc(db, "inscricoes", u, "rodadas", String(n)), { tipo, proposta, inicio: F.serverTimestamp() });
+    },
+    async enviarFoto(n, blob, progresso) {
+      const u = await uid();
+      const tarefa = S.uploadBytesResumable(S.ref(st, "inscricoes/" + u + "/" + n + "/foto.jpg"), blob, { contentType: "image/jpeg" });
+      await new Promise((ok, falha) => tarefa.on("state_changed", s => progresso(s.bytesTransferred / s.totalBytes), falha, ok));
+      await F.setDoc(F.doc(db, "inscricoes", u, "envios", String(n)), { enviadoEm: F.serverTimestamp(), tamanho: blob.size });
+    },
+    async novaPessoa() { await auth.authStateReady(); await A.signOut(auth); }
+  };
+}
+function criarApiSimulacao() {
+  const espera = (ms) => new Promise(r => setTimeout(r, ms));
+  return {
+    async criarInscricao() { await espera(500); return "simulacao"; },
+    async iniciarRodada() { await espera(300); },
+    async enviarFoto(n, blob, progresso) { for (let i = 1; i <= 10; i++) { await espera(120); progresso(i / 10); } },
+    async novaPessoa() {}
+  };
+}
+
+/* ===== Estado ===== */
+let est = lerEstado() || { etapa: "cadastro" };
+// est = { etapa, rodada (0..2), propostas[3], inicio[3] (ms), enviada[3] (bool|"perdida"), dados resumidos }
+
+/* ===== Cadastro ===== */
+function montarGrade() {
+  let h = "<thead><tr><th></th>" + PERIODOS.map(p => "<th>" + p + "</th>").join("") + "</tr></thead><tbody>";
+  DIAS.forEach(d => { h += "<tr><td>" + d + "</td>" + PERIODOS.map(p => '<td><input type="checkbox" value="' + d + ", " + p.toLowerCase() + '" aria-label="' + d + ", " + p.toLowerCase() + '"></td>').join("") + "</tr>"; });
+  $("grade").innerHTML = h + "</tbody>";
+}
+function atualizarCadastro() {
+  const idade = idadeDe($("nascimento").value);
+  const menor = idade !== null && idade < 18;
+  $("idadeTxt").textContent = idade !== null && idade >= 0 ? idade + " anos" : "";
+  $("blocoResp").hidden = !menor;
+  const mod = (document.querySelector('input[name=modalidade]:checked') || {}).value || "";
+  $("blocoHorarios").hidden = !mod.startsWith("Aula presencial");
+  $("textoAutorizacao").textContent = menor
+    ? "Sou pai, mãe ou responsável legal do aluno e autorizo o uso destes dados e das fotos dos desenhos para a inscrição, a avaliação (com apoio de inteligência artificial, revisada pelo professor) e o contato sobre a matrícula."
+    : "Autorizo o uso destes dados e das fotos dos meus desenhos para a inscrição, a avaliação (com apoio de inteligência artificial, revisada pelo professor) e o contato sobre a matrícula.";
+}
+async function enviarCadastro(ev) {
+  ev.preventDefault();
+  const erro = (t) => { $("erroForm").textContent = t; $("erroForm").hidden = false; };
+  $("erroForm").hidden = true;
+  const nome = $("nome").value.trim().replace(/\s+/g, " ");
+  const nasc = $("nascimento").value;
+  const idade = idadeDe(nasc);
+  const menor = idade !== null && idade < 18;
+  const resp = menor ? $("responsavel").value.trim().replace(/\s+/g, " ") : "";
+  const mod = (document.querySelector('input[name=modalidade]:checked') || {}).value || "";
+  const zap = $("whatsapp").value.trim();
+  const email = $("email").value.trim();
+  const horarios = mod.startsWith("Aula presencial") ? [...document.querySelectorAll("#grade input:checked")].map(i => i.value) : [];
+  if (nome.length < 2) return erro("Escreva o nome do aluno.");
+  if (idade === null || idade < 3 || idade > 110) return erro("Confira a data de nascimento.");
+  if (menor && resp.length < 2) return erro("Escreva o nome do responsável.");
+  if (!mod) return erro("Escolha a modalidade.");
+  if (zap.replace(/\D/g, "").length < 10) return erro("Confira o WhatsApp, com DDD.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return erro("Confira o e-mail.");
+  if (!$("autorizacao").checked) return erro("Para seguir, marque a autorização.");
+  const b = $("btnEnviarCadastro"); b.disabled = true; b.textContent = "Salvando...";
+  try {
+    await api.criarInscricao({ nome, nascimento: nasc, idade, modalidade: mod, horarios, responsavel: resp, whatsapp: zap, email, menor, autorizacao: true, versaoAviso: VERSAO_AVISO });
+    est = { etapa: "instrucoes", rodada: 0, propostas: RODADAS.map(r => r.propostas[Math.floor(Math.random() * r.propostas.length)]), inicio: [0, 0, 0], enviada: [false, false, false], primeiroNome: nome.split(" ")[0] };
+    gravarEstado();
+    irInstrucoes();
+  } catch (e) {
+    console.error(e);
+    erro(/PERMISSION_DENIED|permission/i.test(e.code || e.message || "") ? "Não foi possível salvar. Se você já fez a inscrição neste aparelho, ela já foi recebida." : mensagemErro(e));
+  } finally { b.disabled = false; b.textContent = "Avaliação online gratuita"; }
+}
+
+/* ===== Câmera ===== */
+let fluxo = null;
+async function ligarCamera(video) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("sem-camera");
+  if (fluxo) pararCamera();
+  fluxo = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1440 } } });
+  video.srcObject = fluxo;
+  await video.play().catch(() => {});
+}
+function pararCamera() { if (fluxo) { fluxo.getTracks().forEach(t => t.stop()); fluxo = null; } }
+function reduzir(fonte, w, h) {
+  const lado = 1600, esc = Math.min(1, lado / Math.max(w, h));
+  const c = document.createElement("canvas"); c.width = Math.round(w * esc); c.height = Math.round(h * esc);
+  c.getContext("2d").drawImage(fonte, 0, 0, c.width, c.height);
+  return new Promise(ok => {
+    const tenta = (q) => c.toBlob(b => (b.size > 1.6 * 1024 * 1024 && q > 0.5) ? tenta(q - 0.1) : ok(b), "image/jpeg", q);
+    tenta(0.85);
+  });
+}
+function desenhoExemplo(n) {
+  const c = document.createElement("canvas"); c.width = 1200; c.height = 1600;
+  const g = c.getContext("2d"); g.fillStyle = "#fbfaf6"; g.fillRect(0, 0, 1200, 1600);
+  g.strokeStyle = "#333"; g.lineWidth = 6; g.lineCap = "round";
+  const l = (a) => { g.beginPath(); g.moveTo(a[0], a[1]); for (let i = 2; i < a.length; i += 2) g.lineTo(a[i], a[i + 1]); g.stroke(); };
+  if (n === 0) { g.beginPath(); g.arc(600, 420, 120, 0, 7); g.stroke(); l([600, 540, 600, 980]); l([600, 640, 420, 820]); l([600, 640, 800, 760]); l([600, 980, 470, 1300]); l([600, 980, 740, 1300]); }
+  if (n === 1) { l([0, 1150, 1200, 1150]); g.strokeRect(220, 750, 360, 400); l([200, 760, 400, 560, 600, 760]); g.strokeRect(340, 950, 110, 200); g.beginPath(); g.arc(950, 300, 110, 0, 7); g.stroke(); l([850, 1150, 850, 850]); g.beginPath(); g.arc(850, 800, 110, 0, 7); g.stroke(); }
+  if (n === 2) { g.strokeRect(420, 600, 360, 520); g.beginPath(); g.ellipse(600, 600, 180, 50, 0, 0, 7); g.stroke(); g.beginPath(); g.arc(800, 850, 110, -1.4, 1.4); g.stroke(); g.fillStyle = "rgba(0,0,0,.15)"; g.fillRect(780, 640, 0, 0); g.beginPath(); g.ellipse(640, 1150, 260, 40, 0, 0, 7); g.fill(); }
+  g.fillStyle = "#999"; g.font = "36px Lato, sans-serif"; g.fillText("Desenho fictício de simulação", 40, 1560);
+  return reduzir(c, 1200, 1600);
+}
+
+/* ===== Instruções ===== */
+function irInstrucoes() { mostrar("instrucoes", "Avaliação"); }
+async function testarCamera() {
+  $("erroCamera").hidden = true;
+  try {
+    $("testeCamera").hidden = false;
+    await ligarCamera($("videoTeste"));
+    $("btnComecar").disabled = false;
+    $("btnTestarCamera").textContent = "A câmera funciona";
+  } catch (e) {
+    $("testeCamera").hidden = true;
+    $("erroCamera").textContent = "Não consegui abrir a câmera aqui. Confira se o navegador tem permissão para usar a câmera. Se não der, na hora da foto o aparelho abre a própria câmera.";
+    $("erroCamera").hidden = false;
+    $("btnComecar").disabled = false;
+  }
+}
+
+/* ===== Rodada ===== */
+let relogio = null;
+function marcas(id) {
+  [...$(id).children].forEach((s, i) => { s.className = est.enviada[i] ? "feita" : (i === est.rodada ? "atual" : ""); });
+}
+async function comecarRodada() {
+  const n = est.rodada;
+  const b = this; if (b) b.disabled = true;
+  try {
+    await api.iniciarRodada(n + 1, RODADAS[n].tipo, est.propostas[n]);
+  } catch (e) {
+    console.error(e);
+    if (b) b.disabled = false;
+    // Recusa por permissão: a rodada já tinha começado no servidor (página recarregada). Segue.
+    if (!/permission/i.test(e.code || e.message || "")) { alert("Não foi possível começar. " + mensagemErro(e)); return; }
+  }
+  if (b) b.disabled = false;
+  if (!est.inicio[n]) est.inicio[n] = Date.now();
+  est.etapa = "rodada"; gravarEstado();
+  pararCamera();
+  mostrarRodada();
+}
+function mostrarRodada() {
+  const n = est.rodada;
+  mostrar("rodada", "Desenho " + (n + 1) + " de 3");
+  marcas("marcasRodada");
+  $("tipoRodada").textContent = "Desenho " + (n + 1) + " de 3: " + RODADAS[n].tipo;
+  $("propostaRodada").textContent = est.propostas[n];
+  clearInterval(relogio);
+  const tique = () => {
+    const resta = est.inicio[n] + TEMPO_DESENHO - Date.now();
+    $("relogio").textContent = mmss(resta);
+    $("relogio").classList.toggle("fim", resta < 60000);
+    $("barraTempo").style.width = Math.min(100, 100 * (1 - resta / TEMPO_DESENHO)) + "%";
+    if (resta <= 0) { clearInterval(relogio); bip(); irFoto(); }
+  };
+  tique(); relogio = setInterval(tique, 250);
+}
+
+/* ===== Foto ===== */
+let fotoBlob = null, relogioPrazo = null;
+function limitePrazo() { return est.inicio[est.rodada] + TEMPO_DESENHO + PRAZO_ENVIO; }
+async function irFoto() {
+  clearInterval(relogio);
+  const n = est.rodada;
+  est.etapa = "foto"; gravarEstado();
+  mostrar("foto", "Foto do desenho " + (n + 1));
+  marcas("marcasFoto");
+  $("tituloFoto").textContent = "Foto do desenho " + (n + 1);
+  $("erroFoto").hidden = true; $("barraEnvio").hidden = true;
+  $("acoesSim").hidden = !SIMULACAO;
+  clearInterval(relogioPrazo);
+  const tique = () => {
+    const resta = limitePrazo() - Date.now();
+    $("prazo").textContent = resta > 0 ? "Tempo para enviar: " + mmss(resta) : "O prazo para enviar esta foto acabou.";
+    $("prazo").classList.toggle("urgente", resta < 90000);
+    if (resta <= 0) { clearInterval(relogioPrazo); prazoPerdido(); }
+  };
+  tique(); relogioPrazo = setInterval(tique, 500);
+  try { await ligarCamera($("video")); } catch (e) { pararCamera(); }
+  voltarCaptura();
+}
+function voltarCaptura() {
+  fotoBlob = null;
+  $("previa").hidden = true; $("acoesPrevia").hidden = true;
+  $("video").hidden = !fluxo;
+  $("acoesCaptura").hidden = !fluxo;
+  $("acoesAlternativa").hidden = !!fluxo;
+}
+function mostrarPrevia(blob) {
+  fotoBlob = blob;
+  $("previa").src = URL.createObjectURL(blob);
+  $("previa").hidden = false; $("video").hidden = true;
+  $("acoesCaptura").hidden = true; $("acoesAlternativa").hidden = true; $("acoesPrevia").hidden = false;
+}
+async function tirarFoto() {
+  const v = $("video");
+  if (!v.videoWidth) return;
+  mostrarPrevia(await reduzir(v, v.videoWidth, v.videoHeight));
+}
+async function fotoDoArquivo(ev) {
+  const f = ev.target.files && ev.target.files[0]; ev.target.value = "";
+  if (!f) return;
+  // A foto precisa ter acabado de ser tirada (até 2 minutos), para não ser uma imagem antiga da galeria.
+  if (Date.now() - f.lastModified > 2 * 60 * 1000) { $("erroFoto").textContent = "Esta imagem não foi tirada agora. Use a câmera para fotografar o desenho."; $("erroFoto").hidden = false; return; }
+  const img = new Image(); img.src = URL.createObjectURL(f);
+  await img.decode().catch(() => {});
+  if (!img.naturalWidth) { $("erroFoto").textContent = "Não consegui ler a foto. Tente de novo."; $("erroFoto").hidden = false; return; }
+  $("erroFoto").hidden = true;
+  mostrarPrevia(await reduzir(img, img.naturalWidth, img.naturalHeight));
+}
+async function enviarFoto() {
+  if (!fotoBlob) return;
+  const n = est.rodada;
+  const b = $("btnEnviarFoto"); b.disabled = true; $("btnOutra").disabled = true;
+  $("erroFoto").hidden = true; $("barraEnvio").hidden = false;
+  const barra = $("barraEnvio").firstElementChild; barra.style.width = "0";
+  try {
+    await api.enviarFoto(n + 1, fotoBlob, p => { barra.style.width = Math.round(p * 100) + "%"; });
+    est.enviada[n] = true;
+    clearInterval(relogioPrazo);
+    proximaEtapa();
+  } catch (e) {
+    console.error(e);
+    $("erroFoto").textContent = mensagemErro(e); $("erroFoto").hidden = false;
+  } finally { b.disabled = false; $("btnOutra").disabled = false; }
+}
+function prazoPerdido() {
+  est.enviada[est.rodada] = "perdida";
+  pararCamera();
+  proximaEtapa("O prazo para enviar a foto do desenho " + (est.rodada + 1) + " acabou. Tudo bem: vamos seguir para o próximo.");
+}
+function proximaEtapa(texto) {
+  pararCamera();
+  if (est.rodada >= 2) { est.etapa = "fim"; gravarEstado(); mostrarFim(); return; }
+  est.rodada++; est.etapa = "intervalo"; gravarEstado();
+  mostrarIntervalo(texto);
+}
+function mostrarIntervalo(texto) {
+  mostrar("intervalo", est.rodada + " de 3 feitos");
+  marcas("marcasIntervalo");
+  const perdida = est.enviada[est.rodada - 1] === "perdida";
+  $("tituloIntervalo").textContent = perdida ? "Seguimos para o próximo" : "Foto enviada";
+  $("textoIntervalo").textContent = texto || (perdida ? "A foto anterior não chegou a tempo. Vamos seguir." : "A foto do desenho " + est.rodada + " chegou. Faltam " + (3 - est.rodada) + ".");
+  $("btnProxima").textContent = "Começar o desenho " + (est.rodada + 1);
+}
+function mostrarFim() {
+  mostrar("fim", "Concluído");
+  const ok = est.enviada.filter(x => x === true).length;
+  $("resumoFim").textContent = ok === 3 ? "As 3 fotos chegaram." : ok + " de 3 fotos chegaram dentro do prazo.";
+}
+async function outraPessoa() {
+  if (!confirm("Começar uma inscrição nova, para outra pessoa, neste aparelho?")) return;
+  try { await api.novaPessoa(); } catch (e) {}
+  try { localStorage.removeItem(CHAVE_LOCAL); } catch (e) {}
+  location.reload();
+}
+
+/* ===== Início ===== */
+async function iniciar() {
+  montarGrade(); atualizarCadastro();
+  $("form").addEventListener("input", atualizarCadastro);
+  $("form").addEventListener("change", atualizarCadastro);
+  $("form").addEventListener("submit", enviarCadastro);
+  $("btnTestarCamera").onclick = testarCamera;
+  $("btnComecar").onclick = comecarRodada;
+  $("btnProxima").onclick = comecarRodada;
+  $("btnTerminei").onclick = () => { if (confirm("Terminou o desenho? Depois da foto, não dá para voltar a ele.")) irFoto(); };
+  $("btnFoto").onclick = tirarFoto;
+  $("btnOutra").onclick = voltarCaptura;
+  $("btnEnviarFoto").onclick = enviarFoto;
+  $("arquivoCamera").onchange = fotoDoArquivo;
+  $("btnOutraPessoa").onclick = outraPessoa;
+  if (SIMULACAO) {
+    $("faixaSim").hidden = false;
+    $("btnFotoExemplo").onclick = async () => mostrarPrevia(await desenhoExemplo(est.rodada));
+    $("simPular").onclick = () => {
+      if (est.etapa === "rodada") { est.inicio[est.rodada] = Date.now() - TEMPO_DESENHO + 3000; gravarEstado(); }
+    };
+  }
+  try { api = SIMULACAO ? criarApiSimulacao() : await criarApiFirebase(); }
+  catch (e) { console.error(e); $("textoErro").textContent = "Não consegui conectar ao servidor. Confira a internet e tente de novo."; mostrar("erro"); return; }
+
+  if (est.etapa === "instrucoes") irInstrucoes();
+  else if (est.etapa === "rodada") mostrarRodada();
+  else if (est.etapa === "foto") { if (Date.now() > limitePrazo()) prazoPerdido(); else irFoto(); }
+  else if (est.etapa === "intervalo") mostrarIntervalo();
+  else if (est.etapa === "fim") mostrarFim();
+  else mostrar("cadastro", "Cadastro");
+}
+iniciar();
+</script>
+</body>
+</html>

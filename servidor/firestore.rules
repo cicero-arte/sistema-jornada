@@ -1,0 +1,84 @@
+rules_version = '2';
+
+// Regras do Firestore do projeto sistema-jornada.
+// 1. O professor (UID abaixo) lê e grava tudo, como antes.
+// 2. Quem se inscreve (login anônimo) só pode CRIAR a própria inscrição,
+//    o início de cada rodada e o registro de cada envio. Nunca ler, alterar ou apagar.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function ehProfessor() {
+      return request.auth != null && request.auth.uid == "WWCWsIyLX2U2L2GQjwQx90HBtEo1";
+    }
+    function ehAnonimo(uid) {
+      return request.auth != null
+        && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider == "anonymous";
+    }
+    function texto(v, min, max) {
+      return v is string && v.size() >= min && v.size() <= max;
+    }
+    function inscricao(uid) {
+      return /databases/$(database)/documents/inscricoes/$(uid);
+    }
+    function rodada(uid, n) {
+      return /databases/$(database)/documents/inscricoes/$(uid)/rodadas/$(n);
+    }
+    function envio(uid, n) {
+      return /databases/$(database)/documents/inscricoes/$(uid)/envios/$(n);
+    }
+
+    // Professor: tudo, como já era.
+    match /{document=**} {
+      allow read, write: if ehProfessor();
+    }
+
+    // Inscrição: o documento tem o mesmo id do login anônimo (uma por aparelho).
+    match /inscricoes/{uid} {
+      allow create: if ehAnonimo(uid)
+        && request.resource.data.keys().hasOnly(["nome","nascimento","idade","modalidade","horarios","responsavel","whatsapp","email","menor","autorizacao","versaoAviso","criadoEm"])
+        && request.resource.data.keys().hasAll(["nome","nascimento","idade","modalidade","horarios","responsavel","whatsapp","email","menor","autorizacao","versaoAviso","criadoEm"])
+        && texto(request.resource.data.nome, 2, 100)
+        && request.resource.data.nascimento is string && request.resource.data.nascimento.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+        && request.resource.data.idade is int && request.resource.data.idade >= 3 && request.resource.data.idade <= 110
+        && request.resource.data.modalidade in ["Aula presencial avulsa","Aula presencial mensal","Aula online"]
+        && request.resource.data.horarios is list && request.resource.data.horarios.size() <= 20
+        && texto(request.resource.data.responsavel, 0, 100)
+        && texto(request.resource.data.whatsapp, 8, 25)
+        && texto(request.resource.data.email, 5, 120)
+        && request.resource.data.menor is bool
+        && (request.resource.data.menor == false || texto(request.resource.data.responsavel, 2, 100))
+        && request.resource.data.autorizacao == true
+        && texto(request.resource.data.versaoAviso, 1, 20)
+        && request.resource.data.criadoEm == request.time;
+
+      // Início de cada rodada: registrado pelo servidor, uma vez só, em ordem.
+      // A rodada seguinte libera quando a foto anterior foi enviada ou o prazo dela acabou.
+      match /rodadas/{n} {
+        allow create: if ehAnonimo(uid)
+          && n in ["1","2","3"]
+          && exists(inscricao(uid))
+          && (n == "1"
+              || exists(envio(uid, string(int(n) - 1)))
+              || (exists(rodada(uid, string(int(n) - 1)))
+                  && request.time > get(rodada(uid, string(int(n) - 1))).data.inicio + duration.value(15, "m")))
+          && request.resource.data.keys().hasOnly(["tipo","proposta","inicio"])
+          && texto(request.resource.data.tipo, 1, 60)
+          && texto(request.resource.data.proposta, 1, 300)
+          && request.resource.data.inicio == request.time;
+      }
+
+      // Envio de cada foto: só depois que a foto entrou no Storage e dentro do prazo
+      // (10 minutos de desenho mais 5 de prazo para enviar).
+      match /envios/{n} {
+        allow create: if ehAnonimo(uid)
+          && n in ["1","2","3"]
+          && exists(rodada(uid, n))
+          && request.time <= get(rodada(uid, n)).data.inicio + duration.value(15, "m")
+          && request.resource.data.keys().hasOnly(["enviadoEm","tamanho"])
+          && request.resource.data.enviadoEm == request.time
+          && request.resource.data.tamanho is int;
+      }
+    }
+  }
+}
