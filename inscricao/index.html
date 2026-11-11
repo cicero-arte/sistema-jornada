@@ -173,7 +173,7 @@
         <li>A proposta exata de cada desenho só aparece quando ele começa.</li>
         <li>Cada desenho tem 10 minutos. Faça do seu jeito, não existe certo ou errado.</li>
         <li>No fim, fotografe só a folha, de cima, sem rostos na foto. Você tem 5 minutos para enviar.</li>
-        <li>No terceiro desenho, você vai pegar um objeto da casa para desenhar olhando para ele. O tempo já conta enquanto pega.</li>
+        <li>No terceiro desenho, aparece o objeto da casa que você vai desenhar olhando para ele. Se não tiver esse objeto, dá para trocar por outro. Os 10 minutos só começam depois que você pegar o objeto.</li>
         <li>O aluno desenha sozinho. Os adultos podem ajudar só com a câmera.</li>
       </ul>
     </div>
@@ -185,6 +185,24 @@
       <div class="acoes">
         <button class="btn btn-contorno" type="button" id="btnTestarCamera">Testar a câmera</button>
         <button class="btn btn-laranja" type="button" id="btnComecar" disabled>Começar o desenho 1</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3a. Objeto do desenho 3: escolhe antes de o tempo começar -->
+  <section id="tela-objeto" hidden>
+    <div class="card">
+      <div class="rodadas" id="marcasObjeto"><span></span><span></span><span></span></div>
+      <div class="tipo">Desenho 3 de 3: Objeto observado</div>
+      <div class="proposta" id="propostaObjeto"></div>
+      <p>Pegue o objeto e coloque na mesa à sua frente. Os 10 minutos começam quando você tocar no botão.</p>
+      <div class="acoes">
+        <button class="btn btn-laranja" type="button" id="btnObjetoPronto">Já peguei, começar os 10 minutos</button>
+        <button class="btn btn-contorno" type="button" id="btnSemObjeto">Não tenho este objeto</button>
+      </div>
+      <div id="outrosObjetos" hidden style="margin-top:16px">
+        <p><b>Escolha outro objeto que você tenha em casa:</b></p>
+        <div class="opcoes" id="listaObjetos"></div>
       </div>
     </div>
   </section>
@@ -328,7 +346,7 @@ const RODADAS = [
 
 /* ===== Utilidades ===== */
 const $ = (id) => document.getElementById(id);
-const telas = ["carregando","cadastro","instrucoes","rodada","foto","intervalo","fim","erro"];
+const telas = ["carregando","cadastro","instrucoes","objeto","rodada","foto","intervalo","fim","erro"];
 function mostrar(nome, passo) {
   telas.forEach(t => { $("tela-" + t).hidden = t !== nome; });
   $("passo").textContent = passo || "";
@@ -556,8 +574,25 @@ let relogio = null;
 function marcas(id) {
   [...$(id).children].forEach((s, i) => { s.className = est.enviada[i] ? "feita" : (i === est.rodada ? "atual" : ""); });
 }
+// Desenho 3: antes de o tempo começar, mostra o objeto e deixa trocar por outro que a pessoa tenha.
+function mostrarObjeto() {
+  est.etapa = "objeto"; gravarEstado();
+  pararCamera();
+  mostrar("objeto", "Desenho 3 de 3");
+  marcas("marcasObjeto");
+  $("propostaObjeto").textContent = est.propostas[2];
+  $("outrosObjetos").hidden = true;
+  const outros = RODADAS[2].propostas.filter(p => p !== est.propostas[2]);
+  const nomeObjeto = (p) => { const n = p.replace(/^Pegue /, "").split(",")[0]; return n.charAt(0).toUpperCase() + n.slice(1); };
+  $("listaObjetos").innerHTML = outros.map((p, i) =>
+    '<button class="opcao" type="button" data-objeto="' + i + '" style="text-align:left;font:inherit;background:#fff">' + esc(nomeObjeto(p)) + '</button>').join("");
+  [...document.querySelectorAll("[data-objeto]")].forEach(b => b.onclick = () => {
+    est.propostas[2] = outros[+b.dataset.objeto]; est.trocasObjeto = (est.trocasObjeto || 0) + 1; mostrarObjeto();
+  });
+}
 async function comecarRodada() {
   const n = est.rodada;
+  if (n === 2 && est.etapa !== "objeto" && !est.inicio[2]) return mostrarObjeto();
   const b = this; if (b) b.disabled = true;
   try {
     await api.iniciarRodada(n + 1, RODADAS[n].tipo, est.propostas[n]);
@@ -699,6 +734,8 @@ async function iniciar() {
   $("btnTestarCamera").onclick = testarCamera;
   $("btnComecar").onclick = comecarRodada;
   $("btnProxima").onclick = comecarRodada;
+  $("btnObjetoPronto").onclick = comecarRodada;
+  $("btnSemObjeto").onclick = () => { $("outrosObjetos").hidden = false; $("outrosObjetos").scrollIntoView({ behavior: "smooth", block: "start" }); };
   $("btnTerminei").onclick = () => { if (confirm("Terminou o desenho? Depois da foto, não dá para voltar a ele.")) irFoto(); };
   $("btnFoto").onclick = tirarFoto;
   $("btnOutra").onclick = voltarCaptura;
@@ -719,6 +756,7 @@ async function iniciar() {
 
   if (est.etapa === "instrucoes") irInstrucoes();
   else if (est.etapa === "rodada") mostrarRodada();
+  else if (est.etapa === "objeto") mostrarObjeto();
   else if (est.etapa === "foto") { if (Date.now() > limitePrazo()) prazoPerdido(); else irFoto(); }
   else if (est.etapa === "intervalo") mostrarIntervalo();
   else if (est.etapa === "fim") mostrarFim();
