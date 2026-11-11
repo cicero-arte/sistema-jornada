@@ -404,9 +404,11 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
     <div class="splash-frase">O curso não tem começo nem fim definidos. Cada aluno entra e sai em qualquer ponto. Os conteúdos se repetem em níveis crescentes de profundidade, como uma espiral que sempre revisita os mesmos núcleos com mais complexidade.</div>
     <button class="splash-btn" onclick="verificarSenha()">Entrar na Jornada</button>
     <div id="splash-senha-wrap" style="display:none;width:100%;max-width:320px;margin:0 auto;">
-      <input type="password" id="splash-senha-input" placeholder="Senha de acesso" style="width:100%;padding:12px 16px;border:1.5px solid #1a1a1a;border-radius:8px;font-family:'Lato',sans-serif;font-size:15px;margin-bottom:10px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')confirmarSenha()">
-      <button class="splash-btn" onclick="confirmarSenha()" style="margin-top:0;">Confirmar</button>
-      <div id="splash-senha-erro" style="color:#c0392b;font-size:12px;margin-top:8px;display:none;">Senha incorreta. Tente novamente.</div>
+      <input type="email" id="splash-email-input" placeholder="E-mail" autocomplete="username" style="width:100%;padding:12px 16px;border:1.5px solid #1a1a1a;border-radius:8px;font-family:'Lato',sans-serif;font-size:15px;margin-bottom:10px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')document.getElementById('splash-senha-input').focus()">
+      <input type="password" id="splash-senha-input" placeholder="Senha" autocomplete="current-password" style="width:100%;padding:12px 16px;border:1.5px solid #1a1a1a;border-radius:8px;font-family:'Lato',sans-serif;font-size:15px;margin-bottom:10px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')confirmarSenha()">
+      <button class="splash-btn" onclick="confirmarSenha()" style="margin-top:0;">Entrar</button>
+      <div id="splash-senha-erro" style="color:#c0392b;font-size:12px;margin-top:8px;display:none;">E-mail ou senha incorretos. Tente novamente.</div>
+      <div style="margin-top:10px;font-size:12px;"><a href="#" onclick="esqueciSenha();return false;" style="color:inherit;">Esqueci a senha</a></div>
     </div>
     <div class="splash-contato">Cícero Lopes · CL Graphic Design &amp; Ilustração · <a href="https://www.cicero.art.br" target="_blank">cicero.art.br</a></div>
   </div>
@@ -777,12 +779,12 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <div class="field">
         <label>Chave API Anthropic</label>
         <input id="cfg-apiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
-        <div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">Necessária para usar o Assistente IA. Obtida em <a href="https://console.anthropic.com" target="_blank" style="color:var(--warm);">console.anthropic.com</a>. Salva junto com os dados do sistema.</div>
+        <div style="font-size:11px;color:var(--ink-muted);margin-top:4px;">Necessária para usar o Assistente IA. Obtida em <a href="https://console.anthropic.com" target="_blank" style="color:var(--warm);">console.anthropic.com</a>. Fica salva só neste navegador, não vai para o banco de dados. Em outro aparelho, digite de novo.</div>
       </div>
     </div>
     <div class="config-section" style="margin-top:16px;">
       <div class="config-section-title">Sessão</div>
-      <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.6;">O acesso fica salvo neste navegador por 10 dias. Se quiser sair antes disso, por exemplo ao terminar de usar um computador compartilhado, use o botão abaixo.</p>
+      <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.6;">O acesso fica salvo neste navegador até você sair. Ao terminar de usar um computador compartilhado, use o botão abaixo.</p>
       <button class="btn" style="border:1.5px solid #c0392b;color:#c0392b;background:transparent;" onclick="sairDaJornada()">Sair da Jornada</button>
     </div>
     <button class="btn btn-primary" onclick="salvarConfig()">Salvar configurações</button>
@@ -1294,6 +1296,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAlBkKt0rDkt6SBEsEXtxJvWbFH26fguGE",
@@ -1307,9 +1310,21 @@ const firebaseConfig = {
 const _app = initializeApp(firebaseConfig);
 const db = getFirestore(_app);
 const storage = getStorage(_app);
+const auth = getAuth(_app);
 const DOC_REF = doc(db, "sistema", "dados");
 
+// Só grava depois que os dados reais foram carregados. Evita gravar os dados de exemplo por cima dos reais.
+let _dadosCarregados = false;
+const CHAVE_API_LOCAL = 'jornada_api_key';
+
 let _salvandoDebounce = null;
+
+// A chave da API fica só neste navegador (localStorage), nunca no banco de dados.
+function _cfgSemChave(){
+  const c = {...cfg};
+  delete c.apiKey;
+  return c;
+}
 
 function _payload(){
   return {
@@ -1317,7 +1332,7 @@ function _payload(){
     pid: pid,
     statusItens: JSON.stringify(statusItens),
     notasItens: JSON.stringify(notasItens),
-    cfg: JSON.stringify(cfg),
+    cfg: JSON.stringify(_cfgSemChave()),
     vrSet: JSON.stringify([...vrSet]),
     folhas: JSON.stringify(folhas),
     avulsos: JSON.stringify(avulsos),
@@ -1328,6 +1343,7 @@ function _payload(){
 let _salvandoImediatoDebounce = null;
 
 function salvarImediato(){
+  if(!_dadosCarregados) return;
   clearTimeout(_salvandoImediatoDebounce);
   _salvandoImediatoDebounce = setTimeout(async ()=>{
     try{
@@ -1338,6 +1354,7 @@ function salvarImediato(){
 }
 
 function salvar(){
+  if(!_dadosCarregados) return;
   clearTimeout(_salvandoDebounce);
   _salvandoDebounce = setTimeout(async ()=>{
     try{
@@ -1350,6 +1367,7 @@ function salvar(){
 async function salvarForcado(){
   const btn = document.getElementById('btn-salvar-forcado');
   if(!btn) return;
+  if(!_dadosCarregados){ alert('Os dados ainda não foram carregados. Nada foi salvo, para não apagar os dados gravados.'); return; }
   btn.textContent = '⏳ Salvando…';
   btn.classList.add('salvando');
   btn.classList.remove('erro');
@@ -1380,6 +1398,8 @@ async function carregar(){
       if(d.statusItens) statusItens = JSON.parse(d.statusItens);
       if(d.notasItens) notasItens = JSON.parse(d.notasItens);
       if(d.cfg) cfg = {...cfg, ...JSON.parse(d.cfg)};
+      // Migração: se a chave ainda estiver no banco, passa para este navegador. Ela sai do banco no próximo salvamento.
+      if(cfg.apiKey && !localStorage.getItem(CHAVE_API_LOCAL)) localStorage.setItem(CHAVE_API_LOCAL, cfg.apiKey);
       if(d.vrSet) vrSet = new Set(JSON.parse(d.vrSet));
       if(d.folhas) folhas = JSON.parse(d.folhas);
       if(d.avulsos) avulsos = JSON.parse(d.avulsos);
@@ -1387,12 +1407,19 @@ async function carregar(){
       metodoGarantir();
       migrarTemasAntigos();
     }
-  }catch(e){ console.error('Erro ao carregar:', e); }
+    cfg.apiKey = localStorage.getItem(CHAVE_API_LOCAL) || '';
+    _dadosCarregados = true;
+    return true;
+  }catch(e){
+    console.error('Erro ao carregar:', e);
+    alert('Não foi possível carregar os dados (' + (e.code || e.message) + '). Nada será salvo até os dados carregarem. Confira a internet e entre de novo.');
+    return false;
+  }
 }
 
 function showToast(){const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
 
-let cfg={empresa:'CL Graphic Design & Ilustração',cnpj:'01.119.869/0001-12',rep:'CÍCERO LOPES DA COSTA',qual:'Casado, Designer Gráfico e Jornalista Ilustrador',cpf:'912.135.417-00',end:'Quadra Q 9 Ar 15, número 106 - Sobradinho, Brasília - DF, 73.036-715',local:'consultório da Dra. Marcília Campos',logo:'',rodape:'CL Graphic Design & Ilustração · CNPJ 01.119.869/0001-12 · Sobradinho-DF',pix:'',apiKey:''};
+let cfg={empresa:'CL Graphic Design & Ilustração',cnpj:'01.119.869/0001-12',rep:'CÍCERO LOPES DA COSTA',qual:'Casado, Designer Gráfico e Jornalista Ilustrador',cpf:'',end:'',local:'consultório da Dra. Marcília Campos',logo:'',rodape:'CL Graphic Design & Ilustração · CNPJ 01.119.869/0001-12 · Sobradinho-DF',pix:'',apiKey:''};
 let alunos=[
   {id:1,nome:'Aluno 1',nasc:'',perfil:'Adolescente Juvenil (15–17)',resp:'Responsável 1',cpfResp:'',tel:'',email:'',endResp:'',valorCheio:440,valorPromo:240,valorVR:35,dataInicio:'',dataContrato:'',obs:'Altas habilidades.',avatar:'#d4825a',freq:{},pag:{}},
   {id:2,nome:'Aluno 2',nasc:'',perfil:'Adolescente Juvenil (15–17)',resp:'Responsável 2',cpfResp:'',tel:'',email:'',endResp:'',valorCheio:440,valorPromo:240,valorVR:35,dataInicio:'',dataContrato:'',obs:'',avatar:'#7a9e87',freq:{},pag:{}},
@@ -3394,7 +3421,7 @@ function imprimirContrato(){const c=document.getElementById('contrato-html').inn
 
 async function exportarDados(){
   metodoGarantir();
-  const backup={alunos,pid,statusItens,notasItens,cfg,metodo,exportadoEm:new Date().toLocaleString('pt-BR')};
+  const backup={alunos,pid,statusItens,notasItens,cfg:_cfgSemChave(),metodo,exportadoEm:new Date().toLocaleString('pt-BR')};
   const json=JSON.stringify(backup,null,2);
   const now=new Date();
   const data=now.toISOString().slice(0,10);
@@ -3462,17 +3489,25 @@ function importarDados(input){
   reader.readAsText(file);
 }
 
-function salvarConfig(){['empresa','cnpj','rep','qual','cpf','end','local','logo','rodape','pix','apiKey'].forEach(k=>{cfg[k]=document.getElementById('cfg-'+k).value;});salvar();}
+function salvarConfig(){['empresa','cnpj','rep','qual','cpf','end','local','logo','rodape','pix','apiKey'].forEach(k=>{cfg[k]=document.getElementById('cfg-'+k).value;});if(cfg.apiKey)localStorage.setItem(CHAVE_API_LOCAL,cfg.apiKey);else localStorage.removeItem(CHAVE_API_LOCAL);salvar();}
 function preencherConfig(){['empresa','cnpj','rep','qual','cpf','end','local','logo','rodape','pix','apiKey'].forEach(k=>{document.getElementById('cfg-'+k).value=cfg[k]||'';});}
 
-async function iniciar(){
+function iniciar(){
   const splash = document.getElementById('splash');
-  const jaAutenticado = verificarAcesso();
-  if(splash && !jaAutenticado) splash.style.display='flex';
-  await carregar();
-  popularMeses();
-  renderAlunos();
-  if(splash && jaAutenticado) splash.style.display='none';
+  const loading = document.getElementById('splash-loading');
+  onAuthStateChanged(auth, async (user)=>{
+    if(!user){
+      _dadosCarregados = false;
+      if(splash) splash.style.display='flex';
+      return;
+    }
+    if(splash) splash.style.display='none';
+    if(loading) loading.style.display='flex';
+    await carregar();
+    if(loading) loading.style.display='none';
+    popularMeses();
+    renderAlunos();
+  });
 }
 iniciar();
 
@@ -3727,52 +3762,41 @@ function avalToggleRubrica() {
   else { el.classList.add('open'); lnk.textContent = '▲ ocultar tabela'; }
 }
 
-// ── SENHA DE ACESSO ──────────────────────────────────────
-const SENHA_HASH = '5064583e18550f2dabf630be60b2b4dd20b5b66c1bc7d534e3c5166d00087d39';
-
-async function hashSenha(senha) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(senha);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function verificarAcesso() {
-  const expiry = localStorage.getItem('jornada_auth_expiry');
-  if (expiry && Date.now() < parseInt(expiry)) {
-    return true;
-  }
-  localStorage.removeItem('jornada_auth_expiry');
-  return false;
-}
-
+// ── ACESSO (login do Firebase) ─────────────────────────
 function sairDaJornada() {
-  if(!confirm('Sair da Jornada? Você vai precisar digitar a senha de novo para entrar.')) return;
-  localStorage.removeItem('jornada_auth_expiry');
-  location.reload();
+  if(!confirm('Sair da Jornada? Você vai precisar entrar com e-mail e senha de novo.')) return;
+  signOut(auth).then(()=>location.reload());
 }
 
 function verificarSenha() {
   document.getElementById('splash-senha-wrap').style.display = 'block';
   document.querySelector('.splash-btn').style.display = 'none';
-  setTimeout(() => document.getElementById('splash-senha-input').focus(), 100);
+  setTimeout(() => document.getElementById('splash-email-input').focus(), 100);
 }
 
 async function confirmarSenha() {
-  const input = document.getElementById('splash-senha-input').value;
-  const hash = await hashSenha(input);
+  const email = document.getElementById('splash-email-input').value.trim();
+  const senha = document.getElementById('splash-senha-input').value;
   const erroEl = document.getElementById('splash-senha-erro');
-  if (hash === SENHA_HASH) {
-    const expiry = Date.now() + (10 * 24 * 60 * 60 * 1000); // 10 dias
-    localStorage.setItem('jornada_auth_expiry', String(expiry));
-    document.getElementById('splash').style.display = 'none';
-    erroEl.style.display = 'none';
-  } else {
+  erroEl.style.display = 'none';
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+    document.getElementById('splash-senha-input').value = '';
+  } catch (e) {
+    erroEl.textContent = (e.code === 'auth/too-many-requests')
+      ? 'Muitas tentativas. Espere alguns minutos ou use "Esqueci a senha".'
+      : (e.code === 'auth/network-request-failed' ? 'Sem conexão com a internet.' : 'E-mail ou senha incorretos. Tente novamente.');
     erroEl.style.display = 'block';
     document.getElementById('splash-senha-input').value = '';
     document.getElementById('splash-senha-input').focus();
   }
+}
+
+async function esqueciSenha() {
+  const email = document.getElementById('splash-email-input').value.trim();
+  if (!email) { alert('Digite o seu e-mail no campo acima e clique de novo em "Esqueci a senha".'); return; }
+  try { await sendPasswordResetEmail(auth, email); } catch (e) {}
+  alert('Se este e-mail tiver acesso, chega em instantes uma mensagem para criar uma senha nova.');
 }
 
 
@@ -4523,7 +4547,7 @@ iaRestaurar();
 
 // ── FIM ASSISTENTE IA ─────────────────────────────────────
 
-window.verificarSenha=verificarSenha; window.confirmarSenha=confirmarSenha;
+window.verificarSenha=verificarSenha; window.confirmarSenha=confirmarSenha; window.esqueciSenha=esqueciSenha;
 window.abrirModal=abrirModal; window.abrirNFSe=abrirNFSe; window.avalImprimir=avalImprimir;
 window.avalReset=avalReset; window.avalSelNota=avalSelNota; window.avalSelecionarAluno=avalSelecionarAluno;
 window.avalToggleEscala=avalToggleEscala; window.avalToggleRubrica=avalToggleRubrica;
