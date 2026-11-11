@@ -184,6 +184,15 @@
   <section id="vAjustes" hidden>
     <div class="acoes" style="margin-bottom:12px"><button class="btn btn-leve" type="button" data-voltar>Voltar</button></div>
     <div class="card">
+      <h1>Opções da inscrição</h1>
+      <p class="sub">O que aparece para quem se inscreve. Mude quando quiser: vale na hora para as próximas inscrições.</p>
+      <div class="campo"><label for="oDias">Dias de preferência (um por linha)</label><textarea id="oDias" style="min-height:150px"></textarea></div>
+      <div class="campo"><label for="oPeriodos">Períodos de preferência (um por linha)</label><textarea id="oPeriodos" style="min-height:110px"></textarea></div>
+      <div class="campo"><label style="display:flex;gap:8px;align-items:center;font-size:14px;color:var(--texto)"><input type="checkbox" id="oOnline"> Mostrar a opção "Aula online" na inscrição</label></div>
+      <button class="btn btn-azul" type="button" id="btnSalvarOpcoes">Salvar opções</button>
+      <span class="sub" id="opcoesSalvas"></span>
+    </div>
+    <div class="card">
       <h1>Ajustes da mensagem</h1>
       <p class="sub">Links usados na mensagem que acompanha o Relatório de Evolução. Ficam guardados no banco, só para você.</p>
       <div class="campo"><label for="cAmostra">Link da aula de amostra (online)</label><input type="url" id="cAmostra" placeholder="https://"></div>
@@ -239,6 +248,21 @@ const DESC = [
   "Nesta fase, desenhar vira uma escolha consciente. O foco é aprofundar a técnica, desenvolver o estilo próprio e montar um portfólio, com os bastidores do trabalho de ilustrador."
 ];
 const DESC_GARATUJA = "Por enquanto, o desenho está no momento da garatuja: rabiscos, movimento e descoberta do traço. As aulas do curso começam na fase Pré-esquemática.";
+const VALIDADE_CONVITE = 14 * 86400000;
+const OPCOES_PADRAO = {
+  dias: ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Turma em andamento", "Indiferente/Flexível"],
+  periodos: ["Tarde (16h30 às 19h30)", "Noite (18h às 19h)", "Turma em andamento", "Indiferente/Flexível"]
+};
+function novoCodigo() {
+  const letras = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789", a = new Uint32Array(24);
+  crypto.getRandomValues(a);
+  return [...a].map(n => letras[n % letras.length]).join("");
+}
+const fmtCpf = (c) => c ? c.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4") : "";
+const fmtCep = (c) => c ? c.replace(/^(\d{5})(\d{3})$/, "$1-$2") : "";
+function enderecoTexto(m) {
+  return [m.logradouro, m.conjunto, m.numero ? "nº " + m.numero : "", m.complemento, m.bairro, m.cidade + "-" + m.uf, "CEP " + fmtCep(m.cep)].filter(Boolean).join(", ");
+}
 const RODAPE_PADRAO = "Cícero Lopes · CNPJ 01.119.869/0001-12 · Jornada do Desenho, Sobradinho-DF";
 const classeGiro = (g) => g ? ` class="g${g}"` : "";
 const DESENHOS = ["Figura humana em ação","Paisagem com chão e céu","Objeto observado"];
@@ -380,7 +404,12 @@ async function criarApiFirebase() {
     entrar: (e, s) => A.signInWithEmailAndPassword(auth, e, s),
     sair: () => A.signOut(auth),
     async listar() {
-      const snap = await F.getDocs(F.query(F.collection(db, "inscricoes"), F.orderBy("criadoEm", "desc")));
+      const [snap, ms] = await Promise.all([
+        F.getDocs(F.query(F.collection(db, "inscricoes"), F.orderBy("criadoEm", "desc"))),
+        F.getDocs(F.collection(db, "matriculas"))
+      ]);
+      const matriculas = {};
+      ms.docs.forEach(m => { const v = m.data(); matriculas[m.id] = { ...v, enviadoEm: ts(v.enviadoEm), importadoEm: ts(v.importadoEm) }; });
       return Promise.all(snap.docs.map(async d => {
         const x = d.data();
         const [rs, es] = await Promise.all([F.getDocs(F.collection(db, "inscricoes", d.id, "rodadas")), F.getDocs(F.collection(db, "inscricoes", d.id, "envios"))]);
@@ -391,7 +420,8 @@ async function criarApiFirebase() {
           if (!r.envio) return;
           try { r.url = await S.getDownloadURL(S.ref(st, `inscricoes/${d.id}/${i + 1}/foto.jpg`)); } catch (e) { r.url = ""; }
         }));
-        return { id: d.id, ...x, criadoEm: ts(x.criadoEm), rodadas };
+        const m = x.matricula && x.matricula.codigo ? matriculas[x.matricula.codigo] : null;
+        return { id: d.id, ...x, criadoEm: ts(x.criadoEm), rodadas, matriculaDados: m || null };
       }));
     },
     atualizar: (id, dados) => F.updateDoc(F.doc(db, "inscricoes", id), dados),
@@ -401,8 +431,22 @@ async function criarApiFirebase() {
         await F.deleteDoc(F.doc(db, "inscricoes", id, "rodadas", n));
         await F.deleteDoc(F.doc(db, "inscricoes", id, "envios", n));
       }
+      const s = await F.getDoc(F.doc(db, "inscricoes", id));
+      const c = s.exists() && s.data().matricula ? s.data().matricula.codigo : "";
+      if (c) { await F.deleteDoc(F.doc(db, "matriculas", c)); await F.deleteDoc(F.doc(db, "convites", c)); }
       await F.deleteDoc(F.doc(db, "inscricoes", id));
     },
+    async pedirMatricula(ins) {
+      const codigo = novoCodigo();
+      const validoAte = new Date(Date.now() + VALIDADE_CONVITE);
+      await F.setDoc(F.doc(db, "convites", codigo), { menor: !!ins.menor, validoAte: F.Timestamp.fromDate(validoAte) });
+      const matricula = { codigo, pedidoEm: F.serverTimestamp(), validoAte: F.Timestamp.fromDate(validoAte) };
+      await F.updateDoc(F.doc(db, "inscricoes", ins.id), { matricula });
+      if (ins.matricula && ins.matricula.codigo) { try { await F.deleteDoc(F.doc(db, "convites", ins.matricula.codigo)); } catch (e) {} }
+      return { codigo, validoAte };
+    },
+    async lerOpcoes() { const s = await F.getDoc(F.doc(db, "publico", "inscricao")); return s.exists() ? s.data() : {}; },
+    salvarOpcoes: (d) => F.setDoc(F.doc(db, "publico", "inscricao"), d),
     async lerAjustes() { const s = await F.getDoc(F.doc(db, "sistema", "inscricoes")); return s.exists() ? s.data() : {}; },
     salvarAjustes: (d) => F.setDoc(F.doc(db, "sistema", "inscricoes"), d, { merge: true }),
     async analisar(ins) {
@@ -451,14 +495,19 @@ function criarApiSimulacao() {
       trabalhar: "Vamos variar as posições da figura humana, para sair da pose de frente, e trabalhar formas e sobreposição, colocando uma coisa na frente da outra na cena. No objeto, vamos observar a luz e a sombra com calma." },
     modelo: "simulação", uso: { entrada: 9800, saida: 3100 }
   };
+  const analiseExemplo_obs = "Item fictício";
   const dados = [
-    { id: "sim-a", nome: "Aluna Fictícia Ana", nascimento: "2016-04-02", idade: 10, menor: true, responsavel: "Mãe Fictícia", whatsapp: "(61) 90000-0001", email: "ana.ficticia@exemplo.com", modalidade: "Aula online", horarios: [], versaoAviso: "2026-11",
+    { id: "sim-a", nome: "Aluna Fictícia Ana", nascimento: "2016-04-02", idade: 10, menor: true, responsavel: "Mãe Fictícia", whatsapp: "(61) 90000-0001", email: "ana.ficticia@exemplo.com", modalidade: "Aula online", dias: [], periodos: [], outroHorario: "", comoConheceu: "Redes sociais", estilo: "Mangá e personagens de anime", versaoAviso: "2026-11",
+      status: "enviado", revisao: { fase: "Esquemática", observados: analiseExemplo_obs, fortes: "Texto fictício.", trabalhar: "Texto fictício." }, matricula: { codigo: "SIMULACAOana", validoAte: new Date(h + 12 * 86400000), pedidoEm: new Date(h - 86400000) },
+      matriculaDados: { contratanteProprioAluno: false, contratanteNome: "", cpf: "52998224725", cep: "73000000", logradouro: "Quadra Fictícia 1", conjunto: "Conjunto A", numero: "10", complemento: "", bairro: "Bairro Fictício", cidade: "Brasília", uf: "DF", adaptacao: "", autorizaAdaptacao: false, enviadoEm: new Date(h - 3600000) },
       criadoEm: new Date(h - 2 * 86400000), rodadas: rod(h - 2 * 86400000, ["Desenhe uma pessoa de corpo inteiro chutando uma bola.", "Desenhe uma rua da cidade, com o chão, o céu, casas e árvores.", "Pegue uma caneca ou um copo, coloque na mesa à sua frente e desenhe olhando para ele."], 0, [598, 610, 655]), analise: analiseExemplo },
-    { id: "sim-b", nome: "Aluno Fictício Bruno", nascimento: "2011-09-15", idade: 15, menor: true, responsavel: "Pai Fictício", whatsapp: "(61) 90000-0002", email: "bruno.ficticio@exemplo.com", modalidade: "Aula presencial mensal", horarios: ["Terça, tarde", "Sábado, manhã"], versaoAviso: "2026-11",
+    { id: "sim-b", nome: "Aluno Fictício Bruno", nascimento: "2011-09-15", idade: 15, menor: true, responsavel: "Pai Fictício", whatsapp: "(61) 90000-0002", email: "bruno.ficticio@exemplo.com", modalidade: "Aula presencial mensal", dias: ["Terça-feira", "Quinta-feira"], periodos: ["Tarde (16h30 às 19h30)"], outroHorario: "", comoConheceu: "Indicação", estilo: "Quadrinhos de super-heróis", versaoAviso: "2026-11",
       criadoEm: new Date(h - 3600000), rodadas: rod(h - 3600000, ["Desenhe uma pessoa de corpo inteiro andando de bicicleta.", "Desenhe um parque, com o gramado, o céu e árvores.", "Pegue um tênis ou um sapato, coloque na mesa à sua frente e desenhe olhando para ele."], 1, [540, 600, 880]) },
-    { id: "sim-c", nome: "Pessoa Fictícia Carla", nascimento: "1991-01-20", idade: 35, menor: false, responsavel: "", whatsapp: "", usuarioWhatsapp: "carla.ficticia", email: "carla.ficticia@exemplo.com", modalidade: "Aula presencial avulsa", horarios: ["Quarta, noite"], versaoAviso: "2026-11",
+    { id: "sim-c", nome: "Pessoa Fictícia Carla", nascimento: "1991-01-20", idade: 35, menor: false, responsavel: "", whatsapp: "", usuarioWhatsapp: "carla.ficticia", email: "carla.ficticia@exemplo.com", modalidade: "Aula presencial avulsa", dias: ["Indiferente/Flexível"], periodos: ["Noite (18h às 19h)"], outroHorario: "Só depois das 18h", comoConheceu: "Google", estilo: "Desenho realista de paisagens", versaoAviso: "2026-11",
       criadoEm: new Date(h - 200 * 86400000), rodadas: rod(h - 200 * 86400000, ["Desenhe uma pessoa de corpo inteiro regando as plantas.", "Desenhe uma praia, com a areia, o mar e o céu.", "Pegue uma fruta, coloque na mesa à sua frente e desenhe olhando para ela."], 1, [600, null]) }
   ];
+  let opcoesSim = { dias: ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Turma em andamento", "Indiferente/Flexível"],
+    periodos: ["Tarde (16h30 às 19h30)", "Noite (18h às 19h)", "Turma em andamento", "Indiferente/Flexível"], onlineAberta: false };
   let ajustes = { amostra: "https://exemplo.com/aula-de-amostra", f0: "", f1: "https://exemplo.com/comprar-esquematica", f2: "", f3: "", pratica: "2 vezes de 15 minutos por semana" };
   return {
     observarLogin(cb) { setTimeout(() => cb({ uid: UID_PROFESSOR }), 50); },
@@ -466,6 +515,14 @@ function criarApiSimulacao() {
     async listar() { await espera(300); return dados.map(d => ({ ...d })); },
     async atualizar(id, d) { await espera(200); const x = dados.find(y => y.id === id); for (const k in d) x[k] = d[k] === "__agora__" ? new Date() : d[k]; },
     async apagar(id) { await espera(300); dados.splice(dados.findIndex(y => y.id === id), 1); },
+    async pedirMatricula(ins) {
+      await espera(300);
+      const codigo = "SIMULACAO" + novoCodigo().slice(0, 8), validoAte = new Date(Date.now() + VALIDADE_CONVITE);
+      const x = dados.find(y => y.id === ins.id); x.matricula = { codigo, validoAte, pedidoEm: new Date() };
+      return { codigo, validoAte };
+    },
+    async lerOpcoes() { return { ...opcoesSim }; },
+    async salvarOpcoes(d) { opcoesSim = { ...d }; },
     async lerAjustes() { return { ...ajustes }; },
     async salvarAjustes(d) { ajustes = { ...ajustes, ...d }; },
     async analisar(ins) {
@@ -533,7 +590,7 @@ function desenharLista() {
   $("lista").innerHTML = vis.map(i => `
     <button class="item" type="button" data-id="${esc(i.id)}">
       <span class="miniaturas">${i.rodadas.map((r, j) => `<span>${r.url ? `<img alt="" src="${esc(r.url)}" style="${(i.revisao && i.revisao.giros && i.revisao.giros[j]) ? `transform:rotate(${i.revisao.giros[j]}deg)` : ""}">` : ""}</span>`).join("")}</span>
-      <span class="info"><b>${esc(i.nome)}</b><small>${esc(i.idade)} anos · ${esc(i.modalidade)} · ${dataBr(i.criadoEm)}${fase(i) ? " · " + esc(fase(i)) : ""}${situacao(i) === "aguardando" && prazoAbandonado(i) ? " · parou no meio" : ""}</small></span>
+      <span class="info"><b>${esc(i.nome)}</b><small>${esc(i.idade)} anos · ${esc(i.modalidade)} · ${dataBr(i.criadoEm)}${fase(i) ? " · " + esc(fase(i)) : ""}${situacao(i) === "aguardando" && prazoAbandonado(i) ? " · parou no meio" : ""}${i.matriculaDados && !i.matriculaDados.importado ? " · <b>dados da matrícula recebidos</b>" : ""}${i.matricula && !i.matriculaDados ? " · aguardando dados da matrícula" : ""}</small></span>
       ${chip(i)}
     </button>`).join("");
 }
@@ -642,7 +699,10 @@ function abrir(id) {
         ${ins.usuarioWhatsapp ? `<div><span>Usuário do WhatsApp:</span> @${esc(ins.usuarioWhatsapp)}</div>` : ""}
         <div><span>E-mail:</span> ${esc(ins.email)}</div>
         <div><span>Inscrição:</span> ${ins.criadoEm ? ins.criadoEm.toLocaleString("pt-BR") : ""}</div>
+        ${(ins.dias && ins.dias.length) || (ins.periodos && ins.periodos.length) || ins.outroHorario ? `<div style="grid-column:1/-1"><span>Preferência:</span> ${esc([(ins.dias || []).join(", "), (ins.periodos || []).join(", "), ins.outroHorario].filter(Boolean).join(" · "))}</div>` : ""}
         ${ins.horarios && ins.horarios.length ? `<div style="grid-column:1/-1"><span>Horários:</span> ${esc(ins.horarios.join("; "))}</div>` : ""}
+        ${ins.comoConheceu ? `<div><span>Como conheceu:</span> ${esc(ins.comoConheceu)}</div>` : ""}
+        ${ins.estilo ? `<div style="grid-column:1/-1"><span>Estilo e personagens favoritos:</span> ${esc(ins.estilo)}</div>` : ""}
         <div><span>Autorização:</span> ${ins.menor ? "do responsável" : "do próprio aluno"}, aviso ${esc(ins.versaoAviso || "")}</div>
       </div>
     </div>
@@ -683,12 +743,14 @@ function abrir(id) {
         ${s === "enviado" ? `<button class="btn btn-leve" type="button" id="btnMatric">Marcar como matriculado</button>` : ""}
       </div>
     </div>
+    ${["enviado", "matriculado", "aprovado"].includes(s) ? cartaoMatricula(ins) : ""}
     <div class="card"><h2>Dados pessoais (LGPD)</h2>
       <p class="sub">Apaga o cadastro e as 3 fotos de vez. Use quando a família pedir ou depois de 6 meses sem matrícula.</p>
       <button class="btn btn-perigo" type="button" id="btnApagar">Apagar esta inscrição</button>
     </div>`;
   mostrarVista("vDetalhe");
   ligarDetalhe(ins, bloqueado);
+  ligarMatricula(ins);
 }
 function lerForm() {
   return {
@@ -751,6 +813,66 @@ function ligarDetalhe(ins, bloqueado) {
   };
 }
 
+/* ===== Matrícula (cadastro definitivo) ===== */
+function linkMatricula(codigo) { return new URL("matricula/?c=" + codigo, location.href).href; }
+function cartaoMatricula(ins) {
+  const m = ins.matricula, d = ins.matriculaDados;
+  let h = `<div class="card" id="cardMatricula"><h2>Matrícula</h2>`;
+  if (d) {
+    const quem = ins.menor ? ins.responsavel + " (responsável)" : (d.contratanteProprioAluno ? ins.nome + " (o próprio aluno)" : d.contratanteNome);
+    h += `<p class="sub">Dados enviados em ${d.enviadoEm ? d.enviadoEm.toLocaleString("pt-BR") : ""}.</p>
+      <div class="dados" style="margin-bottom:12px">
+        <div><span>Contratante:</span> ${esc(quem)}</div>
+        <div><span>CPF:</span> ${esc(fmtCpf(d.cpf))}</div>
+        <div style="grid-column:1/-1"><span>Endereço:</span> ${esc(enderecoTexto(d))}</div>
+        ${d.adaptacao ? `<div style="grid-column:1/-1"><span>Para adaptar as aulas (dado sensível):</span> ${esc(d.adaptacao)}</div>` : ""}
+      </div>`;
+    h += d.importado
+      ? `<div class="aviso">Aluno adicionado ao app de gestão${d.importadoEm ? " em " + d.importadoEm.toLocaleDateString("pt-BR") : ""}. O contrato sai pelo app, como antes.</div>`
+      : `<div class="aviso laranja"><b>Próximo passo:</b> abra o <a href="./">app de gestão</a>. Na tela de alunos aparece "Matrícula nova" com o botão para abrir o cadastro já preenchido. Confira, complete valor, encontros por semana e data de início, e salve.</div>`;
+  } else if (m && m.codigo) {
+    const val = m.validoAte && m.validoAte.toDate ? m.validoAte.toDate() : m.validoAte;
+    const vencido = val && val < api.agora();
+    h += `<p>${vencido ? `<b class="tarde">O link venceu em ${val.toLocaleDateString("pt-BR")}.</b> Gere um link novo.` : `Link enviado, aguardando os dados. Vale até ${val ? val.toLocaleDateString("pt-BR") : ""}.`}</p>
+      ${vencido ? "" : `<div class="campo"><label for="mLink">Link para a família</label><input type="text" id="mLink" readonly value="${esc(linkMatricula(m.codigo))}"></div>`}
+      <div class="campo"><label for="mMsg">Mensagem</label><textarea id="mMsg">${esc(vencido ? "" : mensagemMatricula(ins, m.codigo, val))}</textarea></div>
+      <div class="acoes">
+        ${vencido ? "" : `<a class="btn btn-contorno" id="lnkZapMat" target="_blank" rel="noopener"${ins.whatsapp ? "" : " hidden"}>Abrir no WhatsApp</a>
+        <button class="btn btn-contorno" type="button" id="btnCopiarMat">Copiar mensagem</button>`}
+        <button class="btn btn-leve" type="button" id="btnPedirMat">Gerar link novo</button>
+      </div>`;
+  } else {
+    h += `<p class="sub">Quando ${ins.menor ? "a família" : "o aluno"} confirmar a matrícula, peça os dados que faltam para o contrato: CPF e endereço completo. O resto já veio da inscrição. O link vale ${VALIDADE_CONVITE / 86400000} dias e serve uma vez só.</p>
+      <div class="acoes"><button class="btn btn-laranja" type="button" id="btnPedirMat">Pedir dados da matrícula</button></div>`;
+  }
+  return h + `<div class="aviso erro" id="erroMat" hidden></div></div>`;
+}
+function mensagemMatricula(ins, codigo, validoAte) {
+  const quem = ins.menor ? (ins.responsavel || "").split(" ")[0] : ins.nome.split(" ")[0];
+  const aluno = ins.nome.split(" ")[0];
+  return `Olá, ${quem}!\n\nQue bom que ${ins.menor ? aluno + " vai começar" : "você vai começar"} na Jornada do Desenho. Para eu preparar o contrato, preencha os dados que faltam neste link (leva cerca de 1 minuto):\n\n${linkMatricula(codigo)}\n\nO link vale até ${validoAte.toLocaleDateString("pt-BR")}. Os outros dados eu já tenho da inscrição.\n\nCícero Lopes\nJornada do Desenho`;
+}
+function ligarMatricula(ins) {
+  const b = $("btnPedirMat");
+  if (b) b.onclick = async () => {
+    if (ins.matricula && ins.matricula.codigo && !confirm("Gerar um link novo? O link anterior deixa de funcionar.")) return;
+    b.disabled = true;
+    try { const r = await api.pedirMatricula(ins); ins.matricula = { codigo: r.codigo, validoAte: r.validoAte }; abrir(ins.id); }
+    catch (e) { console.error(e); $("erroMat").textContent = "Não foi possível criar o link: " + (e.code || e.message); $("erroMat").hidden = false; b.disabled = false; }
+  };
+  const z = $("lnkZapMat");
+  if (z) {
+    const atual = () => { z.href = "https://wa.me/" + numeroZap(ins.whatsapp) + "?text=" + encodeURIComponent($("mMsg").value); };
+    atual(); $("mMsg").oninput = atual;
+  }
+  const c = $("btnCopiarMat");
+  if (c) c.onclick = async () => {
+    try { await navigator.clipboard.writeText($("mMsg").value); c.textContent = "Mensagem copiada"; }
+    catch (e) { $("mMsg").select(); c.textContent = "Selecionada: use Ctrl+C"; }
+    setTimeout(() => { c.textContent = "Copiar mensagem"; }, 2500);
+  };
+}
+
 /* ===== Envio ===== */
 function mensagemPadrao(ins) {
   const rv = rascunho(ins);
@@ -767,7 +889,7 @@ function mensagemPadrao(ins) {
       const compra = iFase >= 0 ? ajustes["f" + iFase] : "";
       m += compra ? `Se quiser começar, a matrícula é por este link: ${compra}\n\n` : `Se quiser começar, me responda que eu mando o link da matrícula.\n\n`;
     } else {
-      m += `Sobre a ${ins.modalidade.toLowerCase()}, vou combinar com você por aqui o dia, o horário e a turma${ins.horarios && ins.horarios.length ? ", a partir dos horários que você marcou" : ""}.\n\n`;
+      m += `Sobre a ${ins.modalidade.toLowerCase()}, vou combinar com você por aqui o dia, o horário e a turma${(ins.dias && ins.dias.length) || (ins.periodos && ins.periodos.length) ? ", a partir das preferências que você marcou" : ""}.\n\n`;
     }
   }
   m += "Qualquer dúvida, é só responder esta mensagem.\n\nCícero Lopes\nJornada do Desenho";
@@ -827,7 +949,14 @@ function relatorio(ins) {
 }
 
 /* ===== Ajustes ===== */
-function abrirAjustes() {
+async function abrirAjustes() {
+  $("opcoesSalvas").textContent = "";
+  try {
+    const o = await api.lerOpcoes();
+    $("oDias").value = (o.dias || OPCOES_PADRAO.dias).join("\n");
+    $("oPeriodos").value = (o.periodos || OPCOES_PADRAO.periodos).join("\n");
+    $("oOnline").checked = !!o.onlineAberta;
+  } catch (e) { $("opcoesSalvas").textContent = " Não foi possível ler as opções: " + (e.code || e.message); }
   $("cAmostra").value = ajustes.amostra || "";
   for (let i = 0; i < 4; i++) $("cF" + i).value = ajustes["f" + i] || "";
   $("cPratica").value = ajustes.pratica || "";
@@ -835,6 +964,13 @@ function abrirAjustes() {
   $("cRodape").placeholder = RODAPE_PADRAO;
   $("ajustesSalvos").textContent = "";
   mostrarVista("vAjustes");
+}
+async function salvarOpcoes() {
+  const linhas = (id) => $(id).value.split("\n").map(s => s.trim()).filter(Boolean).slice(0, 20).map(s => s.slice(0, 80));
+  const d = { dias: linhas("oDias"), periodos: linhas("oPeriodos"), onlineAberta: $("oOnline").checked };
+  if (!d.dias.length || !d.periodos.length) { $("opcoesSalvas").textContent = " Deixe pelo menos um dia e um período."; return; }
+  try { await api.salvarOpcoes(d); $("opcoesSalvas").textContent = " Salvo. Já vale para as próximas inscrições."; }
+  catch (e) { $("opcoesSalvas").textContent = " Erro: " + (e.code || e.message); }
 }
 async function salvarAjustes() {
   const d = { amostra: $("cAmostra").value.trim(), pratica: $("cPratica").value.trim(), rodape: $("cRodape").value.trim() };
@@ -852,6 +988,7 @@ $("abas").onclick = (ev) => { const b = ev.target.closest(".aba"); if (b) { filt
 $("btnFecharRel").onclick = () => { document.title = "Inscrições | Jornada do Desenho"; $("areaRelatorio").hidden = true; $("principal").hidden = false; };
 $("btnAjustes").onclick = abrirAjustes;
 $("btnSalvarAjustes").onclick = salvarAjustes;
+$("btnSalvarOpcoes").onclick = salvarOpcoes;
 $("btnSair").onclick = () => api.sair();
 $("formLogin").onsubmit = async (ev) => {
   ev.preventDefault(); $("erroLogin").hidden = true;

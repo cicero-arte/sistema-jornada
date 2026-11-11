@@ -460,6 +460,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
       <div class="sec-title" style="margin:0;">Alunos</div>
       <button class="btn btn-primary btn-sm" onclick="abrirModal()">+ Novo aluno</button>
     </div>
+    <div id="matriculas-novas"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
       <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;flex-wrap:wrap;">
         <button id="alunos-btn-ativo" class="cresc-periodo-btn" onclick="setAlunosFiltroStatus('ativo')">Ativos</button>
@@ -1296,7 +1297,7 @@ select.mes-sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px
 <script type="module">
 // ── FIREBASE ─────────────────────────────────────────────
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, serverTimestamp, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -1313,6 +1314,12 @@ const _app = initializeApp(firebaseConfig);
 const db = getFirestore(_app);
 const storage = getStorage(_app);
 const auth = getAuth(_app);
+// Só para testes no computador do desenvolvedor (localhost com ?emulador): usa o emulador, nunca o projeto real.
+if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).has('emulador')) {
+  const { connectAuthEmulator } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectFirestoreEmulator(db, "127.0.0.1", 8085);
+}
 const DOC_REF = doc(db, "sistema", "dados");
 
 // Só grava depois que os dados reais foram carregados. Evita gravar os dados de exemplo por cima dos reais.
@@ -3509,6 +3516,7 @@ function iniciar(){
     if(loading) loading.style.display='none';
     popularMeses();
     renderAlunos();
+    verificarMatriculas();
   });
 }
 iniciar();
@@ -4593,6 +4601,73 @@ window.setCrescPeriodo=setCrescPeriodo;
 window.renderCrescimento=renderCrescimento;
 window.setAlunosFiltroStatus=setAlunosFiltroStatus; window.mudarStatusAluno=mudarStatusAluno; window.renderAlunos=renderAlunos;
 window.abrirNFSeAvulso=abrirNFSeAvulso;
+// ── MATRÍCULAS NOVAS (cadastro definitivo vindo da área de inscrições) ──
+// A família envia CPF e endereço pelo link de matrícula. Aqui o aviso abre o formulário
+// "Novo aluno" já preenchido com isso e com os dados da inscrição. Quem grava continua sendo o app.
+let _matriculasNovas = [], _matriculaEmCadastro = null;
+const _escM = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+async function verificarMatriculas(){
+  try{
+    const [ms, ins] = await Promise.all([getDocs(collection(db, 'matriculas')), getDocs(collection(db, 'inscricoes'))]);
+    const porCodigo = {};
+    ins.docs.forEach(d => { const x = d.data(); if (x.matricula && x.matricula.codigo) porCodigo[x.matricula.codigo] = { id: d.id, ...x }; });
+    _matriculasNovas = ms.docs.filter(m => !m.data().importado && porCodigo[m.id]).map(m => ({ codigo: m.id, m: m.data(), ins: porCodigo[m.id] }));
+  }catch(e){ console.error('Matrículas novas:', e); _matriculasNovas = []; }
+  renderMatriculasNovas();
+}
+function renderMatriculasNovas(){
+  const el = document.getElementById('matriculas-novas'); if (!el) return;
+  el.innerHTML = _matriculasNovas.map((x, i) => `<div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#FEF3E2;border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+    <span><b>Matrícula nova:</b> ${_escM(x.ins.nome)} · ${_escM(x.ins.modalidade)}${x.ins.revisao && x.ins.revisao.fase ? ' · fase ' + _escM(x.ins.revisao.fase) : ''}</span>
+    <button class="btn btn-primary btn-sm" onclick="abrirMatriculaNova(${i})">Abrir no cadastro</button></div>`).join('');
+}
+function abrirMatriculaNova(i){
+  const x = _matriculasNovas[i]; if (!x) return;
+  abrirModal();
+  const ins = x.ins, m = x.m;
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v || ''; };
+  const idade = Number(ins.idade) || 0;
+  const contratante = ins.menor ? ins.responsavel : (m.contratanteProprioAluno ? ins.nome : m.contratanteNome);
+  const cpf = String(m.cpf || '').replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+  const cep = String(m.cep || '').replace(/^(\d{5})(\d{3})$/, '$1-$2');
+  const endereco = [m.logradouro, m.conjunto, m.numero ? 'nº ' + m.numero : '', m.complemento, m.bairro, (m.cidade || '') + '-' + (m.uf || ''), cep ? 'CEP ' + cep : ''].filter(Boolean).join(', ');
+  set('f-nome', ins.nome); set('f-nasc', ins.nascimento); calcularIdade();
+  set('f-perfil', idade <= 11 ? 'Infantil (8–11)' : idade <= 14 ? 'Adolescente Infanto-juvenil (12–14)' : idade <= 17 ? 'Adolescente Juvenil (15–17)' : 'Adulto Iniciante');
+  set('f-resp', contratante); set('f-cpf-resp', cpf);
+  set('f-tel', ins.whatsapp || (ins.usuarioWhatsapp ? '@' + ins.usuarioWhatsapp : ''));
+  set('f-email', ins.email); set('f-end-resp', endereco);
+  if (ins.comoConheceu) {
+    if (OPCOES_ORIGEM_FIXAS.includes(ins.comoConheceu)) { set('f-origem', ins.comoConheceu); set('f-origem-outro', ''); }
+    else { set('f-origem', 'Outro'); set('f-origem-outro', ins.comoConheceu); }
+    toggleOrigemOutro('f-origem', 'f-origem-outro');
+  }
+  const pref = [(ins.dias || []).join(', '), (ins.periodos || []).join(', '), ins.outroHorario].filter(Boolean).join(' · ');
+  set('f-obs', [
+    'Matrícula pela avaliação online.' + (ins.revisao && ins.revisao.fase ? ' Fase identificada: ' + ins.revisao.fase + '.' : '') + ' Modalidade: ' + ins.modalidade + '.',
+    pref ? 'Preferência de dias e horários: ' + pref + '.' : '',
+    ins.estilo ? 'Estilo e personagens favoritos: ' + ins.estilo + '.' : '',
+    m.adaptacao ? 'Para adaptar as aulas (dado sensível, autorizado pela família): ' + m.adaptacao : ''
+  ].filter(Boolean).join('\n'));
+  document.getElementById('modal-titulo').textContent = 'Novo aluno (matrícula online)';
+  _matriculaEmCadastro = x;
+}
+async function marcarMatriculaImportada(x){
+  try{
+    await updateDoc(doc(db, 'matriculas', x.codigo), { importado: true, importadoEm: serverTimestamp() });
+    await updateDoc(doc(db, 'inscricoes', x.ins.id), { status: 'matriculado' });
+  }catch(e){ console.error('Não foi possível marcar a matrícula como adicionada:', e); }
+  _matriculasNovas = _matriculasNovas.filter(y => y !== x);
+  renderMatriculasNovas();
+}
+window.abrirMatriculaNova = abrirMatriculaNova;
+const _abrirModalOriginal = abrirModal, _editarAlunoOriginal = editarAluno, _confirmarAlunoOriginal = confirmarAluno;
+window.abrirModal = function(){ _matriculaEmCadastro = null; _abrirModalOriginal(); };
+window.editarAluno = function(id){ _matriculaEmCadastro = null; _editarAlunoOriginal(id); };
+window.confirmarAluno = function(){
+  const pend = _matriculaEmCadastro, antes = alunos.length;
+  _confirmarAlunoOriginal();
+  if (pend && alunos.length > antes) { _matriculaEmCadastro = null; marcarMatriculaImportada(pend); }
+};
 </script>
 
 <!-- POPUP NFSe MODELO (emissor nacional, Simples Nacional) -->

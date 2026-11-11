@@ -39,11 +39,12 @@
   .opcao{display:flex;gap:10px;align-items:flex-start;border:1.5px solid #CBD2D6;border-radius:10px;padding:12px 14px;cursor:pointer;font-weight:400}
   .opcao input{margin-top:4px;accent-color:var(--azul);width:18px;height:18px;flex:none}
   .opcao:has(input:checked){border-color:var(--azul);background:var(--azul-tinta)}
-  .grade{overflow-x:auto}
-  .grade table{border-collapse:collapse;width:100%;font-size:14px}
-  .grade th,.grade td{padding:6px 4px;text-align:center;border-bottom:1px solid var(--linha)}
-  .grade th:first-child,.grade td:first-child{text-align:left}
-  .grade input{width:20px;height:20px;accent-color:var(--azul)}
+  .marcas{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+  .marcas .opcao{padding:10px 12px}
+  select{width:100%;font:inherit;padding:12px 14px;border:1.5px solid #CBD2D6;border-radius:10px;background:#fff;color:var(--texto)}
+  select:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(30,109,148,.15)}
+  textarea{width:100%;font:inherit;padding:12px 14px;border:1.5px solid #CBD2D6;border-radius:10px;background:#fff;color:var(--texto);min-height:80px;resize:vertical}
+  textarea:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(30,109,148,.15)}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:14px 26px;border:2px solid transparent;cursor:pointer;text-decoration:none}
   .btn-laranja{background:var(--laranja);color:#fff}
   .btn-azul{background:var(--azul);color:#fff}
@@ -93,7 +94,7 @@
       <div class="aviso laranja"><b>Use um celular ou um computador com câmera.</b> No fim de cada desenho você vai fotografar a folha na hora, pela câmera.</div>
       <form id="form" novalidate>
         <div class="campo">
-          <label for="nome">Nome do aluno</label>
+          <label for="nome">Nome completo do aluno</label>
           <input type="text" id="nome" maxlength="100" autocomplete="name" required>
         </div>
         <div class="campo">
@@ -103,7 +104,7 @@
         </div>
         <div class="campo" id="blocoResp" hidden>
           <div class="aviso">O aluno é menor de idade. Este cadastro deve ser feito pelo pai, pela mãe ou pelo responsável legal.</div>
-          <label for="responsavel">Nome do responsável</label>
+          <label for="responsavel">Nome completo do responsável</label>
           <input type="text" id="responsavel" maxlength="100" autocomplete="name">
         </div>
         <div class="campo">
@@ -115,9 +116,13 @@
           </div>
         </div>
         <div class="campo" id="blocoHorarios" hidden>
-          <label>Horários que funcionam para você</label>
-          <p class="ajuda" style="margin-top:0">Marque todos os que puder. Se for possível, monto a turma de acordo com os horários dos interessados.</p>
-          <div class="grade"><table id="grade"></table></div>
+          <label>Dias da semana de preferência</label>
+          <p class="ajuda" style="margin-top:0">É uma preferência, não garante a vaga. Cruzo a sua escolha com as turmas disponíveis e entro em contato para confirmar.</p>
+          <div class="marcas" id="dias"></div>
+          <label style="margin-top:14px">Período de preferência</label>
+          <div class="marcas" id="periodos"></div>
+          <label for="outroHorario" style="margin-top:14px">Outro dia ou horário (opcional)</label>
+          <input type="text" id="outroHorario" maxlength="120" placeholder="ex.: só depois das 18h">
         </div>
         <div class="campo">
           <label for="whatsapp">WhatsApp para contato</label>
@@ -132,6 +137,15 @@
         <div class="campo">
           <label for="email">E-mail para receber o Relatório de Evolução</label>
           <input type="email" id="email" maxlength="120" autocomplete="email" required>
+        </div>
+        <div class="campo">
+          <label for="origens">Como conheceu o curso?</label>
+          <select id="origens"></select>
+          <input type="text" id="origemOutro" maxlength="80" placeholder="Conte como conheceu" style="margin-top:8px" hidden>
+        </div>
+        <div class="campo">
+          <label for="estilo">Estilo de desenho e personagens favoritos</label>
+          <textarea id="estilo" maxlength="300" placeholder="ex.: mangá, quadrinhos, personagens de jogos, desenho realista..."></textarea>
         </div>
         <div class="campo">
           <label class="opcao"><input type="checkbox" id="autorizacao"> <span id="textoAutorizacao"></span></label>
@@ -266,8 +280,19 @@ const FIREBASE = {
 // Chave pública do reCAPTCHA Enterprise para o App Check. Vazia: App Check desligado.
 const RECAPTCHA_ENTERPRISE_KEY = "";
 const VERSAO_AVISO = "2026-11";
-// Aula online ainda não começou: a opção fica escondida. Para mostrar, troque para true.
-const ONLINE_ABERTA = false;
+// Opções padrão. As que valem são as do professor, em "Ajustes" na área de inscrições
+// (documento publico/inscricao); estas só são usadas se aquele documento não puder ser lido.
+const OPCOES_PADRAO = {
+  dias: ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Turma em andamento", "Indiferente/Flexível"],
+  periodos: ["Tarde (16h30 às 19h30)", "Noite (18h às 19h)", "Turma em andamento", "Indiferente/Flexível"],
+  onlineAberta: false
+};
+// Mesmos valores da "Origem da matrícula" do app de gestão, para a tela Crescimento contar certo.
+const ORIGENS = [["Indicação", "Indicação de amigo ou aluno"], ["Escola", "Escola"], ["Igreja", "Igreja"], ["Mural/site", "Mural ou site"],
+  ["Redes sociais", "Redes sociais (Instagram, Facebook...)"], ["Google", "Pesquisa no Google"], ["Passou na rua", "Passei na rua"],
+  ["ChatGPT", "IA: ChatGPT"], ["Gemini", "IA: Gemini"], ["Meta AI", "IA: Meta AI"], ["Copilot", "IA: Copilot"], ["Perplexity", "IA: Perplexity"],
+  ["Claude", "IA: Claude"], ["Outro", "Outro"]];
+let opcoes = OPCOES_PADRAO;
 const TEMPO_DESENHO = 10 * 60 * 1000;
 const PRAZO_ENVIO = 5 * 60 * 1000;
 const SIMULACAO = new URLSearchParams(location.search).has("simulacao");
@@ -300,8 +325,6 @@ const RODADAS = [
     "Pegue uma mochila ou uma bolsa, coloque na mesa à sua frente e desenhe olhando para ela.",
     "Pegue uma tesoura ou um grampeador, coloque na mesa à sua frente e desenhe olhando para ele."] }
 ];
-const DIAS = ["Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-const PERIODOS = ["Manhã","Tarde","Noite"];
 
 /* ===== Utilidades ===== */
 const $ = (id) => document.getElementById(id);
@@ -360,6 +383,10 @@ async function criarApiFirebase() {
     return auth.currentUser.uid;
   };
   return {
+    async lerOpcoes() {
+      const s = await F.getDoc(F.doc(db, "publico", "inscricao"));
+      return s.exists() ? s.data() : null;
+    },
     async criarInscricao(d) {
       const u = await uid();
       await F.setDoc(F.doc(db, "inscricoes", u), { ...d, criadoEm: F.serverTimestamp() });
@@ -381,6 +408,7 @@ async function criarApiFirebase() {
 function criarApiSimulacao() {
   const espera = (ms) => new Promise(r => setTimeout(r, ms));
   return {
+    async lerOpcoes() { return null; },
     async criarInscricao() { await espera(500); return "simulacao"; },
     async iniciarRodada() { await espera(300); },
     async enviarFoto(n, blob, progresso) { for (let i = 1; i <= 10; i++) { await espera(120); progresso(i / 10); } },
@@ -393,11 +421,21 @@ let est = lerEstado() || { etapa: "cadastro" };
 // est = { etapa, rodada (0..2), propostas[3], inicio[3] (ms), enviada[3] (bool|"perdida"), dados resumidos }
 
 /* ===== Cadastro ===== */
-function montarGrade() {
-  let h = "<thead><tr><th></th>" + PERIODOS.map(p => "<th>" + p + "</th>").join("") + "</tr></thead><tbody>";
-  DIAS.forEach(d => { h += "<tr><td>" + d + "</td>" + PERIODOS.map(p => '<td><input type="checkbox" value="' + d + ", " + p.toLowerCase() + '" aria-label="' + d + ", " + p.toLowerCase() + '"></td>').join("") + "</tr>"; });
-  $("grade").innerHTML = h + "</tbody>";
+function listaOpcoes(id, nome, lista, tipo) {
+  $(id).innerHTML = lista.map(v => {
+    const [valor, rotulo] = Array.isArray(v) ? v : [v, v];
+    return '<label class="opcao"><input type="' + tipo + '" name="' + nome + '" value="' + esc(valor) + '"> <span>' + esc(rotulo) + '</span></label>';
+  }).join("");
 }
+function montarOpcoes() {
+  listaOpcoes("dias", "dia", opcoes.dias || [], "checkbox");
+  listaOpcoes("periodos", "periodo", opcoes.periodos || [], "checkbox");
+  $("origens").innerHTML = '<option value="">Escolha</option>' + ORIGENS.map(([v, r]) => '<option value="' + esc(v) + '">' + esc(r) + '</option>').join("");
+  const o = $("opcaoOnline");
+  o.hidden = !opcoes.onlineAberta; o.querySelector("input").disabled = !opcoes.onlineAberta;
+  if (!opcoes.onlineAberta) o.querySelector("input").checked = false;
+}
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c])); }
 function mascaraZap() {
   const el = $("whatsapp"), d = el.value.replace(/\D/g, "").slice(0, 11);
   let v = d;
@@ -413,6 +451,8 @@ function atualizarCadastro() {
   $("blocoResp").hidden = !menor;
   const mod = (document.querySelector('input[name=modalidade]:checked') || {}).value || "";
   $("blocoHorarios").hidden = !mod.startsWith("Aula presencial");
+  const origem = $("origens").value;
+  $("origemOutro").hidden = origem !== "Outro";
   $("textoAutorizacao").textContent = menor
     ? "Sou pai, mãe ou responsável legal do aluno e autorizo o uso destes dados e das fotos dos desenhos para a inscrição, a avaliação (com apoio de inteligência artificial, revisada pelo professor) e o contato sobre a matrícula."
     : "Autorizo o uso destes dados e das fotos dos meus desenhos para a inscrição, a avaliação (com apoio de inteligência artificial, revisada pelo professor) e o contato sobre a matrícula.";
@@ -430,20 +470,30 @@ async function enviarCadastro(ev) {
   const zap = $("whatsapp").value.trim();
   const usuarioZap = limparUsuario($("usuarioZap").value);
   const email = $("email").value.trim();
-  const horarios = mod.startsWith("Aula presencial") ? [...document.querySelectorAll("#grade input:checked")].map(i => i.value) : [];
+  const presencial = mod.startsWith("Aula presencial");
+  const dias = presencial ? [...document.querySelectorAll("input[name=dia]:checked")].map(i => i.value) : [];
+  const periodos = presencial ? [...document.querySelectorAll("input[name=periodo]:checked")].map(i => i.value) : [];
+  const outroHorario = presencial ? $("outroHorario").value.trim().slice(0, 120) : "";
+  const origemSel = $("origens").value;
+  const comoConheceu = origemSel === "Outro" ? ($("origemOutro").value.trim().slice(0, 80) || "Outro") : origemSel;
+  const estilo = $("estilo").value.trim().replace(/\s+/g, " ").slice(0, 300);
   if (nome.length < 2) return erro("Escreva o nome do aluno.");
   if (idade === null || idade < 3 || idade > 110) return erro("Confira a data de nascimento.");
   if (menor && resp.length < 2) return erro("Escreva o nome do responsável.");
   if (!mod) return erro("Escolha a modalidade.");
+  if (presencial && !dias.length && !outroHorario) return erro("Marque pelo menos um dia de preferência (ou escreva em \"Outro dia ou horário\").");
+  if (presencial && !periodos.length && !outroHorario) return erro("Marque pelo menos um período de preferência (ou escreva em \"Outro dia ou horário\").");
   const digitos = zap.replace(/\D/g, "").length;
   if (!digitos && !usuarioZap) return erro("Informe o WhatsApp com DDD ou o nome de usuário do WhatsApp.");
   if (digitos && digitos < 10) return erro("Confira o WhatsApp, com DDD.");
   if (usuarioZap && !/^[a-z0-9._]{3,40}$/.test(usuarioZap)) return erro("Confira o nome de usuário do WhatsApp: só letras, números, ponto e sublinhado.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return erro("Confira o e-mail.");
+  if (!comoConheceu) return erro("Conte como conheceu o curso.");
+  if (estilo.length < 2) return erro("Conte o estilo de desenho e os personagens favoritos.");
   if (!$("autorizacao").checked) return erro("Para seguir, marque a autorização.");
   const b = $("btnEnviarCadastro"); b.disabled = true; b.textContent = "Salvando...";
   try {
-    await api.criarInscricao({ nome, nascimento: nasc, idade, modalidade: mod, horarios, responsavel: resp, whatsapp: zap, usuarioWhatsapp: usuarioZap, email, menor, autorizacao: true, versaoAviso: VERSAO_AVISO });
+    await api.criarInscricao({ nome, nascimento: nasc, idade, modalidade: mod, dias, periodos, outroHorario, comoConheceu, estilo, responsavel: resp, whatsapp: zap, usuarioWhatsapp: usuarioZap, email, menor, autorizacao: true, versaoAviso: VERSAO_AVISO });
     est = { etapa: "instrucoes", rodada: 0, propostas: RODADAS.map(r => r.propostas[Math.floor(Math.random() * r.propostas.length)]), inicio: [0, 0, 0], enviada: [false, false, false], primeiroNome: nome.split(" ")[0] };
     gravarEstado();
     irInstrucoes();
@@ -641,8 +691,7 @@ async function outraPessoa() {
 
 /* ===== Início ===== */
 async function iniciar() {
-  if (!ONLINE_ABERTA) { const o = $("opcaoOnline"); o.querySelector("input").disabled = true; o.hidden = true; }
-  montarGrade(); atualizarCadastro();
+  montarOpcoes(); atualizarCadastro();
   $("form").addEventListener("input", atualizarCadastro);
   $("form").addEventListener("change", atualizarCadastro);
   $("form").addEventListener("submit", enviarCadastro);
@@ -665,6 +714,8 @@ async function iniciar() {
   }
   try { api = SIMULACAO ? criarApiSimulacao() : await criarApiFirebase(); }
   catch (e) { console.error(e); $("textoErro").textContent = "Não consegui conectar ao servidor. Confira a internet e tente de novo."; mostrar("erro"); return; }
+  try { const o = await api.lerOpcoes(); if (o) { opcoes = { ...OPCOES_PADRAO, ...o }; montarOpcoes(); atualizarCadastro(); } }
+  catch (e) { console.warn("Opções padrão em uso:", e); }
 
   if (est.etapa === "instrucoes") irInstrucoes();
   else if (est.etapa === "rodada") mostrarRodada();
