@@ -109,7 +109,7 @@
         <div class="campo">
           <label>Modalidade</label>
           <div class="opcoes" id="modalidades">
-            <label class="opcao"><input type="radio" name="modalidade" value="Aula presencial avulsa"> <span><b>Aula presencial avulsa</b><br><span class="sub">Uma aula de cada vez, em Sobradinho-DF.</span></span></label>
+            <label class="opcao"><input type="radio" name="modalidade" value="Aula presencial avulsa"> <span><b>Aula presencial avulsa</b><br><span class="sub">Aula avulsa experimental, para conhecer o método. É uma aula só, em Sobradinho-DF.</span></span></label>
             <label class="opcao"><input type="radio" name="modalidade" value="Aula presencial mensal"> <span><b>Aula presencial mensal</b><br><span class="sub">Aulas toda semana, em Sobradinho-DF.</span></span></label>
             <label class="opcao"><input type="radio" name="modalidade" value="Aula online"> <span><b>Aula online</b><br><span class="sub">Aulas gravadas e encontros ao vivo, de qualquer lugar.</span></span></label>
           </div>
@@ -121,7 +121,13 @@
         </div>
         <div class="campo">
           <label for="whatsapp">WhatsApp para contato</label>
-          <input type="tel" id="whatsapp" maxlength="25" autocomplete="tel" placeholder="(61) 90000-0000" required>
+          <input type="tel" id="whatsapp" maxlength="15" inputmode="numeric" autocomplete="tel" placeholder="(61) 90000-0000">
+          <div class="ajuda">Com DDD. Os parênteses e o traço aparecem sozinhos.</div>
+        </div>
+        <div class="campo">
+          <label for="usuarioZap">Ou o nome de usuário do WhatsApp (opcional)</label>
+          <input type="text" id="usuarioZap" maxlength="40" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: maria.desenhos">
+          <div class="ajuda">Preencha o número, o nome de usuário ou os dois.</div>
         </div>
         <div class="campo">
           <label for="email">E-mail para receber o Relatório de Evolução</label>
@@ -149,7 +155,8 @@
       </ul>
       <p>Como funciona:</p>
       <ul class="lista">
-        <li>São 3 desenhos. Cada proposta só aparece quando o desenho começa.</li>
+        <li>São 3 desenhos, nesta ordem: 1. uma pessoa de corpo inteiro fazendo alguma coisa; 2. uma paisagem com chão e céu; 3. um objeto da casa, desenhado olhando para ele.</li>
+        <li>A proposta exata de cada desenho só aparece quando ele começa.</li>
         <li>Cada desenho tem 10 minutos. Faça do seu jeito, não existe certo ou errado.</li>
         <li>No fim, fotografe só a folha, de cima, sem rostos na foto. Você tem 5 minutos para enviar.</li>
         <li>No terceiro desenho, você vai pegar um objeto da casa para desenhar olhando para ele. O tempo já conta enquanto pega.</li>
@@ -268,9 +275,28 @@ const CHAVE_LOCAL = SIMULACAO ? "jd-inscricao-simulacao" : "jd-inscricao-v1";
 
 /* Propostas: o mesmo banco da ferramenta de avaliação ao vivo. */
 const RODADAS = [
-  { tipo: "Figura humana", propostas: ["Desenhe você mesmo fazendo a coisa de que mais gosta.","Desenhe uma pessoa da sua família, de corpo inteiro.","Desenhe uma pessoa chutando uma bola.","Desenhe uma pessoa andando na chuva com um guarda-chuva.","Desenhe alguém sentado lendo um livro.","Desenhe uma pessoa pulando corda.","Desenhe um astronauta de corpo inteiro acenando."] },
-  { tipo: "Cena com chão e céu", propostas: ["Desenhe uma rua com casas, árvores e o céu.","Desenhe um parque com pessoas brincando.","Desenhe uma praia em um dia de sol.","Desenhe o caminho da sua casa até a escola.","Desenhe uma fazenda com animais.","Desenhe um dia de chuva na cidade.","Desenhe um acampamento à noite."] },
-  { tipo: "Objeto observado", propostas: ["Pegue uma caneca ou um copo, coloque na mesa e desenhe olhando para ele.","Pegue um tênis ou sapato e desenhe olhando para ele.","Pegue uma fruta e desenhe olhando para ela.","Pegue uma mochila ou bolsa e desenhe olhando para ela.","Desenhe a sua mão que não está desenhando, olhando para ela.","Pegue uma tesoura ou um grampeador e desenhe olhando para ele."] }
+  { tipo: "Figura humana em ação", propostas: [
+    "Desenhe uma pessoa de corpo inteiro chutando uma bola.",
+    "Desenhe uma pessoa de corpo inteiro andando de bicicleta.",
+    "Desenhe uma pessoa de corpo inteiro pulando corda.",
+    "Desenhe uma pessoa de corpo inteiro andando na chuva com um guarda-chuva.",
+    "Desenhe uma pessoa de corpo inteiro regando as plantas.",
+    "Desenhe uma pessoa de corpo inteiro carregando uma caixa grande.",
+    "Desenhe você mesmo, de corpo inteiro, fazendo a coisa de que mais gosta."] },
+  { tipo: "Paisagem com chão e céu", propostas: [
+    "Desenhe uma paisagem do campo, com o chão, o céu, árvores e uma casa.",
+    "Desenhe uma praia, com a areia, o mar e o céu.",
+    "Desenhe uma rua da cidade, com o chão, o céu, casas e árvores.",
+    "Desenhe um parque, com o gramado, o céu e árvores.",
+    "Desenhe uma fazenda, com o pasto, o céu e alguns animais.",
+    "Desenhe uma paisagem com montanhas, um rio e o céu."] },
+  { tipo: "Objeto observado", propostas: [
+    "Pegue uma caneca ou um copo, coloque na mesa à sua frente e desenhe olhando para ele.",
+    "Pegue um tênis ou um sapato, coloque na mesa à sua frente e desenhe olhando para ele.",
+    "Pegue uma fruta, coloque na mesa à sua frente e desenhe olhando para ela.",
+    "Pegue uma garrafa, coloque na mesa à sua frente e desenhe olhando para ela.",
+    "Pegue uma mochila ou uma bolsa, coloque na mesa à sua frente e desenhe olhando para ela.",
+    "Pegue uma tesoura ou um grampeador, coloque na mesa à sua frente e desenhe olhando para ele."] }
 ];
 const DIAS = ["Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 const PERIODOS = ["Manhã","Tarde","Noite"];
@@ -370,6 +396,14 @@ function montarGrade() {
   DIAS.forEach(d => { h += "<tr><td>" + d + "</td>" + PERIODOS.map(p => '<td><input type="checkbox" value="' + d + ", " + p.toLowerCase() + '" aria-label="' + d + ", " + p.toLowerCase() + '"></td>').join("") + "</tr>"; });
   $("grade").innerHTML = h + "</tbody>";
 }
+function mascaraZap() {
+  const el = $("whatsapp"), d = el.value.replace(/\D/g, "").slice(0, 11);
+  let v = d;
+  if (d.length > 0) v = "(" + d.slice(0, 2);
+  if (d.length >= 3) v += ") " + (d.length === 11 ? d.slice(2, 7) + (d.length > 7 ? "-" + d.slice(7) : "") : d.slice(2, 6) + (d.length > 6 ? "-" + d.slice(6) : ""));
+  if (el.value !== v) el.value = v;
+}
+function limparUsuario(v) { return v.trim().replace(/^@/, "").toLowerCase(); }
 function atualizarCadastro() {
   const idade = idadeDe($("nascimento").value);
   const menor = idade !== null && idade < 18;
@@ -392,18 +426,22 @@ async function enviarCadastro(ev) {
   const resp = menor ? $("responsavel").value.trim().replace(/\s+/g, " ") : "";
   const mod = (document.querySelector('input[name=modalidade]:checked') || {}).value || "";
   const zap = $("whatsapp").value.trim();
+  const usuarioZap = limparUsuario($("usuarioZap").value);
   const email = $("email").value.trim();
   const horarios = mod.startsWith("Aula presencial") ? [...document.querySelectorAll("#grade input:checked")].map(i => i.value) : [];
   if (nome.length < 2) return erro("Escreva o nome do aluno.");
   if (idade === null || idade < 3 || idade > 110) return erro("Confira a data de nascimento.");
   if (menor && resp.length < 2) return erro("Escreva o nome do responsável.");
   if (!mod) return erro("Escolha a modalidade.");
-  if (zap.replace(/\D/g, "").length < 10) return erro("Confira o WhatsApp, com DDD.");
+  const digitos = zap.replace(/\D/g, "").length;
+  if (!digitos && !usuarioZap) return erro("Informe o WhatsApp com DDD ou o nome de usuário do WhatsApp.");
+  if (digitos && digitos < 10) return erro("Confira o WhatsApp, com DDD.");
+  if (usuarioZap && !/^[a-z0-9._]{3,40}$/.test(usuarioZap)) return erro("Confira o nome de usuário do WhatsApp: só letras, números, ponto e sublinhado.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return erro("Confira o e-mail.");
   if (!$("autorizacao").checked) return erro("Para seguir, marque a autorização.");
   const b = $("btnEnviarCadastro"); b.disabled = true; b.textContent = "Salvando...";
   try {
-    await api.criarInscricao({ nome, nascimento: nasc, idade, modalidade: mod, horarios, responsavel: resp, whatsapp: zap, email, menor, autorizacao: true, versaoAviso: VERSAO_AVISO });
+    await api.criarInscricao({ nome, nascimento: nasc, idade, modalidade: mod, horarios, responsavel: resp, whatsapp: zap, usuarioWhatsapp: usuarioZap, email, menor, autorizacao: true, versaoAviso: VERSAO_AVISO });
     est = { etapa: "instrucoes", rodada: 0, propostas: RODADAS.map(r => r.propostas[Math.floor(Math.random() * r.propostas.length)]), inicio: [0, 0, 0], enviada: [false, false, false], primeiroNome: nome.split(" ")[0] };
     gravarEstado();
     irInstrucoes();
@@ -605,6 +643,7 @@ async function iniciar() {
   $("form").addEventListener("input", atualizarCadastro);
   $("form").addEventListener("change", atualizarCadastro);
   $("form").addEventListener("submit", enviarCadastro);
+  $("whatsapp").addEventListener("input", mascaraZap);
   $("btnTestarCamera").onclick = testarCamera;
   $("btnComecar").onclick = comecarRodada;
   $("btnProxima").onclick = comecarRodada;

@@ -217,7 +217,7 @@ const DESC = [
   "Nesta fase, desenhar vira uma escolha consciente. O foco é aprofundar a técnica, desenvolver o estilo próprio e montar um portfólio, com os bastidores do trabalho de ilustrador."
 ];
 const DESC_GARATUJA = "Por enquanto, o desenho está no momento da garatuja: rabiscos, movimento e descoberta do traço. As aulas do curso começam na fase Pré-esquemática.";
-const DESENHOS = ["Figura humana","Cena com chão e céu","Objeto observado"];
+const DESENHOS = ["Figura humana em ação","Paisagem com chão e céu","Objeto observado"];
 // Mesma lista da ferramenta de avaliação ao vivo (ferramentas/avaliacao).
 const INDICADORES = [
   ["Figura humana tipo \"girino\" (braços e pernas saindo da cabeça)","Objetos soltos no papel, sem linha de chão","Cores escolhidas pela emoção, não pela realidade","Tamanho pela importância (o que importa é maior)","Formas simples, poucos detalhes"],
@@ -250,7 +250,7 @@ function sugerir(lista) {
 }
 
 /* ===== Pedido para a IA ===== */
-const SISTEMA = `Você ajuda o professor Cícero Lopes, ilustrador com mais de 30 anos de carreira e professor do curso de desenho "Jornada do Desenho" (Sobradinho-DF, presencial e online), a avaliar os desenhos de quem se inscreveu no curso. A avaliação tem 3 desenhos de 10 minutos, feitos em casa e fotografados pelo celular na hora: figura humana, cena com chão e céu, e objeto observado. Você recebe a idade, as propostas, os horários e as fotos.
+const SISTEMA = `Você ajuda o professor Cícero Lopes, ilustrador com mais de 30 anos de carreira e professor do curso de desenho "Jornada do Desenho" (Sobradinho-DF, presencial e online), a avaliar os desenhos de quem se inscreveu no curso. A avaliação tem 3 desenhos de 10 minutos, feitos em casa e fotografados pelo celular na hora: 1. uma pessoa de corpo inteiro fazendo alguma coisa (figura humana em ação), 2. uma paisagem com chão e céu, 3. um objeto da casa desenhado olhando para ele (objeto observado). Você recebe a idade, as propostas, os horários e as fotos.
 
 O curso tem 4 fases, baseadas nas etapas do desenho descritas por Viktor Lowenfeld:
 1. Pré-esquemática: desenha o que sabe, não o que vê.
@@ -429,11 +429,11 @@ function criarApiSimulacao() {
   };
   const dados = [
     { id: "sim-a", nome: "Aluna Fictícia Ana", nascimento: "2016-04-02", idade: 10, menor: true, responsavel: "Mãe Fictícia", whatsapp: "(61) 90000-0001", email: "ana.ficticia@exemplo.com", modalidade: "Aula online", horarios: [], versaoAviso: "2026-11",
-      criadoEm: new Date(h - 2 * 86400000), rodadas: rod(h - 2 * 86400000, ["Desenhe uma pessoa chutando uma bola.", "Desenhe uma rua com casas, árvores e o céu.", "Pegue uma caneca ou um copo, coloque na mesa e desenhe olhando para ele."], 0, [598, 610, 655]), analise: analiseExemplo },
+      criadoEm: new Date(h - 2 * 86400000), rodadas: rod(h - 2 * 86400000, ["Desenhe uma pessoa de corpo inteiro chutando uma bola.", "Desenhe uma rua da cidade, com o chão, o céu, casas e árvores.", "Pegue uma caneca ou um copo, coloque na mesa à sua frente e desenhe olhando para ele."], 0, [598, 610, 655]), analise: analiseExemplo },
     { id: "sim-b", nome: "Aluno Fictício Bruno", nascimento: "2011-09-15", idade: 15, menor: true, responsavel: "Pai Fictício", whatsapp: "(61) 90000-0002", email: "bruno.ficticio@exemplo.com", modalidade: "Aula presencial mensal", horarios: ["Terça, tarde", "Sábado, manhã"], versaoAviso: "2026-11",
-      criadoEm: new Date(h - 3600000), rodadas: rod(h - 3600000, ["Desenhe alguém sentado lendo um livro.", "Desenhe um parque com pessoas brincando.", "Pegue um tênis ou sapato e desenhe olhando para ele."], 1, [540, 600, 880]) },
-    { id: "sim-c", nome: "Pessoa Fictícia Carla", nascimento: "1991-01-20", idade: 35, menor: false, responsavel: "", whatsapp: "(61) 90000-0003", email: "carla.ficticia@exemplo.com", modalidade: "Aula presencial avulsa", horarios: ["Quarta, noite"], versaoAviso: "2026-11",
-      criadoEm: new Date(h - 200 * 86400000), rodadas: rod(h - 200 * 86400000, ["Desenhe uma pessoa da sua família, de corpo inteiro.", "Desenhe uma praia em um dia de sol.", "Pegue uma fruta e desenhe olhando para ela."], 1, [600, null]) }
+      criadoEm: new Date(h - 3600000), rodadas: rod(h - 3600000, ["Desenhe uma pessoa de corpo inteiro andando de bicicleta.", "Desenhe um parque, com o gramado, o céu e árvores.", "Pegue um tênis ou um sapato, coloque na mesa à sua frente e desenhe olhando para ele."], 1, [540, 600, 880]) },
+    { id: "sim-c", nome: "Pessoa Fictícia Carla", nascimento: "1991-01-20", idade: 35, menor: false, responsavel: "", whatsapp: "", usuarioWhatsapp: "carla.ficticia", email: "carla.ficticia@exemplo.com", modalidade: "Aula presencial avulsa", horarios: ["Quarta, noite"], versaoAviso: "2026-11",
+      criadoEm: new Date(h - 200 * 86400000), rodadas: rod(h - 200 * 86400000, ["Desenhe uma pessoa de corpo inteiro regando as plantas.", "Desenhe uma praia, com a areia, o mar e o céu.", "Pegue uma fruta, coloque na mesa à sua frente e desenhe olhando para ela."], 1, [600, null]) }
   ];
   let ajustes = { amostra: "https://exemplo.com/aula-de-amostra", f0: "", f1: "https://exemplo.com/comprar-esquematica", f2: "", f3: "", pratica: "2 vezes de 15 minutos por semana" };
   return {
@@ -612,7 +612,8 @@ function abrir(id) {
         <div><span>Idade:</span> ${esc(ins.idade)} anos (${isoBr(ins.nascimento)})</div>
         <div><span>Modalidade:</span> ${esc(ins.modalidade)}</div>
         ${ins.menor ? `<div><span>Responsável:</span> ${esc(ins.responsavel)}</div>` : ""}
-        <div><span>WhatsApp:</span> ${esc(ins.whatsapp)}</div>
+        ${ins.whatsapp ? `<div><span>WhatsApp:</span> ${esc(ins.whatsapp)}</div>` : ""}
+        ${ins.usuarioWhatsapp ? `<div><span>Usuário do WhatsApp:</span> @${esc(ins.usuarioWhatsapp)}</div>` : ""}
         <div><span>E-mail:</span> ${esc(ins.email)}</div>
         <div><span>Inscrição:</span> ${ins.criadoEm ? ins.criadoEm.toLocaleString("pt-BR") : ""}</div>
         ${ins.horarios && ins.horarios.length ? `<div style="grid-column:1/-1"><span>Horários:</span> ${esc(ins.horarios.join("; "))}</div>` : ""}
@@ -645,10 +646,12 @@ function abrir(id) {
     <div class="card" id="cardEnvio"${bloqueado ? "" : " hidden"}>
       <h2>Enviar para ${ins.menor ? "a família" : "o aluno"}</h2>
       <p class="sub">1. Gere o PDF do relatório. 2. Abra o WhatsApp ou o e-mail com a mensagem pronta e anexe o PDF. 3. Marque como enviado.</p>
+      ${!ins.whatsapp && ins.usuarioWhatsapp ? `<div class="aviso">Sem número de telefone: no WhatsApp, procure pelo usuário <b>@${esc(ins.usuarioWhatsapp)}</b> e cole a mensagem (botão "Copiar mensagem").</div>` : ""}
       <div class="campo"><label for="rMsg">Mensagem</label><textarea id="rMsg" style="min-height:180px"></textarea></div>
       <div class="acoes">
         <button class="btn btn-azul" type="button" id="btnRel">Ver Relatório e salvar PDF</button>
-        <a class="btn btn-contorno" id="lnkZap" target="_blank" rel="noopener">Abrir no WhatsApp</a>
+        <a class="btn btn-contorno" id="lnkZap" target="_blank" rel="noopener"${ins.whatsapp ? "" : " hidden"}>Abrir no WhatsApp</a>
+        <button class="btn btn-contorno" type="button" id="btnCopiar">Copiar mensagem</button>
         <a class="btn btn-contorno" id="lnkEmail">Abrir no e-mail</a>
         ${s === "aprovado" ? `<button class="btn btn-laranja" type="button" id="btnEnviado">Marcar como enviado</button>` : ""}
         ${s === "enviado" ? `<button class="btn btn-leve" type="button" id="btnMatric">Marcar como matriculado</button>` : ""}
@@ -752,6 +755,12 @@ function montarEnvio(ins) {
   let t = null;
   $("rMsg").oninput = () => { atualizarLinks(); clearTimeout(t); t = setTimeout(() => api.atualizar(ins.id, { revisao: { ...(ins.revisao || {}), mensagem: $("rMsg").value } }).then(() => { ins.revisao = { ...(ins.revisao || {}), mensagem: $("rMsg").value }; }).catch(console.error), 800); };
   $("btnRel").onclick = () => relatorio(ins);
+  $("btnCopiar").onclick = async () => {
+    const b = $("btnCopiar");
+    try { await navigator.clipboard.writeText($("rMsg").value); b.textContent = "Mensagem copiada"; }
+    catch (e) { $("rMsg").select(); b.textContent = "Selecionada: use Ctrl+C"; }
+    setTimeout(() => { b.textContent = "Copiar mensagem"; }, 2500);
+  };
   if ($("btnEnviado")) $("btnEnviado").onclick = async () => { await api.atualizar(ins.id, { status: "enviado", enviadoEm: api.marcaTempo() }); ins.status = "enviado"; abrir(ins.id); };
   if ($("btnMatric")) $("btnMatric").onclick = async () => { await api.atualizar(ins.id, { status: "matriculado" }); ins.status = "matriculado"; abrir(ins.id); };
 }

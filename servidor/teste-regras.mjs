@@ -13,7 +13,7 @@ const anon = (uid) => env.authenticatedContext(uid, { firebase: { sign_in_provid
 const prof = env.authenticatedContext(PROF, { firebase: { sign_in_provider: "password" } });
 const outro = env.authenticatedContext("xyz", { firebase: { sign_in_provider: "password" } }); const fsOutro = outro.firestore();
 const base = () => ({ nome: "Aluno Teste", nascimento: "2014-05-10", idade: 12, modalidade: "Aula online", horarios: [],
-  responsavel: "Responsável Teste", whatsapp: "61900000000", email: "teste@exemplo.com", menor: true, autorizacao: true,
+  responsavel: "Responsável Teste", whatsapp: "61900000000", usuarioWhatsapp: "", email: "teste@exemplo.com", menor: true, autorizacao: true,
   versaoAviso: "2026-11", criadoEm: serverTimestamp() });
 const jpg = (n) => new Uint8Array(n);
 let ok = 0, falhas = 0;
@@ -43,6 +43,8 @@ await t("campo extra é recusado", assertFails(setDoc(doc(B, "inscricoes/aluno2"
 await t("sem autorização é recusado", assertFails(setDoc(doc(B, "inscricoes/aluno2"), { ...base(), autorizacao: false })));
 await t("data de criação falsa é recusada", assertFails(setDoc(doc(B, "inscricoes/aluno2"), { ...base(), criadoEm: Timestamp.fromDate(new Date(2020,0,1)) })));
 await t("modalidade inválida é recusada", assertFails(setDoc(doc(B, "inscricoes/aluno2"), { ...base(), modalidade: "VIP" })));
+await t("sem número e sem usuário do WhatsApp é recusado", assertFails(setDoc(doc(B, "inscricoes/aluno2"), { ...base(), whatsapp: "", usuarioWhatsapp: "" })));
+await t("usuário do WhatsApp com caractere inválido é recusado", assertFails(setDoc(doc(B, "inscricoes/aluno2"), { ...base(), usuarioWhatsapp: "maria desenhos!" })));
 await t("login com e-mail (não anônimo) não cria", assertFails(setDoc(doc(fsOutro, "inscricoes/xyz"), base())));
 
 const rod = (n) => ({ tipo: "Figura humana", proposta: "Desenhe algo.", inicio: serverTimestamp() });
@@ -67,6 +69,8 @@ await t("envio fora do prazo é recusado", assertFails(setDoc(doc(fsC, "inscrico
 
 await t("rodada 2 libera quando o prazo da 1 acabou", assertSucceeds(setDoc(doc(fsC, "inscricoes/aluno3/rodadas/2"), rod())));
 await t("rodada 3 não libera com a 2 ainda no prazo", assertFails(setDoc(doc(fsC, "inscricoes/aluno3/rodadas/3"), rod())));
+const D = anon("aluno4").firestore();
+await t("só o nome de usuário do WhatsApp é aceito", assertSucceeds(setDoc(doc(D, "inscricoes/aluno4"), { ...base(), whatsapp: "", usuarioWhatsapp: "maria.desenhos" })));
 const fsP = prof.firestore(), stP = prof.storage();
 await t("professor lista inscrições", assertSucceeds(getDocs(collection(fsP, "inscricoes"))));
 await t("professor lê rodadas e envios", assertSucceeds(getDocs(collection(fsP, "inscricoes/aluno1/envios"))));

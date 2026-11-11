@@ -36,15 +36,18 @@ service cloud.firestore {
     // Inscrição: o documento tem o mesmo id do login anônimo (uma por aparelho).
     match /inscricoes/{uid} {
       allow create: if ehAnonimo(uid)
-        && request.resource.data.keys().hasOnly(["nome","nascimento","idade","modalidade","horarios","responsavel","whatsapp","email","menor","autorizacao","versaoAviso","criadoEm"])
-        && request.resource.data.keys().hasAll(["nome","nascimento","idade","modalidade","horarios","responsavel","whatsapp","email","menor","autorizacao","versaoAviso","criadoEm"])
+        && request.resource.data.keys().hasOnly(["nome","nascimento","idade","modalidade","horarios","responsavel","whatsapp","usuarioWhatsapp","email","menor","autorizacao","versaoAviso","criadoEm"])
+        && request.resource.data.keys().hasAll(["nome","nascimento","idade","modalidade","horarios","responsavel","whatsapp","usuarioWhatsapp","email","menor","autorizacao","versaoAviso","criadoEm"])
         && texto(request.resource.data.nome, 2, 100)
         && request.resource.data.nascimento is string && request.resource.data.nascimento.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
         && request.resource.data.idade is int && request.resource.data.idade >= 3 && request.resource.data.idade <= 110
         && request.resource.data.modalidade in ["Aula presencial avulsa","Aula presencial mensal","Aula online"]
         && request.resource.data.horarios is list && request.resource.data.horarios.size() <= 20
         && texto(request.resource.data.responsavel, 0, 100)
-        && texto(request.resource.data.whatsapp, 8, 25)
+        && texto(request.resource.data.whatsapp, 0, 25)
+        && texto(request.resource.data.usuarioWhatsapp, 0, 40)
+        && request.resource.data.usuarioWhatsapp.matches("^[a-z0-9._]*$")
+        && (request.resource.data.whatsapp.size() >= 8 || request.resource.data.usuarioWhatsapp.size() >= 3)
         && texto(request.resource.data.email, 5, 120)
         && request.resource.data.menor is bool
         && (request.resource.data.menor == false || texto(request.resource.data.responsavel, 2, 100))
