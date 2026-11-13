@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Devolutiva · Jornada do Desenho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  /* Base comum das ferramentas */
+  :root{
+    --azul:#1E6D94; --azul-claro:#3E8AB0; --laranja:#F49819;
+    --fundo:#F0F1F2; --texto:#1F2A2E; --papel:#FFFFFF; --linha:#E4E4E4;
+    --suave:rgba(31,42,46,.7); --muito-suave:rgba(31,42,46,.5);
+    --raio:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fundo);color:var(--texto);font-family:Lato,system-ui,sans-serif;font-size:15px;line-height:1.55}
+  a{color:var(--azul)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+  .topo{background:var(--papel);border-bottom:1px solid var(--linha)}
+  .topo .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .logo{font-size:20px;font-weight:400;color:var(--azul);text-decoration:none;white-space:nowrap}
+  .logo span{color:inherit}
+  .topo nav a{font-size:14px;color:var(--suave);text-decoration:none;white-space:nowrap}
+  .topo nav a:hover{color:var(--azul)}
+  @media(max-width:400px){.logo{font-size:17px}}
+  main{padding:28px 0 60px}
+  h1,h2,h3{color:var(--azul);font-weight:300;margin:0}
+  h1{font-size:28px;margin-bottom:6px}
+  h2{font-size:21px;margin-bottom:12px}
+  h3{font-size:16px;font-weight:700;color:var(--texto);margin-bottom:8px}
+  .sub{color:var(--suave);margin:0 0 24px;max-width:760px}
+  .card{background:var(--papel);border:1px solid var(--linha);border-radius:var(--raio);padding:20px;margin-bottom:20px}
+  .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+  .campos>*{min-width:0}
+  label{display:block;font-size:13px;font-weight:700;color:var(--suave);margin-bottom:4px}
+  input,select,textarea{width:100%;min-width:0;max-width:100%;font-family:inherit;font-size:15px;color:var(--texto);background:#fff;border:1px solid #cfd4d7;border-radius:8px;padding:9px 10px}
+  textarea{min-height:90px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:2px solid rgba(30,109,148,.35);border-color:var(--azul)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;font-family:inherit;border:none;cursor:pointer;text-decoration:none}
+  .btn-laranja{background:var(--laranja);color:#fff}
+  .btn-azul{background:var(--azul);color:#fff}
+  .btn-contorno{background:#fff;color:var(--azul);border:1.5px solid var(--azul)}
+  .btn-leve{background:var(--fundo);color:var(--texto);border:1px solid var(--linha)}
+  .btn-peq{padding:6px 12px;font-size:13px}
+  .acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .dica{background:#fff;border:1px solid var(--linha);border-left:4px solid var(--laranja);border-radius:8px;padding:12px 16px;font-size:14px;color:var(--suave);margin:0 0 20px}
+  .dica b{color:var(--texto)}
+  .salvo{font-size:13px;color:var(--muito-suave)}
+  .aviso-ok{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--texto);color:#fff;border-radius:999px;padding:10px 20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30}
+  .aviso-ok.ver{opacity:1}
+  @media print{
+    @page{size:A4;margin:14mm}
+    body{background:#fff}
+    .topo,.no-print{display:none !important}
+    main{padding:0}
+    .wrap{max-width:none;padding:0}
+  }
+
+  /* Devolutiva */
+  .colunas{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .colunas>*{min-width:0}
+  @media(min-width:961px){.colunas>div:last-child{position:sticky;top:16px}}
+  @media(max-width:960px){.colunas{grid-template-columns:1fr}}
+  .item{border-left:4px solid var(--azul);padding-left:14px;margin-bottom:22px}
+  .item.i2{border-left-color:var(--laranja)}
+  .item.i3{border-left-color:var(--azul-claro)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{background:var(--fundo);border:1px solid var(--linha);border-radius:999px;padding:5px 11px;font-size:13px;font-family:inherit;color:var(--texto);cursor:pointer;text-align:left}
+  .chip:hover{border-color:var(--azul);color:var(--azul)}
+  .foto-campo{border:1.5px dashed #cfd4d7;border-radius:10px;padding:14px;text-align:center;font-size:14px;color:var(--suave)}
+
+  .folha{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .folha-cab{display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--azul);padding-bottom:12px;margin-bottom:18px}
+  .marca{width:38px;height:38px;border-radius:8px;background:var(--azul);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .folha-cab b{display:block;color:var(--azul);font-size:18px;font-weight:300}
+  .folha-cab small{color:var(--muito-suave);font-size:12px}
+  .dados{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 18px;font-size:14px;margin-bottom:18px}
+  .dados span{color:var(--muito-suave)}
+  .folha-foto{margin:0 0 18px;text-align:center}
+  .folha-foto img{max-width:100%;max-height:300px;border-radius:8px;border:1px solid var(--linha)}
+  .bloco{border-radius:10px;padding:14px 16px;margin-bottom:12px;background:var(--fundo);-webkit-print-color-adjust:exact;print-color-adjust:exact;break-inside:avoid}
+  .bloco h4{margin:0 0 6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--azul)}
+  .bloco.b2 h4{color:#a8630a}
+  .bloco p{margin:0;white-space:pre-wrap}
+  .bloco .vazio{color:var(--muito-suave);font-style:italic}
+  .assina{margin-top:22px;font-size:13px;color:var(--suave)}
+  .contador{font-size:13px;color:var(--muito-suave)}
+  .contador.longo{color:#c0392b;font-weight:700}
+  @media print{
+    .colunas{display:block}
+    .folha{border:none;box-shadow:none;padding:0}
+    .folha-foto img{max-height:90mm}
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="wrap">
+    <a class="logo" href="../index.html">Jornada <span>do Desenho</span></a>
+    <nav><a href="../index.html">Ferramentas</a></nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="no-print">
+      <h1>Devolutiva</h1>
+      <p class="sub">Ficha-modelo com os 3 itens de sempre: o que está bom, o que treinar e o próximo exercício. Quem contrata a devolutiva recebe duas por mês. Clique nas frases prontas para ganhar tempo e ajuste o texto. Meta: 10 minutos por aluno. Os dados ficam só neste navegador.</p>
+    </div>
+
+    <div class="colunas">
+      <div class="no-print">
+        <div class="card">
+          <h2>Aluno e desenho</h2>
+          <div class="campos">
+            <div><label for="nome">Aluno</label><input id="nome" placeholder="Primeiro nome"></div>
+            <div><label for="fase">Fase</label>
+              <select id="fase"><option>Pré-esquemática</option><option>Esquemática</option><option>Realismo Visual</option><option>Decisão</option></select></div>
+            <div><label for="mes">Mês do curso</label><select id="mes"></select></div>
+            <div><label for="qual">Devolutiva do mês</label>
+              <select id="qual"><option value="1">1ª de 2</option><option value="2">2ª de 2</option></select></div>
+            <div><label for="data">Data</label><input type="date" id="data"></div>
+          </div>
+          <div style="margin-top:14px"><label for="tema">O que o aluno desenhou ao aplicar o fundamento (opcional)</label><input id="tema" placeholder="Ex.: um dragão, o carro do pai, a cachorra Mel"></div>
+          <div style="margin-top:14px">
+            <label for="foto">Foto do desenho (opcional, não fica salva)</label>
+            <div class="foto-campo"><input type="file" id="foto" accept="image/*"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="item i1">
+            <h3>1. O que está bom</h3>
+            <textarea id="bom" placeholder="Comece pelo que o aluno acertou."></textarea>
+            <div class="chips" data-alvo="bom"></div>
+          </div>
+          <div class="item i2">
+            <h3>2. O que treinar</h3>
+            <textarea id="treinar" placeholder="Um ou dois pontos, no máximo."></textarea>
+            <div class="chips" data-alvo="treinar"></div>
+          </div>
+          <div class="item i3" style="margin-bottom:0">
+            <h3>3. Próximo exercício sugerido</h3>
+            <textarea id="proximo" placeholder="Algo concreto para fazer até a próxima devolutiva."></textarea>
+            <div class="chips" data-alvo="proximo"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Roteiro do áudio (até 2 minutos)</h2>
+          <textarea id="roteiro" style="min-height:160px" aria-describedby="contador"></textarea>
+          <p class="contador" id="contador"></p>
+          <div class="acoes"><button class="btn btn-leve btn-peq" type="button" id="refazerRoteiro">Montar de novo a partir da ficha</button></div>
+        </div>
+
+        <div class="acoes" style="margin-bottom:24px">
+          <button class="btn btn-laranja" type="button" onclick="window.print()">Imprimir ou salvar PDF</button>
+          <button class="btn btn-azul" type="button" id="copiarTexto">Copiar texto da ficha</button>
+          <button class="btn btn-contorno" type="button" id="copiarRoteiro">Copiar roteiro</button>
+          <button class="btn btn-leve" type="button" id="nova">Nova devolutiva</button>
+          <span class="salvo" id="salvo"></span>
+        </div>
+      </div>
+
+      <!-- Prévia que vira o PDF -->
+      <div>
+        <div class="folha" id="folha">
+          <div class="folha-cab">
+            <div class="marca">JD</div>
+            <div><b id="vTitulo">Devolutiva do mês</b><small>Jornada do Desenho · Método Espiral</small></div>
+          </div>
+          <div class="dados">
+            <div><span>Aluno:</span> <b id="vNome"></b></div>
+            <div><span>Fase:</span> <b id="vFase"></b></div>
+            <div><span>Mês:</span> <b id="vMes"></b></div>
+            <div><span>Data:</span> <b id="vData"></b></div>
+            <div style="grid-column:1/-1"><span>Aplicado em:</span> <b id="vTema"></b></div>
+          </div>
+          <div class="folha-foto" id="vFoto" hidden></div>
+          <div class="bloco b1"><h4>O que está bom</h4><p id="vBom"></p></div>
+          <div class="bloco b2"><h4>O que treinar</h4><p id="vTreinar"></p></div>
+          <div class="bloco b3"><h4>Próximo exercício sugerido</h4><p id="vProximo"></p></div>
+          <p class="assina">Professor Cícero Lopes · Ouça também o áudio desta devolutiva.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="aviso-ok" id="avisoOk" role="status"></div>
+
+<script>
+(function(){
+  "use strict";
+  var CHAVE = "jd-devolutiva";
+  var TEMAS = ["Linhas","Formas","Perspectiva","Luz e sombra","Cor","Anatomia","Composição","Esboço","Blocagem","Arte-final","Sombreamento","Colorização e acabamento","Trabalho de conclusão"];
+  var FRASES = {
+    bom: ["Seu traço está mais firme e contínuo.","Você ocupou bem o espaço da folha.","Você aplicou o fundamento do mês no assunto de que gosta, como pedido.","As formas básicas estão bem construídas.","A expressão do personagem ficou muito clara.","Dá para ver que você observou antes de desenhar.","As cores conversam bem entre si.","Você caprichou nos detalhes sem perder o conjunto."],
+    treinar: ["Fazer o esboço bem leve antes de reforçar as linhas.","Variar a espessura da linha: mais grossa no que está perto, mais fina no que está longe.","Cuidar da proporção do corpo: compare o tamanho da cabeça com o resto.","Apoiar as figuras em uma linha de chão.","Escolher de onde vem a luz e sombrear do lado oposto.","Planejar onde fica cada elemento antes de começar.","Olhar mais para o modelo do que para o papel.","Limpar as linhas de construção no final."],
+    proximo: ["Rever a aula 2 do mês e repetir o exercício com outro objeto.","Fazer 3 desenhos rápidos de 2 minutos do mesmo assunto, só com linhas.","Desenhar o mesmo personagem em 3 posições diferentes.","Fazer uma página de formas básicas com sombra (bola, caixa, cone).","Desenhar um objeto da casa observando por 10 minutos.","Refazer o desenho corrigindo só um ponto: o item 2 desta ficha."]
+  };
+  function $(id){ return document.getElementById(id); }
+  function hoje(){ var d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function br(s){ return s ? s.split("-").reverse().join("/") : ""; }
+  function vazio(){ return {nome:"",fase:"Esquemática",mes:"1",qual:"1",data:hoje(),tema:"",bom:"",treinar:"",proximo:"",roteiro:"",roteiroEditado:false}; }
+
+  $("mes").innerHTML = TEMAS.map(function(t,i){ return '<option value="'+(i+1)+'">Mês '+(i+1)+': '+t+'</option>'; }).join("");
+
+  var est;
+  try { est = Object.assign(vazio(), JSON.parse(localStorage.getItem(CHAVE)) || {}); } catch(e){ est = vazio(); }
+  var CAMPOS = ["nome","fase","mes","qual","data","tema","bom","treinar","proximo"];
+
+  function salvar(){ try { localStorage.setItem(CHAVE, JSON.stringify(est)); $("salvo").textContent = "Rascunho salvo neste navegador."; } catch(e){} }
+  function aviso(t){ var a = $("avisoOk"); a.textContent = t; a.classList.add("ver"); setTimeout(function(){ a.classList.remove("ver"); }, 1800); }
+  function temaMes(){ return TEMAS[(+est.mes||1)-1]; }
+  function qualTxt(){ return est.qual==="2" ? "segunda" : "primeira"; }
+
+  function montarRoteiro(){
+    var n = est.nome.trim() || "[nome]", partes = [];
+    partes.push("Oi, " + n + "! Aqui é o Cícero. Esta é a " + qualTxt() + " devolutiva do mês de " + temaMes().toLowerCase() + (est.tema.trim() ? ". Olhei o seu desenho com " + est.tema.trim() : "") + ".");
+    if (est.bom.trim()) partes.push("Primeiro, o que está bom: " + est.bom.trim());
+    if (est.treinar.trim()) partes.push("Agora, o que eu quero que você treine: " + est.treinar.trim());
+    if (est.proximo.trim()) partes.push("Até a próxima devolutiva, a minha sugestão é: " + est.proximo.trim());
+    partes.push("A ficha escrita vai junto com este áudio. Continue desenhando o que você gosta. Até o encontro!");
+    return partes.join("\n\n");
+  }
+  function contar(){
+    var p = (est.roteiro.trim().match(/\S+/g) || []).length, seg = Math.round(p / 130 * 60);
+    var c = $("contador");
+    c.textContent = p + " palavras, cerca de " + Math.floor(seg/60) + " min " + (seg%60) + " s de fala." + (seg>120 ? " Passou de 2 minutos: encurte um pouco." : "");
+    c.className = "contador" + (seg>120 ? " longo" : "");
+  }
+  function previa(){
+    $("vTitulo").textContent = "Devolutiva " + (est.qual==="2" ? "2" : "1") + " de 2 do mês";
+    $("vNome").textContent = est.nome || "";
+    $("vFase").textContent = est.fase;
+    $("vMes").textContent = est.mes + " (" + temaMes() + ")";
+    $("vData").textContent = br(est.data);
+    $("vTema").textContent = est.tema || "";
+    [["bom","vBom"],["treinar","vTreinar"],["proximo","vProximo"]].forEach(function(x){
+      var el = $(x[1]), t = est[x[0]].trim();
+      el.textContent = t || "Preencha ao lado.";
+      el.className = t ? "" : "vazio";
+    });
+    if (!est.roteiroEditado){ est.roteiro = montarRoteiro(); $("roteiro").value = est.roteiro; }
+    contar();
+  }
+  function textoFicha(){
+    return [
+      "*Devolutiva " + (est.qual==="2" ? "2" : "1") + " de 2 do mês: " + temaMes() + "*",
+      "Aluno: " + (est.nome||"") + " · Fase " + est.fase + (est.tema ? " · Aplicado em: " + est.tema : ""),
+      "",
+      "*O que está bom*", est.bom.trim(), "",
+      "*O que treinar*", est.treinar.trim(), "",
+      "*Próximo exercício sugerido*", est.proximo.trim(), "",
+      "Professor Cícero Lopes · Jornada do Desenho"
+    ].join("\n");
+  }
+  function copiar(t, msg){
+    function antigo(){ var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch(e){} ta.remove(); aviso(msg); }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(function(){ aviso(msg); }, antigo); else antigo();
+  }
+
+  function carregar(){
+    CAMPOS.forEach(function(c){ $(c).value = est[c]; });
+    $("roteiro").value = est.roteiro;
+    previa();
+  }
+  CAMPOS.forEach(function(c){
+    $(c).addEventListener($(c).tagName==="SELECT" || c==="data" ? "change" : "input", function(){ est[c] = this.value; salvar(); previa(); });
+  });
+  $("roteiro").addEventListener("input", function(){ est.roteiro = this.value; est.roteiroEditado = true; salvar(); contar(); });
+  $("refazerRoteiro").addEventListener("click", function(){ est.roteiroEditado = false; previa(); salvar(); });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".chips"), function(box){
+    var alvo = box.dataset.alvo;
+    box.innerHTML = FRASES[alvo].map(function(f,i){ return '<button type="button" class="chip" data-i="'+i+'">+ '+f+'</button>'; }).join("");
+    box.addEventListener("click", function(ev){
+      var b = ev.target.closest(".chip"); if (!b) return;
+      var f = FRASES[alvo][+b.dataset.i], ta = $(alvo);
+      ta.value = ta.value.trim() ? ta.value.replace(/\s+$/,"") + " " + f : f;
+      est[alvo] = ta.value; salvar(); previa();
+    });
+  });
+
+  $("foto").addEventListener("change", function(){
+    var f = this.files && this.files[0], box = $("vFoto");
+    if (!f){ box.hidden = true; box.innerHTML = ""; return; }
+    var r = new FileReader();
+    r.onload = function(){ box.innerHTML = '<img alt="Desafio do aluno" src="'+r.result+'">'; box.hidden = false; };
+    r.readAsDataURL(f);
+  });
+
+  $("copiarTexto").addEventListener("click", function(){ copiar(textoFicha(), "Texto da ficha copiado."); });
+  $("copiarRoteiro").addEventListener("click", function(){ copiar(est.roteiro, "Roteiro copiado."); });
+  $("nova").addEventListener("click", function(){
+    if (!confirm("Começar uma devolutiva nova? A atual será apagada deste navegador. Fase, mês e número da devolutiva continuam iguais.")) return;
+    var fase = est.fase, mes = est.mes, qual = est.qual;
+    try { localStorage.removeItem(CHAVE); } catch(e){}
+    est = vazio(); est.fase = fase; est.mes = mes; est.qual = qual;
+    $("foto").value = ""; $("vFoto").hidden = true; $("vFoto").innerHTML = "";
+    carregar(); $("salvo").textContent = "Rascunho apagado.";
+  });
+
+  carregar();
+})();
+</script>
+</body>
+</html>

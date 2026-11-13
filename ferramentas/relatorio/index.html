@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Relatório de Evolução · Jornada do Desenho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  /* Base comum das ferramentas */
+  :root{
+    --azul:#1E6D94; --azul-claro:#3E8AB0; --laranja:#F49819;
+    --fundo:#F0F1F2; --texto:#1F2A2E; --papel:#FFFFFF; --linha:#E4E4E4;
+    --suave:rgba(31,42,46,.7); --muito-suave:rgba(31,42,46,.5);
+    --raio:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fundo);color:var(--texto);font-family:Lato,system-ui,sans-serif;font-size:15px;line-height:1.55}
+  a{color:var(--azul)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+  .topo{background:var(--papel);border-bottom:1px solid var(--linha)}
+  .topo .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .logo{font-size:20px;font-weight:400;color:var(--azul);text-decoration:none;white-space:nowrap}
+  .logo span{color:inherit}
+  .topo nav a{font-size:14px;color:var(--suave);text-decoration:none;white-space:nowrap}
+  .topo nav a:hover{color:var(--azul)}
+  @media(max-width:400px){.logo{font-size:17px}}
+  main{padding:28px 0 60px}
+  h1,h2,h3{color:var(--azul);font-weight:300;margin:0}
+  h1{font-size:28px;margin-bottom:6px}
+  h2{font-size:21px;margin-bottom:12px}
+  h3{font-size:16px;font-weight:700;color:var(--texto);margin-bottom:8px}
+  .sub{color:var(--suave);margin:0 0 24px;max-width:760px}
+  .card{background:var(--papel);border:1px solid var(--linha);border-radius:var(--raio);padding:20px;margin-bottom:20px}
+  .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+  .campos>*{min-width:0}
+  label{display:block;font-size:13px;font-weight:700;color:var(--suave);margin-bottom:4px}
+  input,select,textarea{width:100%;min-width:0;max-width:100%;font-family:inherit;font-size:15px;color:var(--texto);background:#fff;border:1px solid #cfd4d7;border-radius:8px;padding:9px 10px}
+  textarea{min-height:84px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:2px solid rgba(30,109,148,.35);border-color:var(--azul)}
+  input[type=radio]{width:auto;margin:0}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;font-family:inherit;border:none;cursor:pointer;text-decoration:none}
+  .btn-laranja{background:var(--laranja);color:#fff}
+  .btn-azul{background:var(--azul);color:#fff}
+  .btn-contorno{background:#fff;color:var(--azul);border:1.5px solid var(--azul)}
+  .btn-leve{background:var(--fundo);color:var(--texto);border:1px solid var(--linha)}
+  .btn-peq{padding:6px 12px;font-size:13px}
+  .acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .dica{background:#fff;border:1px solid var(--linha);border-left:4px solid var(--laranja);border-radius:8px;padding:12px 16px;font-size:14px;color:var(--suave);margin:0 0 20px}
+  .dica b{color:var(--texto)}
+  .salvo{font-size:13px;color:var(--muito-suave)}
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff}
+    .topo,.no-print{display:none !important}
+    main{padding:0}
+    .wrap{max-width:none;padding:0}
+  }
+
+  /* Relatório */
+  .colunas{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:start}
+  @media(min-width:1001px){.colunas>div:last-child{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;border-radius:var(--raio)}}
+  @media(max-width:1000px){.colunas{grid-template-columns:1fr}}
+  .tipos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+  .tipo{border:1.5px solid var(--azul);background:#fff;color:var(--azul);border-radius:12px;padding:10px 8px;font-weight:700;font-family:inherit;font-size:14px;cursor:pointer;line-height:1.3}
+  .tipo small{display:block;font-weight:400;font-size:12px;opacity:.8}
+  .tipo[aria-pressed=true]{background:var(--azul);color:#fff}
+  .parte[hidden]{display:none}
+  .fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .fotos.seis{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:520px){.fotos,.fotos.seis{grid-template-columns:repeat(2,1fr)}.fotos.tres{grid-template-columns:repeat(3,1fr);gap:6px}.fotos.tres .slot{padding:4px;font-size:11px}}
+  .slot{border:1.5px dashed #cfd4d7;border-radius:10px;padding:8px;text-align:center;font-size:12px;color:var(--suave);display:flex;flex-direction:column;gap:6px;min-width:0}
+  .slot b{font-size:12px;color:var(--texto)}
+  .slot input[type=file]{font-size:11px;padding:4px;border:none}
+  .slot input[type=text]{font-size:13px;padding:6px}
+  .slot img{width:100%;aspect-ratio:3/4;object-fit:contain;background:var(--fundo);border-radius:6px}
+  .niveis{width:100%;border-collapse:collapse;font-size:14px}
+  .niveis th,.niveis td{padding:7px 6px;border-bottom:1px solid var(--linha);text-align:center}
+  .niveis th:first-child,.niveis td:first-child{text-align:left}
+  .niveis{table-layout:fixed}
+  .niveis th:first-child,.niveis td:first-child{width:38%}
+  .niveis th{font-size:11px;line-height:1.2;text-transform:uppercase;letter-spacing:.04em;color:var(--muito-suave)}
+  .niveis tr.sep td{background:var(--fundo);font-weight:700;color:var(--azul);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+
+  /* Folha (prévia e PDF) */
+  .folha{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:30px;box-shadow:0 1px 3px rgba(0,0,0,.04);font-size:14px}
+  .f-cab{display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--azul);padding-bottom:12px;margin-bottom:16px}
+  .marca{width:40px;height:40px;border-radius:8px;background:var(--azul);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .f-cab b{display:block;color:var(--azul);font-size:20px;font-weight:300;line-height:1.2}
+  .f-cab small{color:var(--muito-suave);font-size:12px}
+  .f-dados{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 18px;margin-bottom:16px}
+  .f-dados span{color:var(--muito-suave)}
+  .f-fase{background:rgba(30,109,148,.08);border-radius:10px;padding:12px 14px;margin-bottom:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;break-inside:avoid}
+  .f-fase b{color:var(--azul);font-size:16px}
+  .f-fase p{margin:4px 0 0;color:var(--suave)}
+  .f-sec{margin-bottom:14px;break-inside:avoid}
+  .f-sec h4{margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--laranja)}
+  .f-sec p{margin:0;white-space:pre-wrap}
+  .f-sec ul{margin:0;padding-left:18px}
+  .f-vazio{color:var(--muito-suave);font-style:italic}
+  .f-fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .f-foto{text-align:center;font-size:11px;color:var(--muito-suave);break-inside:avoid}
+  .f-foto .q{aspect-ratio:3/4;background:var(--fundo);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:4px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .f-foto img{width:100%;height:100%;object-fit:contain}
+  .f-par{display:grid;grid-template-columns:90px 1fr 1fr;gap:10px;align-items:center;margin-bottom:10px;break-inside:avoid}
+  .f-par .rot{font-size:12px;font-weight:700;color:var(--azul)}
+  .f-par .f-foto .q{aspect-ratio:auto;height:190px;margin:0}
+  .f-cols{display:grid;grid-template-columns:90px 1fr 1fr;gap:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muito-suave);font-weight:700;text-align:center;margin-bottom:4px}
+  .f-niv{width:100%;border-collapse:collapse;font-size:13px}
+  .f-niv td{padding:5px 4px;border-bottom:1px solid var(--linha)}
+  .f-niv td:last-child{text-align:right;white-space:nowrap}
+  .pontos{display:inline-flex;gap:3px;vertical-align:middle;margin-right:6px}
+  .pontos i{width:9px;height:9px;border-radius:50%;background:var(--linha);display:inline-block;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pontos i.on{background:var(--azul)}
+  .f-num{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .f-num div{flex:1;min-width:120px;background:var(--fundo);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--muito-suave);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .f-num b{display:block;font-size:16px;color:var(--azul)}
+  .f-rod{margin-top:18px;padding-top:10px;border-top:1px solid var(--linha);font-size:12px;color:var(--muito-suave);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  @media(max-width:520px){.niveis th{font-size:9px;letter-spacing:0}.niveis td:first-child{font-size:13px}.folha{padding:18px}.f-dados{grid-template-columns:1fr}.f-par,.f-cols{grid-template-columns:60px 1fr 1fr}}
+  @media print{
+    .colunas{display:block}
+    .folha{border:none;box-shadow:none;padding:0;font-size:10.5pt}
+    .f-fotos{gap:6mm}
+    .f-par .f-foto .q{height:52mm}
+    .f-fotos .f-foto .q{max-height:70mm}
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="wrap">
+    <a class="logo" href="../index.html">Jornada <span>do Desenho</span></a>
+    <nav><a href="../index.html">Ferramentas</a></nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="no-print">
+      <h1>Relatório de Evolução</h1>
+      <p class="sub">Preencha a ficha, anexe as fotos dos desenhos e gere o PDF pelo navegador. Os textos ficam salvos como rascunho neste navegador; as fotos não ficam salvas.</p>
+      <p class="dica" id="importado" hidden></p>
+      <div class="tipos" role="group" aria-label="Tipo de relatório">
+        <button class="tipo" type="button" data-tipo="inicial">Inicial<small>após a avaliação</small></button>
+        <button class="tipo" type="button" data-tipo="meio">Meio de ciclo<small>mês 7</small></button>
+        <button class="tipo" type="button" data-tipo="final">Final<small>mês 13</small></button>
+      </div>
+    </div>
+
+    <div class="colunas">
+      <div class="no-print">
+        <div class="card">
+          <h2>Aluno</h2>
+          <div class="campos">
+            <div><label for="nome">Nome do aluno</label><input id="nome" data-campo="nome"></div>
+            <div><label for="idade">Idade</label><input id="idade" data-campo="idade" type="number" min="3" max="99"></div>
+            <div><label for="responsavel">Responsável</label><input id="responsavel" data-campo="responsavel"></div>
+            <div><label for="fase">Fase</label><select id="fase" data-campo="fase"></select></div>
+            <div><label for="data">Data do relatório</label><input id="data" data-campo="data" type="date"></div>
+            <div><label for="professor">Professor</label><input id="professor" data-campo="professor"></div>
+          </div>
+          <div class="campos" style="margin-top:14px">
+            <div><label for="pratica">Acordo de prática em casa</label><input id="pratica" data-campo="pratica" list="opPratica" placeholder="Ex.: 2 vezes de 15 minutos por semana"></div>
+            <div class="so-meio-final"><label for="praticaReal">Como foi a prática</label>
+              <select id="praticaReal" data-campo="praticaReal">
+                <option value="">Escolha</option>
+                <option>Cumprida na maior parte das semanas</option>
+                <option>Cumprida em parte das semanas</option>
+                <option>Pouca prática em casa</option>
+              </select></div>
+          </div>
+          <datalist id="opPratica"><option value="1 vez de 15 minutos por semana"><option value="2 vezes de 15 minutos por semana"><option value="3 vezes de 15 minutos por semana"><option value="2 vezes de 30 minutos por semana"></datalist>
+        </div>
+
+        <!-- Inicial -->
+        <div class="parte" data-parte="inicial">
+          <div class="card">
+            <h2>Avaliação inicial</h2>
+            <div style="margin-bottom:14px"><label for="observados">O que apareceu nos desenhos (um item por linha)</label><textarea id="observados" data-campo="observados"></textarea></div>
+            <div style="margin-bottom:14px"><label for="fortes">Pontos fortes</label><textarea id="fortes" data-campo="fortes"></textarea></div>
+            <div><label for="trabalhar">O que será trabalhado</label><textarea id="trabalhar" data-campo="trabalhar"></textarea></div>
+          </div>
+          <div class="card">
+            <h2>Os 3 desenhos da avaliação</h2>
+            <div class="fotos" id="fotosIni"></div>
+          </div>
+        </div>
+
+        <!-- Meio -->
+        <div class="parte" data-parte="meio" hidden>
+          <div class="card">
+            <h2>Fundamentos trabalhados</h2>
+            <p class="sub" style="margin-bottom:10px">Marque o nível de cada fundamento até agora.</p>
+            <table class="niveis" id="nivMeio"></table>
+          </div>
+          <div class="card">
+            <h2>Participação</h2>
+            <div class="campos">
+              <div><label for="desafios">Desafios enviados</label><input id="desafios" data-campo="desafios" placeholder="Ex.: 6 de 7"></div>
+              <div><label for="encontros">Encontros ao vivo (ao vivo ou gravação)</label><input id="encontros" data-campo="encontros" placeholder="Ex.: 5 de 6"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Desafios enviados lado a lado</h2>
+            <div class="fotos seis" id="fotosMeio"></div>
+          </div>
+          <div class="card">
+            <div style="margin-bottom:14px"><label for="evolucaoMeio">O que observei no período</label><textarea id="evolucaoMeio" data-campo="evolucaoMeio"></textarea></div>
+            <div><label for="proximos">Próximos passos até o fim da fase</label><textarea id="proximos" data-campo="proximos"></textarea></div>
+          </div>
+        </div>
+
+        <!-- Final -->
+        <div class="parte" data-parte="final" hidden>
+          <div class="card">
+            <h2>Antes e depois</h2>
+            <p class="sub" style="margin-bottom:10px">Os 3 desenhos da avaliação inicial e os 3 refeitos no mês 13, no mesmo formato.</p>
+            <div class="fotos tres" id="fotosFinAntes"></div>
+            <div class="fotos tres" id="fotosFinDepois" style="margin-top:10px"></div>
+          </div>
+          <div class="card">
+            <h2>Fundamentos e etapas da fase</h2>
+            <table class="niveis" id="nivFinal"></table>
+          </div>
+          <div class="card">
+            <div style="margin-bottom:14px"><label for="evolucaoFinal">O que observei na fase</label><textarea id="evolucaoFinal" data-campo="evolucaoFinal"></textarea></div>
+            <div style="margin-bottom:14px"><label for="recomendacao">Recomendação</label><select id="recomendacao" data-campo="recomendacao"></select></div>
+            <div><label for="mensagem">Mensagem para o aluno</label><textarea id="mensagem" data-campo="mensagem"></textarea></div>
+          </div>
+        </div>
+
+        <div class="acoes" style="margin-bottom:24px">
+          <button class="btn btn-laranja" type="button" onclick="window.print()">Imprimir ou salvar PDF</button>
+          <button class="btn btn-leve" type="button" id="novo">Novo relatório</button>
+          <span class="salvo" id="salvo"></span>
+        </div>
+      </div>
+
+      <div><div class="folha" id="folha"></div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var CHAVE = "jd-relatorio", PONTE = "jd-ponte-relatorio";
+  var FASES = ["Pré-esquemática","Esquemática","Realismo Visual","Decisão"];
+  var DESC = [
+    "Nesta fase, a criança desenha o que sabe, não o que vê. É o momento de ganhar confiança, conhecer muitas formas e explorar o traço, sem cobrança de realismo.",
+    "Nesta fase, a criança cria \"esquemas\" próprios para pessoas, casas e árvores, e organiza o desenho em uma linha de chão. O foco é enriquecer esses esquemas, variar posições e pontos de vista e começar a sobrepor elementos.",
+    "Nesta fase, o aluno quer que o desenho pareça real e fica mais crítico com o próprio trabalho. O foco é observação, proporção, luz e sombra e perspectiva, respeitando o ritmo de cada aluno.",
+    "Nesta fase, desenhar vira uma escolha consciente. O foco é aprofundar a técnica, desenvolver o estilo próprio e montar um portfólio, com os bastidores do trabalho de ilustrador."
+  ];
+  var FUND = ["Linhas","Formas","Perspectiva","Luz e sombra","Cor","Anatomia","Composição"];
+  var ETAPAS = ["Esboço","Blocagem","Arte-final","Sombreamento","Colorização e acabamento"];
+  var NIVEIS = ["Começando","Em desenvolvimento","Consolidado"];
+  var DESENHOS = ["Figura humana em ação","Paisagem com chão e céu","Objeto observado"];
+  var TITULOS = {inicial:"Relatório de Evolução inicial", meio:"Relatório de Evolução: meio de ciclo", final:"Relatório de Evolução final"};
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+  function hoje(){ var d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function br(s){ return s ? s.split("-").reverse().join("/") : ""; }
+  function vazio(){
+    return {tipo:"inicial", nome:"", idade:"", responsavel:"", fase:"Esquemática", data:hoje(), professor:"Cícero Lopes da Costa",
+      pratica:"", praticaReal:"", observados:"", fortes:"", trabalhar:"", desafios:"", encontros:"", evolucaoMeio:"", proximos:"",
+      evolucaoFinal:"", recomendacao:"", mensagem:"", niveis:{}, legendas:{}};
+  }
+  var est;
+  try { est = Object.assign(vazio(), JSON.parse(localStorage.getItem(CHAVE)) || {}); } catch(e){ est = vazio(); }
+  var fotos = {};
+
+  function salvar(){ try { localStorage.setItem(CHAVE, JSON.stringify(est)); $("salvo").textContent = "Rascunho salvo neste navegador (sem as fotos)."; } catch(e){} }
+
+  /* Importa da ferramenta de avaliação */
+  (function(){
+    if (!/[?&]de=avaliacao/.test(location.search)) return;
+    var p = null; try { p = JSON.parse(localStorage.getItem(PONTE)); localStorage.removeItem(PONTE); } catch(e){}
+    if (!p) return;
+    est = vazio();
+    est.nome = p.nome||""; est.idade = p.idade||""; est.data = p.data||hoje();
+    if (FASES.indexOf(p.fase)>=0) est.fase = p.fase;
+    est.fortes = p.fortes||""; est.trabalhar = p.trabalhar||""; est.observados = (p.observados||[]).join("\n");
+    salvar();
+    var d = $("importado"); d.hidden = false;
+    d.innerHTML = "<b>Dados trazidos da avaliação.</b> Confira os textos, complete o responsável e anexe as fotos dos 3 desenhos.";
+    history.replaceState(null, "", location.pathname);
+  })();
+
+  /* Montagem dos campos */
+  $("fase").innerHTML = FASES.map(function(f){ return "<option>"+f+"</option>"; }).join("");
+  function opcoesRecomendacao(){
+    var i = FASES.indexOf(est.fase), l = [];
+    if (i<3) l.push("Seguir para a fase " + FASES[i+1]); else l.push("Concluir a fase Decisão e seguir com projetos próprios");
+    l.push("Permanecer mais um ciclo nesta fase, aplicando em novos assuntos");
+    $("recomendacao").innerHTML = '<option value="">Escolha</option>' + l.map(function(x){ return "<option"+(est.recomendacao===x?" selected":"")+">"+x+"</option>"; }).join("");
+    if (l.indexOf(est.recomendacao)<0) est.recomendacao = "";
+  }
+  function tabelaNiveis(id, itens, prefixo){
+    var h = '<thead><tr><th>Item</th>' + NIVEIS.map(function(n){ return "<th>"+n+"</th>"; }).join("") + "</tr></thead><tbody>";
+    itens.forEach(function(it){
+      if (it.sep){ h += '<tr class="sep"><td colspan="4">'+it.sep+'</td></tr>'; return; }
+      var k = prefixo + it;
+      h += "<tr><td>"+it+"</td>" + NIVEIS.map(function(n,j){
+        return '<td><input type="radio" name="'+esc(k)+'" value="'+j+'" aria-label="'+esc(it+": "+n)+'"'+(String(est.niveis[k])===String(j)?" checked":"")+'></td>';
+      }).join("") + "</tr>";
+    });
+    $(id).innerHTML = h + "</tbody>";
+    Array.prototype.forEach.call($(id).querySelectorAll("input"), function(el){
+      el.addEventListener("change", function(){ est.niveis[el.name] = +el.value; salvar(); previa(); });
+    });
+  }
+  function slots(id, chaves, rotulos, comLegenda){
+    $(id).innerHTML = chaves.map(function(k,i){
+      return '<div class="slot"><b>'+esc(rotulos[i])+'</b>'+(fotos[k]?'<img alt="" src="'+fotos[k]+'">':'')+
+        '<input type="file" accept="image/*" data-foto="'+k+'" aria-label="Foto: '+esc(rotulos[i])+'">'+
+        (comLegenda?'<input type="text" data-leg="'+k+'" placeholder="Mês e tema" value="'+esc(est.legendas[k]||"")+'">':'')+'</div>';
+    }).join("");
+    Array.prototype.forEach.call($(id).querySelectorAll("[data-foto]"), function(el){
+      el.addEventListener("change", function(){ var f = el.files && el.files[0]; if (f) reduzir(f, function(url){ fotos[el.dataset.foto] = url; montarFotos(); previa(); }); });
+    });
+    Array.prototype.forEach.call($(id).querySelectorAll("[data-leg]"), function(el){
+      el.addEventListener("input", function(){ est.legendas[el.dataset.leg] = el.value; salvar(); previa(); });
+    });
+  }
+  /* Reduz a foto para no máximo 1400 px, para a página e o PDF ficarem leves */
+  function reduzir(arquivo, pronto){
+    var r = new FileReader();
+    r.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        var m = 1400, e = Math.min(1, m/Math.max(img.width, img.height));
+        var c = document.createElement("canvas"); c.width = Math.round(img.width*e); c.height = Math.round(img.height*e);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        pronto(c.toDataURL("image/jpeg", .85));
+      };
+      img.onerror = function(){ pronto(r.result); };
+      img.src = r.result;
+    };
+    r.readAsDataURL(arquivo);
+  }
+  function montarFotos(){
+    slots("fotosIni", ["ini0","ini1","ini2"], DESENHOS, false);
+    slots("fotosMeio", ["des0","des1","des2","des3","des4","des5"], ["Desafio 1","Desafio 2","Desafio 3","Desafio 4","Desafio 5","Desafio 6"], true);
+    slots("fotosFinAntes", ["ini0","ini1","ini2"], DESENHOS.map(function(d){ return "Antes: " + d.toLowerCase(); }), false);
+    slots("fotosFinDepois", ["fin0","fin1","fin2"], DESENHOS.map(function(d){ return "Depois: " + d.toLowerCase(); }), false);
+  }
+
+  /* Prévia */
+  function txt(v){ return v && String(v).trim() ? "<p>"+esc(String(v).trim())+"</p>" : '<p class="f-vazio">Não preenchido.</p>'; }
+  function foto(k, rot){ return '<div class="f-foto"><div class="q">'+(fotos[k]?'<img alt="'+esc(rot)+'" src="'+fotos[k]+'">':'sem foto')+'</div>'+esc(rot)+'</div>'; }
+  function niveis(itens, prefixo){
+    var linhas = itens.map(function(it){
+      var v = est.niveis[prefixo+it];
+      var p = '<span class="pontos">' + [0,1,2].map(function(j){ return '<i class="'+(v!=null && j<=v?"on":"")+'"></i>'; }).join("") + '</span>';
+      return "<tr><td>"+it+"</td><td>"+p+(v!=null?NIVEIS[v]:'<span class="f-vazio">não avaliado</span>')+"</td></tr>";
+    }).join("");
+    return '<table class="f-niv">'+linhas+'</table>';
+  }
+  function previa(){
+    var t = est.tipo, i = FASES.indexOf(est.fase), h = "";
+    h += '<div class="f-cab"><div class="marca">JD</div><div><b>'+TITULOS[t]+'</b><small>Jornada do Desenho · Método Espiral</small></div></div>';
+    h += '<div class="f-dados"><div><span>Aluno:</span> <b>'+esc(est.nome)+'</b>'+(est.idade?' ('+esc(est.idade)+' anos)':'')+'</div>'+
+         '<div><span>Data:</span> <b>'+br(est.data)+'</b></div>'+
+         '<div><span>Responsável:</span> '+esc(est.responsavel)+'</div>'+
+         '<div><span>Professor:</span> '+esc(est.professor)+'</div></div>';
+    h += '<div class="f-fase"><b>'+(t==="inicial"?"Fase identificada: ":"Fase: ")+esc(est.fase)+'</b><p>'+DESC[i]+'</p></div>';
+    var prat = est.pratica ? esc(est.pratica) : '<span class="f-vazio">não combinado</span>';
+    if (t==="inicial"){
+      var obs = est.observados.split("\n").map(function(s){ return s.trim(); }).filter(Boolean);
+      h += '<div class="f-sec"><h4>Os 3 desenhos da avaliação</h4><div class="f-fotos">'+DESENHOS.map(function(d,j){ return foto("ini"+j, d); }).join("")+'</div></div>';
+      h += '<div class="f-sec"><h4>O que apareceu nos desenhos</h4>'+(obs.length?'<ul>'+obs.map(function(o){ return "<li>"+esc(o)+"</li>"; }).join("")+'</ul>':'<p class="f-vazio">Não preenchido.</p>')+'</div>';
+      h += '<div class="f-sec"><h4>Pontos fortes</h4>'+txt(est.fortes)+'</div>';
+      h += '<div class="f-sec"><h4>O que será trabalhado</h4>'+txt(est.trabalhar)+'</div>';
+      h += '<div class="f-sec"><h4>Acordo de prática em casa</h4><p>'+prat+'</p></div>';
+    } else if (t==="meio"){
+      h += '<div class="f-num"><div><b>'+(esc(est.desafios)||"-")+'</b>desafios enviados</div><div><b>'+(esc(est.encontros)||"-")+'</b>encontros ao vivo</div><div><b>'+(est.praticaReal?esc(est.praticaReal):"-")+'</b>prática combinada: '+prat+'</div></div>';
+      h += '<div class="f-sec"><h4>Fundamentos trabalhados</h4>'+niveis(FUND,"m:")+'</div>';
+      h += '<div class="f-sec"><h4>Desafios enviados</h4><div class="f-fotos">'+[0,1,2,3,4,5].filter(function(j){ return fotos["des"+j] || est.legendas["des"+j]; }).map(function(j){ return foto("des"+j, est.legendas["des"+j]||("Desafio "+(j+1))); }).join("")+'</div></div>';
+      h += '<div class="f-sec"><h4>O que observei no período</h4>'+txt(est.evolucaoMeio)+'</div>';
+      h += '<div class="f-sec"><h4>Próximos passos</h4>'+txt(est.proximos)+'</div>';
+    } else {
+      h += '<div class="f-sec" style="break-inside:auto"><h4>Antes e depois</h4><div class="f-cols"><span></span><span>Avaliação inicial</span><span>Mês 13</span></div>'+
+        DESENHOS.map(function(d,j){ return '<div class="f-par"><span class="rot">'+d+'</span>'+foto("ini"+j,"")+foto("fin"+j,"")+'</div>'; }).join("")+'</div>';
+      h += '<div class="f-sec"><h4>Fundamentos e etapas</h4>'+niveis(FUND.concat(ETAPAS),"f:")+'</div>';
+      h += '<div class="f-sec"><h4>O que observei na fase</h4>'+txt(est.evolucaoFinal)+'</div>';
+      h += '<div class="f-sec"><h4>Prática em casa</h4><p>Combinado: '+prat+(est.praticaReal?". "+esc(est.praticaReal)+".":"")+'</p></div>';
+      h += '<div class="f-sec"><h4>Recomendação</h4>'+txt(est.recomendacao)+'</div>';
+      h += '<div class="f-sec"><h4>Mensagem para o aluno</h4>'+txt(est.mensagem)+'</div>';
+    }
+    h += '<div class="f-rod"><span>'+esc(est.professor)+', ilustrador e professor</span><span>Jornada do Desenho · Sobradinho-DF</span></div>';
+    $("folha").innerHTML = h;
+  }
+
+  function aplicarTipo(){
+    Array.prototype.forEach.call(document.querySelectorAll(".tipo"), function(b){ b.setAttribute("aria-pressed", String(b.dataset.tipo===est.tipo)); });
+    Array.prototype.forEach.call(document.querySelectorAll(".parte"), function(p){ p.hidden = p.dataset.parte!==est.tipo; });
+    Array.prototype.forEach.call(document.querySelectorAll(".so-meio-final"), function(p){ p.hidden = est.tipo==="inicial"; });
+    document.title = TITULOS[est.tipo] + " · Jornada do Desenho";
+  }
+  function carregar(){
+    Array.prototype.forEach.call(document.querySelectorAll("[data-campo]"), function(el){ if (el.id!=="recomendacao") el.value = est[el.dataset.campo]; });
+    opcoesRecomendacao();
+    tabelaNiveis("nivMeio", FUND, "m:");
+    tabelaNiveis("nivFinal", [{sep:"Fundamentos"}].concat(FUND, [{sep:"Etapas de estrutura"}], ETAPAS), "f:");
+    montarFotos(); aplicarTipo(); previa();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-campo]"), function(el){
+    el.addEventListener(el.tagName==="SELECT" || el.type==="date" ? "change" : "input", function(){
+      est[el.dataset.campo] = el.value;
+      if (el.id==="fase") opcoesRecomendacao();
+      salvar(); previa();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".tipo"), function(b){
+    b.addEventListener("click", function(){ est.tipo = b.dataset.tipo; salvar(); aplicarTipo(); previa(); });
+  });
+  $("novo").addEventListener("click", function(){
+    if (!confirm("Começar um relatório novo? O rascunho atual e as fotos serão apagados deste navegador.")) return;
+    try { localStorage.removeItem(CHAVE); } catch(e){}
+    var tipo = est.tipo; est = vazio(); est.tipo = tipo; fotos = {}; carregar();
+    $("salvo").textContent = "Rascunho apagado.";
+  });
+
+  carregar();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Calendário anual · Jornada do Desenho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  /* Base comum das ferramentas */
+  :root{
+    --azul:#1E6D94; --azul-claro:#3E8AB0; --laranja:#F49819;
+    --fundo:#F0F1F2; --texto:#1F2A2E; --papel:#FFFFFF; --linha:#E4E4E4;
+    --suave:rgba(31,42,46,.7); --muito-suave:rgba(31,42,46,.5);
+    --raio:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fundo);color:var(--texto);font-family:Lato,system-ui,sans-serif;font-size:15px;line-height:1.55}
+  a{color:var(--azul)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+  .topo{background:var(--papel);border-bottom:1px solid var(--linha)}
+  .topo .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .logo{font-size:20px;font-weight:400;color:var(--azul);text-decoration:none;white-space:nowrap}
+  .logo span{color:inherit}
+  .topo nav a{font-size:14px;color:var(--suave);text-decoration:none;white-space:nowrap}
+  .topo nav a:hover{color:var(--azul)}
+  @media(max-width:400px){.logo{font-size:17px}}
+  main{padding:28px 0 60px}
+  h1,h2,h3{color:var(--azul);font-weight:300;margin:0}
+  h1{font-size:28px;margin-bottom:6px}
+  h2{font-size:21px;margin-bottom:12px}
+  h3{font-size:16px;font-weight:700;color:var(--texto);margin-bottom:8px}
+  .sub{color:var(--suave);margin:0 0 24px;max-width:760px}
+  .card{background:var(--papel);border:1px solid var(--linha);border-radius:var(--raio);padding:20px;margin-bottom:20px}
+  .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+  label{display:block;font-size:13px;font-weight:700;color:var(--suave);margin-bottom:4px}
+  input,select,textarea{width:100%;font-family:inherit;font-size:15px;color:var(--texto);background:#fff;border:1px solid #cfd4d7;border-radius:8px;padding:9px 10px}
+  input:focus,select:focus,textarea:focus{outline:2px solid rgba(30,109,148,.35);border-color:var(--azul)}
+  input,select,textarea{min-width:0;max-width:100%}
+  .campos>*,.pausa-linha>*{min-width:0}
+  input[type=checkbox]{width:auto;margin:0}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;font-family:inherit;border:none;cursor:pointer;text-decoration:none}
+  .btn-laranja{background:var(--laranja);color:#fff}
+  .btn-azul{background:var(--azul);color:#fff}
+  .btn-contorno{background:#fff;color:var(--azul);border:1.5px solid var(--azul)}
+  .btn-leve{background:var(--fundo);color:var(--texto);border:1px solid var(--linha)}
+  .btn-peq{padding:6px 12px;font-size:13px}
+  .acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .dica{background:#fff;border:1px solid var(--linha);border-left:4px solid var(--laranja);border-radius:8px;padding:12px 16px;font-size:14px;color:var(--suave);margin:0 0 20px}
+  .dica b{color:var(--texto)}
+  .tabela-rolagem{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--linha);vertical-align:top}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muito-suave);font-weight:700}
+  .so-impressao{display:none}
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff;font-size:11pt}
+    .topo,.no-print{display:none !important}
+    .so-impressao{display:block}
+    main{padding:0}
+    .wrap{max-width:none;padding:0}
+    .card{border:none;padding:0;margin-bottom:12px}
+  }
+
+  /* Calendário */
+  .pausa-linha{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+  @media(max-width:600px){.pausa-linha{grid-template-columns:1fr 1fr}.pausa-linha .nome{grid-column:1/-1}}
+  .feriados{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px}
+  .feriado{display:flex;gap:8px;align-items:center;font-size:14px}
+  .feriado span{color:var(--muito-suave);font-variant-numeric:tabular-nums;min-width:44px}
+  .fases-hora{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .fases-hora .linha{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+  .meses{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:1000px){.meses{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:720px){.meses{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.meses{grid-template-columns:1fr}}
+  .mes h3{font-size:14px;color:var(--azul);margin-bottom:6px;text-transform:capitalize}
+  .grade-mes{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:12px;text-align:center}
+  .grade-mes .ds{font-weight:700;color:var(--muito-suave);font-size:10px}
+  .grade-mes .d{padding:4px 0;border-radius:4px;font-variant-numeric:tabular-nums}
+  .d.pausa{background:#DADDE0;color:var(--muito-suave)}
+  .d.feriado{background:#FDE3BD;color:#7a4a06;font-weight:700}
+  .d.encontro{background:var(--azul);color:#fff;font-weight:700}
+  .mes ul{list-style:none;padding:0;margin:8px 0 0;font-size:12px;color:var(--suave)}
+  .legenda{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--suave);margin:0 0 16px}
+  .legenda i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+  .resumo-num{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .resumo-num div{background:var(--fundo);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--suave)}
+  .resumo-num b{display:block;font-size:20px;color:var(--azul)}
+  tr.em-pausa td{color:var(--muito-suave)}
+  tr.inicio-ciclo td{border-top:2px solid var(--azul)}
+  .cab-impressao{border-bottom:2px solid var(--azul);padding-bottom:8px;margin-bottom:14px}
+  .cab-impressao b{color:var(--azul);font-size:16pt;font-weight:300}
+  @media print{
+    .meses{grid-template-columns:repeat(4,1fr);gap:10px}
+    .mes{break-inside:avoid}
+    .grade-mes{font-size:8pt}
+    .grade-mes .d{padding:2px 0}
+    .d.pausa,.d.feriado,.d.encontro{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .quebra{break-before:page}
+    table{font-size:9pt}
+    th,td{padding:4px 6px}
+    tr{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="wrap">
+    <a class="logo" href="../index.html">Jornada <span>do Desenho</span></a>
+    <nav><a href="../index.html">Ferramentas</a></nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="no-print">
+      <h1>Calendário anual</h1>
+      <p class="sub">Monte o calendário do ano com pausas, feriados e encontros ao vivo, e gere a tabela de liberação das aulas na Hotmart em dias após a compra, já descontando as pausas. Os dados ficam só neste navegador.</p>
+
+      <div class="card">
+        <h2>1. Ano e encontros</h2>
+        <div class="campos">
+          <div><label for="ano">Ano do calendário</label><input type="number" id="ano" min="2024" max="2100"></div>
+          <div><label for="semana">Semana dos encontros</label>
+            <select id="semana">
+              <option value="1">1ª quinta e sexta do mês</option>
+              <option value="2">2ª quinta e sexta do mês</option>
+              <option value="3">3ª quinta e sexta do mês</option>
+              <option value="4">4ª quinta e sexta do mês</option>
+              <option value="-1">Última quinta e sexta do mês</option>
+            </select>
+          </div>
+        </div>
+        <h3 style="margin-top:18px">Dia e horário de cada fase</h3>
+        <p class="sub" style="margin-bottom:12px">Um aulão de dúvidas por mês para cada fase, às quintas e sextas. Se a data cair em pausa ou feriado, o encontro passa para a semana anterior ou a seguinte, dentro do mesmo mês.</p>
+        <div class="fases-hora" id="fasesHora"></div>
+      </div>
+
+      <div class="card">
+        <h2>2. Pausas</h2>
+        <p class="sub" style="margin-bottom:14px">Períodos sem aulas novas e sem encontros. As pausas se repetem nas mesmas datas todos os anos, e uma pausa pode atravessar a virada do ano (por exemplo, de 20/12 a 31/01).</p>
+        <div id="pausas"></div>
+        <button class="btn btn-leve btn-peq" type="button" id="addPausa">+ Adicionar pausa</button>
+      </div>
+
+      <div class="card">
+        <h2>3. Feriados</h2>
+        <p class="sub" style="margin-bottom:14px">Calculados para o ano escolhido (nacionais e do DF). Desmarque os que não quiser considerar. Nos feriados não há encontro, mas a liberação de aulas continua.</p>
+        <div class="feriados" id="feriados"></div>
+        <h3 style="margin-top:18px">Outros feriados ou datas sem encontro</h3>
+        <div id="extras"></div>
+        <button class="btn btn-leve btn-peq" type="button" id="addExtra">+ Adicionar data</button>
+      </div>
+
+      <div class="card">
+        <h2>4. Liberação das aulas na Hotmart</h2>
+        <div class="campos">
+          <div><label for="compra">Data de compra de referência</label><input type="date" id="compra"></div>
+          <div><label for="ciclo">Dias por ciclo (mês do curso)</label><input type="number" id="ciclo" min="20" max="60"></div>
+          <div><label for="intervalo">Dias entre as aulas do ciclo</label><input type="number" id="intervalo" min="1" max="12"></div>
+        </div>
+        <p class="dica" style="margin:16px 0 0"><b>Como ler:</b> a Hotmart libera cada aula um número de dias depois da compra de cada aluno e não sabe das pausas. Esta tabela para o relógio durante as pausas. Ela é exata para quem compra na data de referência; para outras datas, gere de novo. Por isso vale trabalhar com datas de entrada de turma, ou liberar sem pausas e suspender a cobrança nas férias.</p>
+      </div>
+
+      <div class="acoes" style="margin-bottom:28px">
+        <button class="btn btn-laranja" type="button" onclick="window.print()">Imprimir ou salvar PDF</button>
+        <button class="btn btn-contorno" type="button" id="baixarCsv">Baixar tabela da Hotmart (CSV)</button>
+        <button class="btn btn-leve" type="button" id="apagar">Apagar rascunho e voltar ao padrão</button>
+        <span id="salvo" style="font-size:13px;color:var(--muito-suave)"></span>
+      </div>
+    </div>
+
+    <!-- Resultado -->
+    <div class="card" id="resCalendario">
+      <div class="so-impressao cab-impressao"><b>Jornada do Desenho</b> · Calendário anual <span class="txtAno"></span> (Anexo I)</div>
+      <h2 class="no-print">Calendário <span class="txtAno"></span></h2>
+      <div class="legenda">
+        <span><i style="background:#DADDE0"></i>Pausa</span>
+        <span><i style="background:#FDE3BD"></i>Feriado</span>
+        <span><i style="background:var(--azul)"></i>Encontro ao vivo</span>
+      </div>
+      <div class="meses" id="meses"></div>
+    </div>
+
+    <div class="card quebra" id="resEncontros">
+      <h2>Encontros ao vivo <span class="txtAno"></span></h2>
+      <div class="resumo-num" id="resumoEnc"></div>
+      <div class="tabela-rolagem"><table id="tabEncontros"></table></div>
+    </div>
+
+    <div class="card quebra" id="resLiberacao">
+      <h2>Liberação das aulas na Hotmart</h2>
+      <p class="sub" id="txtLiberacao" style="margin-bottom:12px"></p>
+      <div class="tabela-rolagem"><table id="tabLiberacao"></table></div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var CHAVE = "jd-calendario";
+  var VERSAO = 2; /* 2: encontros às quintas e sextas (12/11/2026) */
+  var FASES = ["Pré-esquemática","Esquemática","Realismo Visual","Decisão"];
+  var TEMAS = ["Linhas","Formas","Perspectiva","Luz e sombra","Cor","Anatomia","Composição","Esboço","Blocagem","Arte-final","Sombreamento","Colorização e acabamento","Trabalho de conclusão"];
+  var PAPEIS = ["Ver","Praticar","Praticar","Aplicar","Desafio"];
+  var MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  var DSEM = ["dom","seg","ter","qua","qui","sex","sáb"];
+
+  function $(id){ return document.getElementById(id); }
+  function pad(n){ return (n<10?"0":"") + n; }
+  function iso(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function md(d){ return pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function br(d){ return pad(d.getDate())+"/"+pad(d.getMonth()+1)+"/"+d.getFullYear(); }
+  function lerIso(s){ var p = String(s||"").split("-"); if(p.length!==3) return null; var d = new Date(+p[0], +p[1]-1, +p[2]); return isNaN(d) ? null : d; }
+  function somaDias(d,n){ var r = new Date(d.getFullYear(), d.getMonth(), d.getDate()+n); return r; }
+  function difDias(a,b){ return Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate()) - Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000); }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+  function fasesPadrao(){ return [ {dia:4,hora:"17:00"}, {dia:4,hora:"18:30"}, {dia:5,hora:"17:00"}, {dia:5,hora:"18:30"} ]; }
+  function padrao(){
+    var ano = new Date().getFullYear() + 1;
+    return {
+      versao: VERSAO, ano: ano, semana: "-1",
+      fases: fasesPadrao(),
+      pausas: [
+        {nome:"Férias de verão", ini:"12-20", fim:"01-31"},
+        {nome:"Férias de inverno", ini:"07-12", fim:"07-25"}
+      ],
+      desligados: [], extras: [],
+      compra: ano+"-02-15", ciclo: 30, intervalo: 6
+    };
+  }
+
+  var est;
+  try { est = JSON.parse(localStorage.getItem(CHAVE)) || padrao(); } catch(e){ est = padrao(); }
+  /* Rascunho antigo (sextas e sábados): troca só os dias e horários das fases, mantém pausas e feriados */
+  if (!est || typeof est !== "object") est = padrao();
+  if (est.versao !== VERSAO || !Array.isArray(est.fases) || est.fases.length !== 4 || est.fases.some(function(f){ return !f || (f.dia!==4 && f.dia!==5); })){
+    est.fases = fasesPadrao(); est.versao = VERSAO;
+  }
+
+  function salvar(){
+    try { localStorage.setItem(CHAVE, JSON.stringify(est)); $("salvo").textContent = "Rascunho salvo neste navegador."; } catch(e){}
+  }
+
+  /* Páscoa (algoritmo gregoriano) */
+  function pascoa(y){
+    var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),
+        h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+        mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;
+    return new Date(y, mes-1, dia);
+  }
+  function feriadosDoAno(y){
+    var p = pascoa(y);
+    var l = [
+      [new Date(y,0,1),"Confraternização Universal"],
+      [somaDias(p,-51),"Sexta de Carnaval (sugestão)"],
+      [somaDias(p,-48),"Carnaval (segunda)"],
+      [somaDias(p,-47),"Carnaval (terça)"],
+      [somaDias(p,-3),"Quinta-feira Santa (sugestão)"],
+      [somaDias(p,-2),"Sexta-feira Santa"],
+      [new Date(y,3,21),"Tiradentes e aniversário de Brasília"],
+      [new Date(y,4,1),"Dia do Trabalho"],
+      [somaDias(p,60),"Corpus Christi"],
+      [new Date(y,8,7),"Independência do Brasil"],
+      [new Date(y,9,12),"Nossa Senhora Aparecida"],
+      [new Date(y,10,2),"Finados"],
+      [new Date(y,10,15),"Proclamação da República"],
+      [new Date(y,10,20),"Dia Nacional de Zumbi e da Consciência Negra"],
+      [new Date(y,10,30),"Dia do Evangélico (DF)"],
+      [new Date(y,11,24),"Véspera de Natal (sugestão)"],
+      [new Date(y,11,25),"Natal"],
+      [new Date(y,11,31),"Véspera de Ano-Novo (sugestão)"]
+    ];
+    return l.map(function(x){ return {data:x[0], nome:x[1], chave:md(x[0])+" "+x[1].replace(/ \(sugestão\)/,"")}; });
+  }
+
+  function emPausa(d){
+    var m = md(d);
+    for (var i=0;i<est.pausas.length;i++){
+      var p = est.pausas[i]; if(!p.ini || !p.fim) continue;
+      if (p.ini <= p.fim ? (m>=p.ini && m<=p.fim) : (m>=p.ini || m<=p.fim)) return p.nome || "Pausa";
+    }
+    return null;
+  }
+  var cacheFer = {};
+  function mapaFeriados(y){
+    if (cacheFer[y]) return cacheFer[y];
+    var mapa = {};
+    feriadosDoAno(y).forEach(function(f){ if (est.desligados.indexOf(f.chave)<0) mapa[iso(f.data)] = f.nome; });
+    est.extras.forEach(function(x){ var d = lerIso(x.data); if (d && d.getFullYear()===y) mapa[iso(d)] = x.nome || "Data sem encontro"; });
+    return (cacheFer[y] = mapa);
+  }
+  function feriado(d){ return mapaFeriados(d.getFullYear())[iso(d)] || null; }
+
+  /* Formulários */
+  function montarFases(){
+    $("fasesHora").innerHTML = FASES.map(function(f,i){
+      return '<div><label>'+f+'</label><div class="linha">'+
+        '<select data-fase="'+i+'" data-campo="dia" aria-label="Dia da fase '+f+'"><option value="4">Quinta</option><option value="5">Sexta</option></select>'+
+        '<input type="time" data-fase="'+i+'" data-campo="hora" aria-label="Horário da fase '+f+'"></div></div>';
+    }).join("");
+    Array.prototype.forEach.call($("fasesHora").querySelectorAll("[data-fase]"), function(el){
+      var f = est.fases[+el.dataset.fase]; el.value = String(f[el.dataset.campo]);
+      el.addEventListener("change", function(){ f[el.dataset.campo] = el.dataset.campo==="dia" ? +el.value : el.value; atualizar(); });
+    });
+  }
+  function mdParaData(s){ return est.ano + "-" + s; }
+  function montarPausas(){
+    $("pausas").innerHTML = est.pausas.map(function(p,i){
+      return '<div class="pausa-linha">'+
+        '<div class="nome"><label>Nome</label><input data-i="'+i+'" data-c="nome" value="'+esc(p.nome||"")+'"></div>'+
+        '<div><label>Início</label><input type="date" data-i="'+i+'" data-c="ini" value="'+mdParaData(p.ini)+'"></div>'+
+        '<div><label>Fim</label><input type="date" data-i="'+i+'" data-c="fim" value="'+mdParaData(p.fim)+'"></div>'+
+        '<button class="btn btn-leve btn-peq" type="button" data-rem="'+i+'" aria-label="Remover pausa">Remover</button></div>';
+    }).join("") || '<p class="sub">Nenhuma pausa.</p>';
+    Array.prototype.forEach.call($("pausas").querySelectorAll("input"), function(el){
+      el.addEventListener("change", function(){
+        var p = est.pausas[+el.dataset.i];
+        if (el.dataset.c==="nome") p.nome = el.value; else { var d = lerIso(el.value); if (d) p[el.dataset.c] = md(d); }
+        atualizar();
+      });
+    });
+    Array.prototype.forEach.call($("pausas").querySelectorAll("[data-rem]"), function(b){
+      b.addEventListener("click", function(){ est.pausas.splice(+b.dataset.rem,1); montarPausas(); atualizar(); });
+    });
+  }
+  function montarFeriados(){
+    $("feriados").innerHTML = feriadosDoAno(est.ano).map(function(f){
+      var lig = est.desligados.indexOf(f.chave)<0;
+      return '<label class="feriado" style="font-weight:400;color:var(--texto);margin:0"><input type="checkbox" data-chave="'+esc(f.chave)+'"'+(lig?" checked":"")+'>'+
+        '<span>'+pad(f.data.getDate())+'/'+pad(f.data.getMonth()+1)+'</span>'+esc(f.nome)+'</label>';
+    }).join("");
+    Array.prototype.forEach.call($("feriados").querySelectorAll("input"), function(el){
+      el.addEventListener("change", function(){
+        var k = el.dataset.chave, i = est.desligados.indexOf(k);
+        if (el.checked && i>=0) est.desligados.splice(i,1);
+        if (!el.checked && i<0) est.desligados.push(k);
+        atualizar();
+      });
+    });
+    $("extras").innerHTML = est.extras.map(function(x,i){
+      return '<div class="pausa-linha">'+
+        '<div class="nome"><label>Nome</label><input data-i="'+i+'" data-c="nome" value="'+esc(x.nome||"")+'"></div>'+
+        '<div><label>Data</label><input type="date" data-i="'+i+'" data-c="data" value="'+esc(x.data||"")+'"></div><div></div>'+
+        '<button class="btn btn-leve btn-peq" type="button" data-rem="'+i+'">Remover</button></div>';
+    }).join("");
+    Array.prototype.forEach.call($("extras").querySelectorAll("input"), function(el){
+      el.addEventListener("change", function(){ est.extras[+el.dataset.i][el.dataset.c] = el.value; atualizar(); });
+    });
+    Array.prototype.forEach.call($("extras").querySelectorAll("[data-rem]"), function(b){
+      b.addEventListener("click", function(){ est.extras.splice(+b.dataset.rem,1); montarFeriados(); atualizar(); });
+    });
+  }
+
+  /* Encontros: quinta e sexta da mesma semana; se cair em pausa ou feriado, tenta a semana anterior e depois a seguinte, dentro do mês */
+  function quintaDaSemana(ano, mes, n){
+    if (n>0){ var d = new Date(ano,mes,1); while(d.getDay()!==4) d = somaDias(d,1); d = somaDias(d,7*(n-1)); return d.getMonth()===mes ? d : null; }
+    var u = new Date(ano,mes+1,0); while(u.getDay()!==5) u = somaDias(u,-1); return somaDias(u,-1); /* última sexta do mês e a quinta anterior */
+  }
+  function livre(d){ return !emPausa(d) && !feriado(d); }
+  function calcularEncontros(){
+    var lista = [];
+    for (var m=0;m<12;m++){
+      for (var f=0; f<4; f++){
+        var cfg = est.fases[f], qui = quintaDaSemana(est.ano, m, +est.semana), escolhido = null, obs = "";
+        var base = qui ? somaDias(qui, cfg.dia===5 ? 1 : 0) : null; /* quinta e sexta da mesma semana */
+        if (base){
+          var tent = [0,-7,7,-14,14];
+          for (var t=0;t<tent.length;t++){
+            var d = somaDias(base, tent[t]);
+            if (d.getMonth()!==m) continue;
+            if (livre(d)){ escolhido = d; if (tent[t]!==0) obs = "remarcado: "+br(base)+" cai em "+(emPausa(base)?"pausa":"feriado"); break; }
+          }
+        }
+        lista.push({mes:m, fase:f, data:escolhido, hora:cfg.hora, obs: escolhido ? obs : "sem encontro (pausa ou feriado)"});
+      }
+    }
+    return lista;
+  }
+
+  /* Liberação: o relógio só anda fora das pausas */
+  function calcularLiberacao(){
+    var ini = lerIso(est.compra); if (!ini) return [];
+    var ciclo = Math.max(1, +est.ciclo||30), inter = Math.max(1, +est.intervalo||6);
+    var alvos = [];
+    for (var c=0;c<13;c++) for (var a=0;a<5;a++) alvos.push({ciclo:c, aula:a, ativo: c*ciclo + a*inter});
+    var res = [], d = ini, ativo = 0, k = 0, guarda = 0, pausados = 0;
+    while (k < alvos.length && guarda < 3000){
+      if (!emPausa(d)){
+        while (k < alvos.length && alvos[k].ativo === ativo){
+          res.push({ciclo:alvos[k].ciclo, aula:alvos[k].aula, data:d, dias:difDias(ini,d), semPausa: alvos[k].ativo, pausados: pausados});
+          k++;
+        }
+        ativo++;
+      } else pausados++;
+      d = somaDias(d,1); guarda++;
+    }
+    return res;
+  }
+
+  function nomeMes(m){ return MESES[m]; }
+
+  function desenhar(){
+    Array.prototype.forEach.call(document.querySelectorAll(".txtAno"), function(e){ e.textContent = est.ano; });
+    var enc = calcularEncontros(), porData = {};
+    enc.forEach(function(e){ if (e.data){ var k = iso(e.data); (porData[k] = porData[k]||[]).push(e); } });
+
+    var html = "";
+    for (var m=0;m<12;m++){
+      var prim = new Date(est.ano,m,1), dias = new Date(est.ano,m+1,0).getDate();
+      html += '<div class="mes"><h3>'+nomeMes(m)+'</h3><div class="grade-mes">';
+      DSEM.forEach(function(s){ html += '<div class="ds">'+s.charAt(0).toUpperCase()+'</div>'; });
+      for (var v=0; v<prim.getDay(); v++) html += '<div></div>';
+      for (var dd=1; dd<=dias; dd++){
+        var d = new Date(est.ano,m,dd), cls = "d", tit = [];
+        var p = emPausa(d), fe = feriado(d), en = porData[iso(d)];
+        if (p){ cls += " pausa"; tit.push(p); }
+        if (fe){ cls += " feriado"; tit.push(fe); }
+        if (en){ cls += " encontro"; en.forEach(function(e){ tit.push(FASES[e.fase]+" "+e.hora); }); }
+        html += '<div class="'+cls+'"'+(tit.length?' title="'+esc(tit.join(", "))+'"':'')+'>'+dd+'</div>';
+      }
+      html += '</div><ul>';
+      enc.filter(function(e){ return e.mes===m && e.data; }).forEach(function(e){
+        html += '<li>'+pad(e.data.getDate())+' '+DSEM[e.data.getDay()]+' '+e.hora+': '+FASES[e.fase]+'</li>';
+      });
+      if (!enc.some(function(e){ return e.mes===m && e.data; })) html += '<li>Sem encontros</li>';
+      html += '</ul></div>';
+    }
+    $("meses").innerHTML = html;
+
+    var total = enc.filter(function(e){ return e.data; }).length;
+    var mesesCom = {}; enc.forEach(function(e){ if(e.data) mesesCom[e.mes]=1; });
+    var diasPausa = 0; for (var d0 = new Date(est.ano,0,1); d0.getFullYear()===est.ano; d0 = somaDias(d0,1)) if (emPausa(d0)) diasPausa++;
+    $("resumoEnc").innerHTML = '<div><b>'+total+'</b>encontros no ano</div><div><b>'+Object.keys(mesesCom).length+'</b>meses com encontro</div><div><b>'+diasPausa+'</b>dias de pausa</div>';
+
+    var t = '<thead><tr><th>Mês</th><th>Fase</th><th>Data</th><th>Horário</th><th>Observação</th></tr></thead><tbody>';
+    enc.forEach(function(e){
+      t += '<tr'+(e.fase===0?' class="inicio-ciclo"':'')+'><td style="text-transform:capitalize">'+(e.fase===0?nomeMes(e.mes):'')+'</td><td>'+FASES[e.fase]+'</td><td>'+
+        (e.data ? br(e.data)+' ('+DSEM[e.data.getDay()]+')' : '') +'</td><td>'+(e.data?e.hora:'')+'</td><td>'+esc(e.obs)+'</td></tr>';
+    });
+    $("tabEncontros").innerHTML = t + '</tbody>';
+
+    var lib = calcularLiberacao();
+    if (!lib.length){ $("txtLiberacao").textContent = "Informe a data de compra de referência."; $("tabLiberacao").innerHTML = ""; return; }
+    var ult = lib[lib.length-1];
+    $("txtLiberacao").innerHTML = 'Compra de referência em <b>'+br(lerIso(est.compra))+'</b>. Ciclos de '+est.ciclo+' dias, com uma aula a cada '+est.intervalo+' dias. As 65 aulas da fase (13 meses de 5 aulas) terminam em <b>'+br(ult.data)+'</b>, '+ult.dias+' dias após a compra, com '+ult.pausados+' dias de pausa no caminho. Coloque o número da coluna "Dias após a compra" na configuração de cada aula na Hotmart. É igual para as 4 fases.';
+    t = '<thead><tr><th>Aula</th><th>Mês do curso</th><th>Papel</th><th>Liberação prevista</th><th>Dias após a compra</th></tr></thead><tbody>';
+    lib.forEach(function(r){
+      var n = r.ciclo*5 + r.aula + 1;
+      t += '<tr'+(r.aula===0?' class="inicio-ciclo"':'')+'><td>'+n+'</td><td>'+(r.aula===0?'Mês '+(r.ciclo+1)+': '+TEMAS[r.ciclo]:'')+'</td><td>Aula '+(r.aula+1)+', '+PAPEIS[r.aula].toLowerCase()+'</td><td>'+br(r.data)+' ('+DSEM[r.data.getDay()]+')</td><td><b>'+r.dias+'</b></td></tr>';
+    });
+    $("tabLiberacao").innerHTML = t + '</tbody>';
+  }
+
+  function atualizar(){ cacheFer = {}; salvar(); desenhar(); }
+
+  function montarTudo(){
+    $("ano").value = est.ano; $("semana").value = est.semana;
+    $("compra").value = est.compra; $("ciclo").value = est.ciclo; $("intervalo").value = est.intervalo;
+    montarFases(); montarPausas(); montarFeriados(); desenhar();
+  }
+
+  $("ano").addEventListener("change", function(){ var a = parseInt(this.value,10); if (a>=2024 && a<=2100){ est.ano = a; montarPausas(); montarFeriados(); atualizar(); } });
+  $("semana").addEventListener("change", function(){ est.semana = this.value; atualizar(); });
+  ["compra","ciclo","intervalo"].forEach(function(id){ $(id).addEventListener("change", function(){ est[id] = id==="compra" ? this.value : (parseInt(this.value,10)||est[id]); atualizar(); }); });
+  $("addPausa").addEventListener("click", function(){ est.pausas.push({nome:"Nova pausa", ini:"10-12", fim:"10-12"}); montarPausas(); atualizar(); });
+  $("addExtra").addEventListener("click", function(){ est.extras.push({nome:"Aniversário de Sobradinho", data: est.ano+"-05-13"}); montarFeriados(); atualizar(); });
+  $("apagar").addEventListener("click", function(){
+    if (!confirm("Apagar o rascunho e voltar às configurações padrão?")) return;
+    try { localStorage.removeItem(CHAVE); } catch(e){}
+    est = padrao(); montarTudo(); $("salvo").textContent = "Rascunho apagado.";
+  });
+  $("baixarCsv").addEventListener("click", function(){
+    var linhas = [["Aula","Mês do curso","Tema do mês","Papel","Liberação prevista","Dias após a compra"]];
+    calcularLiberacao().forEach(function(r){ linhas.push([r.ciclo*5+r.aula+1, r.ciclo+1, TEMAS[r.ciclo], "Aula "+(r.aula+1)+", "+PAPEIS[r.aula].toLowerCase(), br(r.data), r.dias]); });
+    var csv = "﻿" + linhas.map(function(l){ return l.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(";"); }).join("\r\n");
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+    a.download = "liberacao-hotmart-" + est.compra + ".csv";
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+
+  montarTudo();
+})();
+</script>
+</body>
+</html>
