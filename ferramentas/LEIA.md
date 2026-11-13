@@ -1,7 +1,8 @@
 # Ferramentas da Jornada do Desenho
 
-Cópia publicada das ferramentas do professor (calendário, avaliação ao vivo, devolutiva e Relatório de Evolução).
+Cópia publicada das ferramentas do professor (calendário, devolutiva e Relatório de Evolução de meio de ciclo e final).
 
 - **Fonte:** a pasta `ferramentas/` do repositório `jornada-do-desenho`. Mudanças são feitas lá e copiadas para cá, sem editar aqui.
 - **Sem dados:** os arquivos não têm dados de alunos nem segredos. O que o professor digita fica só no navegador dele (`localStorage`, chaves que começam com `jd-`) e não é enviado para lugar nenhum.
 - **Fora do Google:** as páginas têm `noindex`, para não aparecerem nas buscas.
+- **Não vem para cá:** `ferramentas/avaliacao/` do `jornada-do-desenho`. A avaliação é a online, da inscrição, e o Relatório de Evolução inicial sai da área de inscrições.

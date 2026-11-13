@@ -63,7 +63,7 @@
   .colunas{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:start}
   @media(min-width:1001px){.colunas>div:last-child{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;border-radius:var(--raio)}}
   @media(max-width:1000px){.colunas{grid-template-columns:1fr}}
-  .tipos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+  .tipos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px}
   .tipo{border:1.5px solid var(--azul);background:#fff;color:var(--azul);border-radius:12px;padding:10px 8px;font-weight:700;font-family:inherit;font-size:14px;cursor:pointer;line-height:1.3}
   .tipo small{display:block;font-weight:400;font-size:12px;opacity:.8}
   .tipo[aria-pressed=true]{background:var(--azul);color:#fff}
@@ -142,9 +142,8 @@
     <div class="no-print">
       <h1>Relatório de Evolução</h1>
       <p class="sub">Preencha a ficha, anexe as fotos dos desenhos e gere o PDF pelo navegador. Os textos ficam salvos como rascunho neste navegador; as fotos não ficam salvas.</p>
-      <p class="dica" id="importado" hidden></p>
+      <p class="dica"><b>Relatório inicial:</b> sai pela área de inscrições do app de gestão, depois da avaliação online. Aqui ficam o de meio de ciclo (mês 7) e o final (mês 13). Para o final, use as fotos dos 3 desenhos da avaliação guardadas na inscrição do aluno.</p>
       <div class="tipos" role="group" aria-label="Tipo de relatório">
-        <button class="tipo" type="button" data-tipo="inicial">Inicial<small>após a avaliação</small></button>
         <button class="tipo" type="button" data-tipo="meio">Meio de ciclo<small>mês 7</small></button>
         <button class="tipo" type="button" data-tipo="final">Final<small>mês 13</small></button>
       </div>
@@ -247,7 +246,7 @@
 <script>
 (function(){
   "use strict";
-  var CHAVE = "jd-relatorio", PONTE = "jd-ponte-relatorio";
+  var CHAVE = "jd-relatorio";
   var FASES = ["Pré-esquemática","Esquemática","Realismo Visual","Decisão"];
   var DESC = [
     "Nesta fase, a criança desenha o que sabe, não o que vê. É o momento de ganhar confiança, conhecer muitas formas e explorar o traço, sem cobrança de realismo.",
@@ -266,30 +265,16 @@
   function hoje(){ var d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
   function br(s){ return s ? s.split("-").reverse().join("/") : ""; }
   function vazio(){
-    return {tipo:"inicial", nome:"", idade:"", responsavel:"", fase:"Esquemática", data:hoje(), professor:"Cícero Lopes da Costa",
+    return {tipo:"meio", nome:"", idade:"", responsavel:"", fase:"Esquemática", data:hoje(), professor:"Cícero Lopes da Costa",
       pratica:"", praticaReal:"", observados:"", fortes:"", trabalhar:"", desafios:"", encontros:"", evolucaoMeio:"", proximos:"",
       evolucaoFinal:"", recomendacao:"", mensagem:"", niveis:{}, legendas:{}};
   }
   var est;
   try { est = Object.assign(vazio(), JSON.parse(localStorage.getItem(CHAVE)) || {}); } catch(e){ est = vazio(); }
+  if (est.tipo!=="meio" && est.tipo!=="final") est.tipo = "meio"; /* o inicial sai pela área de inscrições */
   var fotos = {};
 
   function salvar(){ try { localStorage.setItem(CHAVE, JSON.stringify(est)); $("salvo").textContent = "Rascunho salvo neste navegador (sem as fotos)."; } catch(e){} }
-
-  /* Importa da ferramenta de avaliação */
-  (function(){
-    if (!/[?&]de=avaliacao/.test(location.search)) return;
-    var p = null; try { p = JSON.parse(localStorage.getItem(PONTE)); localStorage.removeItem(PONTE); } catch(e){}
-    if (!p) return;
-    est = vazio();
-    est.nome = p.nome||""; est.idade = p.idade||""; est.data = p.data||hoje();
-    if (FASES.indexOf(p.fase)>=0) est.fase = p.fase;
-    est.fortes = p.fortes||""; est.trabalhar = p.trabalhar||""; est.observados = (p.observados||[]).join("\n");
-    salvar();
-    var d = $("importado"); d.hidden = false;
-    d.innerHTML = "<b>Dados trazidos da avaliação.</b> Confira os textos, complete o responsável e anexe as fotos dos 3 desenhos.";
-    history.replaceState(null, "", location.pathname);
-  })();
 
   /* Montagem dos campos */
   $("fase").innerHTML = FASES.map(function(f){ return "<option>"+f+"</option>"; }).join("");
